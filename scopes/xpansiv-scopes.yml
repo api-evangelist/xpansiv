@@ -1,0 +1,100 @@
+generated: '2026-09-04'
+method: probed
+source: >-
+  https://auth.xpansiv.com/.well-known/openid-configuration (200) ,
+  https://developer.xpansiv.com/.well-known/oauth-protected-resource/mcp (200) ,
+  https://developer.xpansiv.com/developer-portal/nar-registry/authentication ,
+  https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+provider: Xpansiv
+note: >-
+  derive-oauth-scopes.py returned "providers with oauth2: 0" — none of the eleven OpenAPI
+  descriptions declares an oauth2 securityScheme, so there is nothing to derive from the
+  contracts. Every scope below was read from a discovery document that was actually
+  fetched, or from the provider's own authentication pages. THERE IS NO PUBLISHED
+  API-PERMISSION SCOPE REFERENCE: Xpansiv does not document a scope vocabulary that
+  grants or restricts access to Connect, registry, Optimal or Managed Solutions
+  operations. Authorisation is carried by the account and credentials Xpansiv issues, not
+  by a scope string the client chooses. An integrator cannot request least privilege.
+scope_reference_published: false
+docs: null
+authorization_servers:
+- issuer: https://auth.xpansiv.com/
+  discovery: https://auth.xpansiv.com/.well-known/openid-configuration
+  serves: Xpansiv Connect API, Xpansiv Data API
+  platform: Auth0
+  token_endpoint: https://auth.xpansiv.com/oauth/token
+  jwks_uri: https://auth.xpansiv.com/.well-known/jwks.json
+  code_challenge_methods_supported: [S256, plain]
+  scopes_supported:
+  - openid
+  - profile
+  - offline_access
+  - name
+  - given_name
+  - family_name
+  - nickname
+  - email
+  - email_verified
+  - picture
+  - created_at
+  - identities
+  - phone
+  - address
+  scope_kind: identity
+  note: >-
+    These are the standard OIDC identity claims the Auth0 tenant advertises, not API
+    permissions. The Connect getting-started example passes a literal placeholder
+    `scope=SCOPE` in its token request and never says what a real value would be, and the
+    successful response it shows returns `"scope": ""` — an empty scope. In practice the
+    audience (https://xpansiv/platform) selects the API and the account selects the
+    rights.
+- issuer: https://apxjwtauthprod.apx.com/oauth/token
+  discovery: none published (host returns 403 on every /.well-known/ path)
+  serves: NAR Registry Client API, TIGRS Registry Client API, APX Power Markets File
+    Registry API
+  uat: https://apxjwtauthuat.apx.com/oauth/token
+  grant_type: password (RFC 6749 §4.3.2)
+  client_authentication: 'HTTP Basic {clientId:clientSecret}'
+  scopes_supported:
+  - name: access
+    description: >-
+      The single scope value this authorization server returns. The published Results
+      table states verbatim: "scope — The scope of the granted access. The value returned
+      will be 'access'." It is not requestable, not subdividable, and grants whatever the
+      Client API Service user account is entitled to.
+  scope_kind: fixed single value
+  source: https://developer.xpansiv.com/developer-portal/nar-registry/authentication and
+    https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+- issuer: https://auth.cloud.redocly.com
+  discovery: https://developer.xpansiv.com/.well-known/oauth-authorization-server
+  serves: the developer portal and its MCP server at https://developer.xpansiv.com/mcp
+  protected_resource_metadata: https://developer.xpansiv.com/.well-known/oauth-protected-resource/mcp
+  scopes_supported:
+  - openid
+  - profile
+  - email
+  - offline_access
+  scope_kind: identity
+  note: >-
+    Docs-platform authentication (Redocly) reached through Xpansiv's own host. Governs
+    the documentation MCP server, not any Xpansiv business API. tools/list answered
+    anonymously.
+- issuer: https://support.xpansiv.com
+  discovery: https://support.xpansiv.com/.well-known/openid-configuration
+  serves: the Salesforce Experience Cloud support community
+  scope_kind: identity
+  note: Support portal sign-in; unrelated to API authorisation.
+non_oauth_credentials:
+- api: Xpansiv Managed Solutions API
+  model: bearer API key
+  issued_at: https://www.ms.xpansiv.com/app/api_access/manage
+  scope_model: >-
+    None. The provider states the key "is linked to a user and an account, and has the
+    same rights as" that user — a full-privilege credential with no scoping, no
+    per-endpoint restriction and no read-only variant. This is the widest-blast-radius
+    credential in the Xpansiv catalog and is worth flagging to any integrator.
+  source: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+- api: Xpansiv Data API
+  model: Basic auth exchanged for a JWT + refresh token, or an NG_API_KEY, or Auth0 SSO
+  scope_model: none published
+  source: https://developer.xpansiv.com/developer-portal/xpansiv-data/authorization

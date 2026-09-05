@@ -1,0 +1,759 @@
+openapi: 3.0.1
+info:
+  title: File Registry API API
+  version: 1.1.49
+servers:
+  - url: https://pm-file-api.apx.com
+    description: Generated server url
+tags:
+  - name: /fileRegistry
+    description: the File Registry REST API
+  - name: /reporting
+    description: the Reporting REST API
+paths:
+  /reporting/getReport:
+    put:
+      tags:
+        - /reporting
+      summary: >-
+        Run a MarketSuite Report and receive the results in the specified
+        format.
+      operationId: getReport
+      parameters:
+        - name: reportPath
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: reportFormat
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - HTML_4_0
+              - CSV
+              - PSV
+              - EXCEL
+              - PDF
+              - XML
+              - IMAGE
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReportRequestParameters'
+        required: true
+      responses:
+        '200':
+          description: A report file
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: byte
+        '400':
+          description: Invalid input parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '401':
+          description: The user does not have authorization to perform this operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '503':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+  /fileRegistry/listFiles:
+    put:
+      tags:
+        - /fileRegistry
+      summary: >-
+        Query for a list of files which can be downloaded from the APX
+        MarketSuite.
+      operationId: getList
+      parameters:
+        - name: intervalBegin
+          in: query
+          description: >-
+            The expected format for the intervalBegin parameter is
+            yyyy-mm-ddThh:mm:ss i.e 2016-10-08T00:00:00
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: intervalEnd
+          in: query
+          description: >-
+            The expected format for the intervalEnd parameter is
+            yyyy-mm-ddThh:mm:ss i.e 2016-10-08T00:00:00
+          required: true
+          schema:
+            type: string
+            format: date-time
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DownloadFileDescriptor'
+        required: true
+      responses:
+        '200':
+          description: List of files which can be downloaded from the APX MarketSuite
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FileItem'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: string
+        '401':
+          description: >-
+            Invalid user credentials were supplied or the user does not have
+            authorization to perform this operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+  /fileRegistry/listFilesSince:
+    put:
+      tags:
+        - /fileRegistry
+      summary: >-
+        Query for a list files which can be downloaded from the APX MarketSuite
+        which have changed since the specified date.
+      operationId: getList_1
+      parameters:
+        - name: watermarkDate
+          in: query
+          description: >-
+            The expected format for the watermarkDate parameter is
+            yyyy-mm-ddThh:mm:ss
+          required: true
+          schema:
+            type: string
+            format: yyyy-mm-ddThh:mm:ss
+            example: '2019-10-08T00:00:00'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DownloadFileDescriptor'
+        required: true
+      responses:
+        '200':
+          description: >-
+            List files which can be downloaded from the APX MarketSuite which
+            have changed since the specified date
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FileItem'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                type: string
+        '401':
+          description: >-
+            Invalid user credentials were supplied or the user does not have
+            authorization to perform this operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+  /fileRegistry/getScheduleData/{fileName}:
+    put:
+      tags:
+        - /fileRegistry
+      summary: Query for ISO Scheduling data with current status.
+      operationId: getScheduleData
+      parameters:
+        - name: fileName
+          in: path
+          description: Returned file name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleFileParam'
+        required: true
+      responses:
+        '200':
+          description: ISO Scheduling data with current status
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: byte
+        '400':
+          description: Invalid input parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '401':
+          description: The user does not have authorization to perform this operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+  /fileRegistry/file:
+    post:
+      tags:
+        - /fileRegistry
+      summary: Upload a file to the APX MarketSuite
+      operationId: uploadFile
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MultiRequest'
+      responses:
+        '200':
+          description: A files unique identifier (filehandle).
+          content:
+            '*/*':
+              schema:
+                type: string
+        '400':
+          description: Invalid input parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '401':
+          description: The user does not have authorization to perform this operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '503':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+  /fileRegistry/file/{fileHandle}:
+    get:
+      tags:
+        - /fileRegistry
+      summary: >-
+        Download a specific file from the APX MarketSuite based on the files
+        unique identifier (filehandle).
+      operationId: getFile
+      parameters:
+        - name: fileHandle
+          in: path
+          description: The file identifier that has been returned by the /file function
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: >-
+            A file from the APX MarketSuite based on the files unique identifier
+            (filehandle)
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: byte
+        '400':
+          description: Invalid input parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '401':
+          description: The user does not have authorization to perform this operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+  /fileRegistry/file/{fileHandle}/status:
+    get:
+      tags:
+        - /fileRegistry
+      summary: >-
+        Get scheduling data validation errors for an uploaded ISO Scheduling
+        file based on the files unique identifier (filehandle).
+      operationId: getStatus
+      parameters:
+        - name: fileHandle
+          in: path
+          description: A files unique identifier (filehandle).
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: >-
+            A file from the APX MarketSuite based on the files unique identifier
+            (filehandle)
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: byte
+        '400':
+          description: >-
+            Scheduling data validation errors for an uploaded ISO Scheduling
+            file based on the files unique identifier (filehandle)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '401':
+          description: The user does not have authorization to perform this operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+components:
+  schemas:
+    ServiceException:
+      type: object
+      properties:
+        cause:
+          type: object
+          properties:
+            stackTrace:
+              type: array
+              items:
+                type: object
+                properties:
+                  methodName:
+                    type: string
+                  fileName:
+                    type: string
+                  lineNumber:
+                    type: integer
+                    format: int32
+                  className:
+                    type: string
+                  nativeMethod:
+                    type: boolean
+            message:
+              type: string
+            localizedMessage:
+              type: string
+            suppressed:
+              type: array
+              items:
+                type: object
+                properties:
+                  stackTrace:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        methodName:
+                          type: string
+                        fileName:
+                          type: string
+                        lineNumber:
+                          type: integer
+                          format: int32
+                        className:
+                          type: string
+                        nativeMethod:
+                          type: boolean
+                  message:
+                    type: string
+                  localizedMessage:
+                    type: string
+        stackTrace:
+          type: array
+          items:
+            type: object
+            properties:
+              methodName:
+                type: string
+              fileName:
+                type: string
+              lineNumber:
+                type: integer
+                format: int32
+              className:
+                type: string
+              nativeMethod:
+                type: boolean
+        innerExceptions:
+          type: object
+          properties:
+            cause:
+              type: object
+              properties:
+                stackTrace:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      methodName:
+                        type: string
+                      fileName:
+                        type: string
+                      lineNumber:
+                        type: integer
+                        format: int32
+                      className:
+                        type: string
+                      nativeMethod:
+                        type: boolean
+                message:
+                  type: string
+                localizedMessage:
+                  type: string
+                suppressed:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      stackTrace:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            methodName:
+                              type: string
+                            fileName:
+                              type: string
+                            lineNumber:
+                              type: integer
+                              format: int32
+                            className:
+                              type: string
+                            nativeMethod:
+                              type: boolean
+                      message:
+                        type: string
+                      localizedMessage:
+                        type: string
+            stackTrace:
+              type: array
+              items:
+                type: object
+                properties:
+                  methodName:
+                    type: string
+                  fileName:
+                    type: string
+                  lineNumber:
+                    type: integer
+                    format: int32
+                  className:
+                    type: string
+                  nativeMethod:
+                    type: boolean
+            message:
+              type: string
+            localizedMessage:
+              type: string
+            suppressed:
+              type: array
+              items:
+                type: object
+                properties:
+                  stackTrace:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        methodName:
+                          type: string
+                        fileName:
+                          type: string
+                        lineNumber:
+                          type: integer
+                          format: int32
+                        className:
+                          type: string
+                        nativeMethod:
+                          type: boolean
+                  message:
+                    type: string
+                  localizedMessage:
+                    type: string
+        method:
+          type: string
+        message:
+          type: string
+        localizedMessage:
+          type: string
+        suppressed:
+          type: array
+          items:
+            type: object
+            properties:
+              stackTrace:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    methodName:
+                      type: string
+                    fileName:
+                      type: string
+                    lineNumber:
+                      type: integer
+                      format: int32
+                    className:
+                      type: string
+                    nativeMethod:
+                      type: boolean
+              message:
+                type: string
+              localizedMessage:
+                type: string
+    ReportRequestParameters:
+      required:
+        - key
+        - value
+      type: object
+      properties:
+        key:
+          type: string
+          description: Name of the specific report parameter
+        value:
+          type: string
+          description: Value for the specific report parameter
+    FileItem:
+      type: object
+      properties:
+        location:
+          type: string
+          description: >-
+            Location associated with the file. Generally refers to the ISO or
+            region
+        participant:
+          type: string
+          description: APX MarketSuite participant code
+        intervalBegin:
+          type: string
+          description: >-
+            DateTime value of interval_begin that was specified when the file
+            was uploaded or otherwise registered. This is not necessarily true
+            for the content of the file. Format - yyyy-mm-ddThh:mm:ss
+        intervalEnd:
+          type: string
+          description: >-
+            Datetime value of interval_end that was specified when the file was
+            uploaded or otherwise registered. This is not necessarily true for
+            the content of the file. Format - yyyy-mm-ddThh:mm:ss
+        source:
+          type: string
+          description: Data source system
+        rendition:
+          type: string
+          description: Type of data in the file, such as DA or RT
+        fileType:
+          type: string
+          description: APX MarketSuite File Type Name
+        fileVersion:
+          type: integer
+          description: >-
+            Version of the file instance within the APX MarketSuite for the same
+            business keys
+          format: int32
+        fileStructureVersion:
+          type: number
+          description: The version of the structure of the file
+        fileFormat:
+          type: string
+          description: The format of the file (CSV, XML, etc.)
+        fileHandle:
+          type: string
+          description: Unique identifier for the file within the APX MarketSuite
+        createDate:
+          type: string
+          description: Datetime the file was created in the APX MarketSuite
+    DownloadFileDescriptor:
+      required:
+        - fileType
+        - latestVersionOnly
+        - participant
+        - region
+        - rendition
+        - source
+      type: object
+      properties:
+        region:
+          type: string
+          description: 'ISO code '
+        participant:
+          type: string
+          description: APX MarketSuite participant code
+        fileType:
+          type: string
+          description: APX MarketSuite File Type Name
+        source:
+          type: string
+          description: Data source system
+        rendition:
+          type: string
+          description: Type of data in the file, such as DA or RT
+        latestVersionOnly:
+          type: boolean
+          description: >-
+            Flag indicating whether or not to list the most recent version of a
+            file.  True means list the most recent version only.  False means
+            list all versions.  The default is true.
+    ScheduleFileParam:
+      required:
+        - applications
+        - marketParticipants
+        - marketStage
+        - marketStatus
+        - region
+      type: object
+      properties:
+        region:
+          type: string
+        marketParticipants:
+          type: array
+          items:
+            type: string
+        marketStage:
+          type: string
+        marketStatus:
+          type: string
+        firstIntervalBegin:
+          type: string
+          format: date-time
+        lastIntervalEnd:
+          type: string
+          format: date-time
+        applications:
+          type: array
+          items:
+            type: string
+        format:
+          type: string
+          enum:
+            - xml
+            - csv
+      xml:
+        name: ParameterSet
+    MultiRequest:
+      type: object
+      properties:
+        uploadFileDescription:
+          $ref: '#/components/schemas/UploadFileDescription'
+        file:
+          type: string
+          format: binary
+    UploadFileDescription:
+      required:
+        - fileType
+        - location
+        - participant
+        - rendition
+        - source
+      type: object
+      properties:
+        location:
+          type: string
+          description: >-
+            Location associated with the file. Generally refers to the ISO or
+            region
+        participant:
+          type: string
+          description: APX MarketSuite participant code
+        intervalBegin:
+          type: string
+          description: >-
+            DateTime value of interval_begin that was specified when the file
+            was uploaded or otherwise registered. This is not necessarily true
+            for the content of the file.
+          format: date-time
+        intervalEnd:
+          type: string
+          description: >-
+            Datetime value of interval_end that was specified when the file was
+            uploaded or otherwise registered. This is not necessarily true for
+            the content of the file
+          format: date-time
+        fileType:
+          type: string
+          description: APX MarketSuite File Type Name
+        source:
+          type: string
+          description: Data source system.
+        rendition:
+          type: string
+          description: Type of data in the file, such as DA or RT
+      description: UploadFileDescription
+  securitySchemes:
+    basicScheme:
+      type: http
+      scheme: basic

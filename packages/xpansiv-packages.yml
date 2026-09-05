@@ -1,0 +1,82 @@
+generated: '2026-09-04'
+method: searched
+source: https://pypi.org/pypi/xpansiv-data/json + https://developer.xpansiv.com/developer-portal/xpansiv-data/sdk
+provider: Xpansiv
+note: >-
+  Registry sweep run 2026-09-04 across PyPI, npm, Maven Central, NuGet, pkg.go.dev,
+  RubyGems, Packagist and crates.io. Exactly one first-party client library was found:
+  the Xpansiv Data Python SDK on PyPI, published by Xpansiv (info@xpansiv.com) with
+  homepage xpansiv.com. An npm registry text search for "xpansiv" returned 0 packages.
+  The registry client APIs (NAR, TIGR, Optimal, APX Power Markets) and Xpansiv Connect
+  ship no published SDK — the developer portal documents raw curl/HTTP usage and, for
+  APX MarketSuite, a downloadable Postman collection instead.
+packages:
+- name: xpansiv-data
+  registry: pypi
+  official: true
+  language: python
+  url: https://pypi.org/project/xpansiv-data/
+  install: pip3 install xpansiv_data==1.0.2.post1
+  version: 1.0.2.post1
+  published: '2026-03-12'
+  covers: Xpansiv Data API
+  publisher: Xpansiv <info@xpansiv.com>
+  homepage: https://xpansiv.com/
+  docs: https://developer.xpansiv.com/developer-portal/xpansiv-data/sdk
+  summary: Python SDK for the XPANSIV DATA platform
+  scope:
+  - Datalake Handler — download / upload / read files from the data lake
+  - Status Handler — send statuses about a task run
+  - Task Handler — inter-task communication and parameter read/write within a pipeline
+  - Time Series Handler — retrieve data directly from the time series database
+  released_versions:
+  - 0.0.0
+  - 1.0.1
+  - 1.0.2
+  - 1.0.2.post1
+  note: >-
+    Provider states the SDK "does not cover everything from API documentation but rather
+    commonly used features". Configured by environment variable (LOGIN/PASSWORD or
+    NG_API_KEY, NG_API_ENDPOINT defaulting to https://api.data.xpansiv.com); SSO accounts
+    additionally set CLIENT_ID/CLIENT_SECRET for Auth0.
+absent:
+- registry: npm
+  searched: 'https://registry.npmjs.org/-/v1/search?text=xpansiv'
+  result: 0 packages
+  version: null
+- registry: maven-central
+  result: no first-party Xpansiv or APX artifact identified
+  version: null
+- registry: nuget
+  result: no first-party package identified
+  version: null
+- registry: rubygems
+  result: no first-party package identified
+  version: null
+- registry: crates.io
+  result: no first-party package identified
+  version: null
+- registry: pkg.go.dev
+  result: no first-party module identified
+  version: null
+collateral:
+- name: REST API - DevPortal Master (Postman collection)
+  registry: cdn
+  official: true
+  kind: postman-collection
+  url: https://developer.xpansiv.com/assets/rest_api_devportal_master.postman_collection.1e0ebd71bccec3cd471682d69702fc1c4da15640135b1a560ecd465b1787f518.5dcc6978.json
+  docs: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+  version: null
+  published: null
+  note: >-
+    Content-addressed asset on the provider's own docs CDN with no version in the URL and
+    no registry metadata endpoint — a consumer cannot tell which build of the collection
+    they hold. Recorded as null rather than guessed.
+- name: MarketSuite Sandbox Environment (Postman environment)
+  registry: cdn
+  official: true
+  kind: postman-environment
+  url: https://developer.xpansiv.com/assets/marketsuite_sandbox_devportal.postman_environment.3cf3711b3e03466da26e83662dadae29fac1a75605eebd44abd76cfd2d7da5e9.5dcc6978.json
+  docs: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+  version: null
+  published: null

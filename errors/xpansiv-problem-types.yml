@@ -1,0 +1,156 @@
+generated: '2026-09-04'
+method: derived
+source: >-
+  openapi/*.yml (4xx/5xx responses across 110 operations) enriched from
+  https://developer.xpansiv.com/developer-portal/xpansiv-data/errors and
+  https://developer.xpansiv.com/developer-portal/marketplace/fix-api
+provider: Xpansiv
+format: http-status
+rfc9457: false
+envelope_note: >-
+  Xpansiv does not publish one error envelope. Error bodies are declared as
+  application/json on 222 responses and */* on 89, and no response anywhere declares
+  application/problem+json. Integrators should branch on HTTP status, not on a shared
+  problem-type URI. The Marketplace FIX surface has its own error model entirely
+  (BusinessMessageReject 35=j for unsupported messages, session-level Reject 35=3 for
+  malformed ones) and does not use HTTP status at all.
+status_codes:
+- status: 400
+  title: Bad Request
+  occurrences: 89
+  meaning: The request you sent is incorrect.
+  remediation: >-
+    Validate the JSON payload before sending; URL-encode query parameters (the Xpansiv
+    Data docs call out spaces in groupName needing %20); check required path parameters
+    such as AccountIdentifier, ProgramCode, ledgerIdentifier and readingProfileCode.
+  source: openapi + https://developer.xpansiv.com/developer-portal/xpansiv-data/errors
+- status: 401
+  title: Unauthorized
+  occurrences: 81
+  meaning: Your API key is wrong, or the bearer token is missing or expired.
+  remediation: >-
+    Re-issue a token. Registry and Power Markets clients POST to
+    https://apxjwtauthprod.apx.com/oauth/token; Connect and Data clients POST to
+    https://auth.xpansiv.com/oauth/token. Tokens are short-lived (Connect returns
+    expires_in 86400). The auth endpoints themselves return 401 with status message
+    "Bad Request - Invalid Login ID or Password" on bad credentials.
+  source: openapi + the four published authentication pages
+- status: 403
+  title: Forbidden
+  occurrences: 45
+  meaning: The requested resource is hidden and may be accessed by the administrators only.
+  remediation: The token is valid but the account lacks rights on this resource. Managed
+    Solutions keys carry the same rights as the user that generated them.
+  source: openapi + https://developer.xpansiv.com/developer-portal/xpansiv-data/errors
+- status: 404
+  title: Not Found
+  occurrences: 32
+  meaning: The specified resource could not be found.
+  source: openapi + https://developer.xpansiv.com/developer-portal/xpansiv-data/errors
+- status: 405
+  title: Method Not Allowed
+  occurrences: 0
+  meaning: You tried to access a resource with an invalid method.
+  note: Documented in the Xpansiv Data error table; not declared in any OpenAPI response.
+  source: https://developer.xpansiv.com/developer-portal/xpansiv-data/errors
+- status: 406
+  title: Not Acceptable
+  occurrences: 14
+  meaning: You requested a format that isn't json.
+  source: openapi + https://developer.xpansiv.com/developer-portal/xpansiv-data/errors
+- status: 409
+  title: Conflict
+  occurrences: 1
+  meaning: The request conflicts with the current state of the resource.
+  source: openapi
+- status: 410
+  title: Gone
+  occurrences: 1
+  meaning: The resource requested has been removed from our servers.
+  source: openapi + https://developer.xpansiv.com/developer-portal/xpansiv-data/errors
+- status: 413
+  title: Payload Too Large
+  occurrences: 7
+  meaning: The uploaded file or batch exceeds the accepted size.
+  remediation: Applies to file upload and batch submission operations (APX Power Markets
+    uploadFile, Optimal file registry and telemetry submissions).
+  source: openapi
+- status: 418
+  title: I'm a teapot
+  occurrences: 0
+  meaning: Published verbatim in the Xpansiv Data error table.
+  note: Present in the provider's documented table; recorded for fidelity. Not declared
+    in any OpenAPI response.
+  source: https://developer.xpansiv.com/developer-portal/xpansiv-data/errors
+- status: 422
+  title: Unprocessable Entity
+  occurrences: 17
+  meaning: The request was well-formed but failed domain validation.
+  remediation: >-
+    The dominant validation failure class on registry writes — retirement and transfer
+    requests that violate program rules. Call GET
+    /retirements/program/{RetirementProgramCode}/rules (getRegistryRules) on Xpansiv
+    Connect before creating a retirement.
+  source: openapi
+- status: 429
+  title: Too Many Requests
+  occurrences: 15
+  meaning: You're requesting too many times! Slow down!
+  remediation: >-
+    Back off and retry. No Retry-After or RateLimit-* header is declared or documented,
+    so the retry interval is not discoverable from the response — use exponential
+    backoff. See rate-limits/xpansiv-rate-limits.yml.
+  source: openapi + https://developer.xpansiv.com/developer-portal/xpansiv-data/errors
+- status: 500
+  title: Internal Server Error
+  occurrences: 81
+  meaning: We had a problem with our server. Try again later.
+  source: openapi + https://developer.xpansiv.com/developer-portal/xpansiv-data/errors
+- status: 503
+  title: Service Unavailable
+  occurrences: 2
+  meaning: We're temporarily offline for maintenance. Please try again later.
+  source: openapi + https://developer.xpansiv.com/developer-portal/xpansiv-data/errors
+domain_error_surfaces:
+- name: APX Power Markets scheduling validation errors
+  operation: getStatus
+  path: /fileRegistry/file/{fileHandle}/status
+  api: APX Power Markets File Registry API
+  note: >-
+    Submitted ISO scheduling files are validated asynchronously. A 200 on uploadFile
+    does not mean the schedule was accepted — validation errors are retrieved separately
+    through getStatus against the returned fileHandle. This is the most common
+    integration mistake on this API and it is not visible in the HTTP status code.
+  source: openapi/xpansiv-apx-power-markets-file-registry-openapi.yml
+- name: Managed Solutions facility upload error correction
+  operations:
+  - facilityUploadErrorPreviewBulk
+  - facilityUploadSingleRowErrorPreview
+  - facilityUploadApplyFixBulk
+  - facilityUploadApplyFixSingleRow
+  api: Xpansiv Managed Solutions API
+  note: >-
+    A bulk facility upload that fails returns a per-row error set that is previewed and
+    then fixed in place, rather than resubmitted. Errors here are addressable resources
+    with their own operations, not just response bodies.
+  source: openapi/xpansiv-managed-solutions-openapi.yml
+- name: FIX session and business rejects
+  api: Xpansiv Marketplace FIX API
+  codes:
+  - code: 35=j
+    name: BusinessMessageReject
+    meaning: Incoming message is not listed in the specification, or is not supported by
+      the negotiated session type (Transaction / DropCopy / MarketData).
+  - code: 35=3
+    name: Reject
+    meaning: Session-level reject for a malformed incoming message.
+  source: https://developer.xpansiv.com/developer-portal/marketplace/fix-api
+common_user_errors:
+  source: https://developer.xpansiv.com/developer-portal/xpansiv-data/errors
+  note: The provider distinguishes API-level errors from caller mistakes and documents
+    the latter explicitly.
+  items:
+  - Placing multiple curl commands on the same line without proper separation.
+  - Omitting the Authorization; Bearer <token> header.
+  - Improper JSON body formatting (single quotes, missing commas).
+  - Not URL-encoding query parameters, e.g. spaces in groupName must be %20.

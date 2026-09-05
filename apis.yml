@@ -1,23 +1,276 @@
 aid: xpansiv
 name: Xpansiv
-description: 'Xpansiv is a company surfaced via the API Evangelist harvest backlog (source: secondary-market)
-  and added to the network as a stub for full-pipeline profiling.'
+description: 'Xpansiv is market infrastructure for global environmental and energy
+  commodities — carbon credits, renewable energy certificates, water, low-carbon fuels
+  and recycled materials. It operates CBL, the largest spot exchange for environmental
+  commodities, the Evolution Markets and OTX brokerage and execution desks, the H2OX
+  water market and the ACE and JSEV carbon platforms, alongside the environmental
+  registries it acquired with APX in 2022 — NAR (North American Renewables Registry),
+  TIGR, I-REC, I-TRACK-G and the Xpansiv-powered digital fuels registries. Its public
+  developer portal at developer.xpansiv.com publishes eleven OpenAPI descriptions across
+  Xpansiv Connect (environmental commodity portfolio, retirement and transfer), Xpansiv
+  Managed Solutions, the NAR and TIGR registry client APIs, the Optimal Outcomes suite
+  and the APX Power Markets file registry, plus a FIX 4.4 marketplace protocol
+  specification, Xpansiv Data market-data APIs and a first-party Python SDK.'
 url: https://raw.githubusercontent.com/api-evangelist/xpansiv/refs/heads/main/apis.yml
+image: https://kinlane-productions2.s3.amazonaws.com/apis-io/apis-io-logo.png
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
 specificationVersion: '0.20'
 created: '2026-09-04'
 modified: '2026-09-04'
 tags:
 - Company
-apis: []
+- Environmental Commodities
+- Carbon Markets
+- Renewable Energy Certificates
+- Registries
+- Market Data
+- Trading
+- Energy
+- Sustainability
+- Climate
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
+apis:
+- aid: xpansiv-connect
+  name: Xpansiv Connect API
+  description: Xpansiv Connect exposes environmental commodity account, portfolio,
+    exchange, forward deal, issuance, project, reference data, report, retirement,
+    split lot and transfer operations over REST. Bearer tokens are issued by the
+    Xpansiv authorization server at auth.xpansiv.com.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Carbon Markets
+  - Retirements
+  - Portfolio
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-connect-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Overlay
+    url: overlays/xpansiv-connect-overlay.yaml
+- aid: xpansiv-managed-solutions
+  name: Xpansiv Managed Solutions API
+  description: Access facilities, transactions, meter readings, clean transportation,
+    market, qualified reporting entity, building type, remote data collector and
+    utility data from an Xpansiv Managed Solutions account using a bearer API key
+    generated on the account API Access page.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  baseURL: https://www.ms.xpansiv.com/app/api/v1
+  tags:
+  - Renewable Energy Certificates
+  - Meter Data
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-managed-solutions-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Overlay
+    url: overlays/xpansiv-managed-solutions-overlay.yaml
+- aid: xpansiv-data
+  name: Xpansiv Data API
+  description: Real-time, end-of-day and historical transaction-based market data
+    for environmental and energy commodities, sourced from CBL and global
+    intermediaries including Evolution Markets. Delivered as time series, data-lake
+    file groups and NCSV downloads over a JWT-authenticated REST API, with a
+    first-party Python SDK.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-data
+  baseURL: https://api.data.xpansiv.com
+  tags:
+  - Market Data
+  - Time Series
+  properties:
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-data
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-data/authorization
+  - type: ErrorCatalog
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-data/errors
+  - type: SDKs
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-data/sdk
+- aid: xpansiv-nar-registry
+  name: NAR Registry Client API
+  description: The North American Renewables Registry client API for retrieving and
+    transacting NAR monthly vintage renewable energy certificates — account, ledger,
+    subaccount and system operations behind an OAuth2 password-grant JWT.
+  humanURL: https://developer.xpansiv.com/developer-portal/nar-registry
+  baseURL: https://narenewables2.apx.com/ClientAPI
+  tags:
+  - Registries
+  - Renewable Energy Certificates
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-nar-registry-client-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Overlay
+    url: overlays/xpansiv-nar-registry-client-overlay.yaml
+- aid: xpansiv-tigr-registry
+  name: TIGRS Registry Client API
+  description: The Tradable Instrument for Global Renewables (TIGR) registry client
+    API for retrieving and retiring TIGR certificates — corporate entity, ledger,
+    subaccount and system operations behind an OAuth2 password-grant JWT.
+  humanURL: https://developer.xpansiv.com/developer-portal/tigr-registry
+  baseURL: https://tigrsregistry.apx.com/clientapi
+  tags:
+  - Registries
+  - Renewable Energy Certificates
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-tigr-registry-client-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Overlay
+    url: overlays/xpansiv-tigr-registry-client-overlay.yaml
+- aid: xpansiv-optimal-outcomes
+  name: Xpansiv Optimal Outcomes APIs
+  description: The Optimal Outcomes suite — a system health API, a file registry, a
+    meter-data telemetry API, a reporting service, a resource API and a transfer
+    position external API for viewing and managing environmental instruments,
+    transfer and retirement batches, ledgers and subaccounts.
+  humanURL: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  baseURL: https://optimalapi-ext.apx.com
+  tags:
+  - Registries
+  - Telemetry
+  - Reporting
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-optimal-system-openapi.yml
+  - type: OpenAPI
+    url: openapi/xpansiv-optimal-file-registry-openapi.yml
+  - type: OpenAPI
+    url: openapi/xpansiv-optimal-telemetry-openapi.yml
+  - type: OpenAPI
+    url: openapi/xpansiv-optimal-reporting-openapi.yml
+  - type: OpenAPI
+    url: openapi/xpansiv-optimal-resource-openapi.yml
+  - type: OpenAPI
+    url: openapi/xpansiv-optimal-transfer-position-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Overlay
+    url: overlays/xpansiv-optimal-transfer-position-overlay.yaml
+- aid: xpansiv-apx-power-markets
+  name: APX Power Markets File Registry API
+  description: The APX MarketSuite file registry and reporting API used to submit and
+    retrieve ISO scheduling files for CAISO, ERCOT, PJM, SPP, MISO, ISONE and NYISO,
+    alongside the XML/XSD schedule schemas and REST report endpoints.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  baseURL: https://pm-file-api.apx.com
+  tags:
+  - Energy
+  - Power Markets
+  - Scheduling
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-apx-power-markets-file-registry-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+  - type: Overlay
+    url: overlays/xpansiv-apx-power-markets-file-registry-overlay.yaml
+- aid: xpansiv-marketplace-fix
+  name: Xpansiv Marketplace FIX API
+  description: The Xpansiv Marketplace Server API for retrieving real-time market
+    data and executing and managing orders on CBL, published as rules of engagement
+    against the FIX 4.4 specification from the FIX Trading Community, with
+    Transaction, DropCopy and MarketData session types.
+  humanURL: https://developer.xpansiv.com/developer-portal/marketplace
+  baseURL: https://developer.xpansiv.com/developer-portal/marketplace/fix-api
+  tags:
+  - Trading
+  - Market Data
+  - FIX Protocol
+  properties:
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/marketplace
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/marketplace/fix-api
+x-enrichment:
+  date: '2026-09-04'
+  status: enriched
+  artifacts_added: 41
+  pass: local-v3
 common:
 - type: Website
-  url: https://forgeglobal.com/xpansiv_stock/
+  url: https://www.xpansiv.com/
+- type: DeveloperPortal
+  url: https://developer.xpansiv.com/
+- type: Documentation
+  url: https://developer.xpansiv.com/developer-portal
+- type: APIReference
+  url: https://developer.xpansiv.com/developer-portal
+- type: GettingStarted
+  url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+- type: Support
+  url: https://support.xpansiv.com/
+- type: SignUp
+  url: https://connect.xpansiv.com/app/login/
+- type: Blog
+  url: https://www.xpansiv.com/blog
+- type: TermsOfService
+  url: https://www.xpansiv.com/general-terms-of-use
+- type: PrivacyPolicy
+  url: https://www.xpansiv.com/privacy-policy
+- type: Postman
+  url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- type: LLMsTxt
+  url: llms/xpansiv-llms.txt
+- type: MCPServer
+  url: mcp/xpansiv-mcp.yml
+- type: ToolCrosswalk
+  url: mcp/xpansiv-tool-crosswalk.yml
+- type: WellKnown
+  url: well-known/xpansiv-well-known.yml
+- type: Packages
+  url: packages/xpansiv-packages.yml
+- type: SDKs
+  url: packages/xpansiv-packages.yml
+- type: Authentication
+  url: authentication/xpansiv-authentication.yml
+- type: OAuthScopes
+  url: scopes/xpansiv-scopes.yml
+- type: Conventions
+  url: conventions/xpansiv-conventions.yml
+- type: ErrorCatalog
+  url: errors/xpansiv-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/xpansiv-lifecycle.yml
+- type: Conformance
+  url: conformance/xpansiv-conformance.yml
+- type: DataModel
+  url: data-model/xpansiv-data-model.yml
+- type: DomainSecurity
+  url: security/xpansiv-domain-security.yml
+- type: RateLimits
+  url: rate-limits/xpansiv-rate-limits.yml
+- type: Plans
+  url: plans/xpansiv-plans-pricing.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Sandbox
+  url: sandbox/xpansiv-sandbox.yml
+- type: Overlay
+  url: overlays/xpansiv-connect-overlay.yaml

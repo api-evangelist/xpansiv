@@ -1,0 +1,202 @@
+generated: '2026-09-04'
+method: probed
+source: direct HTTPS probes of the named /.well-known/ path list, 2026-09-04
+provider: Xpansiv
+note: >-
+  Probed the named path list (never a glob) on every host this record knows: the
+  registrable domain and www, the docs/portal host, every apis[].baseURL host, every
+  OpenAPI servers[] host, the support host, and the authorization servers those
+  documents name. Four hosts serve real documents. No host serves security.txt,
+  api-catalog, ai-plugin.json or an A2A agent card — every such path 404s, redirects to
+  a login/marketing page, or answers 401/403. The Xpansiv Data host
+  (api.data.xpansiv.com) answers 307 on every path and lands on the marketing site
+  404 page; connect.xpansiv.com redirects every path into the application login form.
+hosts:
+- host: auth.xpansiv.com
+  role: authorization server (named by the Xpansiv Connect and Xpansiv Data auth docs)
+  documents:
+  - path: /.well-known/openid-configuration
+    status: 200
+    file: xpansiv-auth-openid-configuration.json
+    note: Auth0-backed OIDC discovery, issuer https://auth.xpansiv.com/
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    file: xpansiv-auth-oauth-authorization-server.json
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /ai-plugin.json
+    status: 404
+- host: developer.xpansiv.com
+  role: developer portal + remote MCP server
+  documents:
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    file: xpansiv-developer-oauth-authorization-server.json
+    note: >-
+      Authorization-server metadata for the portal's own MCP/login flow; issuer is
+      https://auth.cloud.redocly.com, the Redocly platform the portal runs on, reached
+      through Xpansiv's own host.
+  - path: /.well-known/oauth-protected-resource/mcp
+    status: 200
+    file: xpansiv-developer-oauth-protected-resource-mcp.json
+    note: >-
+      RFC 9728 protected-resource metadata for https://developer.xpansiv.com/mcp —
+      scopes_supported openid, profile, email, offline_access.
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /ai-plugin.json
+    status: 404
+  - path: /llms.txt
+    status: 200
+    file: ../llms/xpansiv-llms.txt
+    note: Provider-published llms.txt, saved verbatim under llms/.
+- host: support.xpansiv.com
+  role: customer support portal
+  documents:
+  - path: /.well-known/openid-configuration
+    status: 200
+    file: xpansiv-support-openid-configuration.json
+    note: Salesforce Experience Cloud OIDC discovery for the support community.
+  - path: /.well-known/security.txt
+    status: 401
+  - path: /.well-known/oauth-authorization-server
+    status: 401
+  - path: /.well-known/api-catalog
+    status: 401
+  - path: /.well-known/agent-card.json
+    status: 401
+  - path: /.well-known/agent.json
+    status: 401
+- host: www.xpansiv.com
+  role: corporate website (registrable domain; xpansiv.com 301s here)
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: api.data.xpansiv.com
+  role: Xpansiv Data API base URL
+  documents:
+  - path: /.well-known/security.txt
+    status: 307
+    note: 307 to https://www.xpansiv.com/home, which returns 404 — not a document.
+  - path: /.well-known/openid-configuration
+    status: 307
+  - path: /.well-known/oauth-authorization-server
+    status: 307
+  - path: /.well-known/api-catalog
+    status: 307
+  - path: /.well-known/agent-card.json
+    status: 307
+  - path: /.well-known/agent.json
+    status: 307
+- host: connect.xpansiv.com
+  role: Xpansiv Connect API base URL
+  documents:
+  - path: /.well-known/security.txt
+    status: 301
+    note: 301 into https://connect.xpansiv.com/app/login/ — the application login form.
+  - path: /.well-known/openid-configuration
+    status: 301
+  - path: /.well-known/oauth-authorization-server
+    status: 301
+  - path: /.well-known/api-catalog
+    status: 301
+  - path: /.well-known/agent-card.json
+    status: 301
+  - path: /.well-known/agent.json
+    status: 301
+- host: www.ms.xpansiv.com
+  role: Xpansiv Managed Solutions API base URL
+  documents:
+  - path: /.well-known/security.txt
+    status: 301
+    note: 301 to ms.xpansiv.com, which then 404s.
+  - path: /.well-known/openid-configuration
+    status: 301
+  - path: /.well-known/api-catalog
+    status: 301
+  - path: /.well-known/agent-card.json
+    status: 301
+  - path: /.well-known/agent.json
+    status: 301
+- host: optimalapi-ext.apx.com
+  role: Optimal Outcomes API base URL (Xpansiv/APX)
+  documents:
+  - path: /.well-known/security.txt
+    status: 401
+  - path: /.well-known/openid-configuration
+    status: 401
+  - path: /.well-known/api-catalog
+    status: 401
+  - path: /.well-known/agent-card.json
+    status: 401
+  - path: /.well-known/agent.json
+    status: 401
+- host: apxjwtauthprod.apx.com
+  role: NAR / TIGR / APX Power Markets OAuth2 token endpoint host
+  documents:
+  - path: /.well-known/security.txt
+    status: 403
+  - path: /.well-known/openid-configuration
+    status: 403
+  - path: /.well-known/oauth-authorization-server
+    status: 403
+  - path: /.well-known/api-catalog
+    status: 403
+  - path: /.well-known/agent-card.json
+    status: 403
+  - path: /.well-known/agent.json
+    status: 403
+- host: narenewables2.apx.com
+  role: NAR Registry Client API base URL
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: tigrsregistry.apx.com
+  role: TIGR Registry Client API base URL
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: pm-file-api.apx.com
+  role: APX Power Markets File Registry API base URL
+  documents:
+  - path: /.well-known/security.txt
+    status: 0
+    note: DNS does not resolve publicly for this host; the spec's servers[] entry is
+      reachable only from a customer network.
+security_txt: none
+api_catalog: none
+agent_card: none

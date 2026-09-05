@@ -1,0 +1,324 @@
+openapi: 3.0.1
+info:
+  title: File Registry API
+  description: Use API credentials to view or submit registry files.
+  version: 1.0.0
+servers:
+  - url: https://optimalapi-ext.apx.com/fileRegistry/v1
+  - url: https://optimalapi-uat-ext.apx.com/fileRegistry/v1
+security:
+  - JWT: []
+tags:
+  - name: file-type-v1
+    description: View, update or upload a file
+paths:
+  /api/file:
+    post:
+      tags:
+        - file-type-v1
+      summary: Add a new registry file entry
+      description: Upload a new file entry to the Registry.
+      operationId: addFileEntry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileEntry'
+        required: true
+      responses:
+        '201':
+          description: File registry entry created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileEntry'
+  /api/fileType:
+    get:
+      tags:
+        - file-type-v1
+      summary: Retrieve registry file types
+      description: >-
+        View a list of the different file types accepted by the Registry. Files
+        types are Account level, Resource level, or could be associate with
+        either an Account or Resource.
+      operationId: getFileTypes
+      responses:
+        '200':
+          description: File Types retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FileType'
+  /api/file/{fileId}:
+    get:
+      tags:
+        - file-type-v1
+      summary: Retrieve a registry file
+      description: View a specific file, using the file identifier.
+      operationId: getFileEntry
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: File retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileEntry'
+        '404':
+          description: Not Found
+  /api/file/report/file:
+    get:
+      tags:
+        - file-type-v1
+      summary: File Report
+      description: Retrieve your Registry account's file history.
+      operationId: getFileReport
+      parameters:
+        - name: srcResourceId
+          in: query
+          description: Resource identifier
+          required: true
+          schema:
+            type: string
+        - name: viewOnlyAccountFiles
+          in: query
+          description: View only account files
+          required: false
+          schema:
+            type: boolean
+        - name: $filter
+          in: query
+          description: >-
+            OData expression, filter results by specific Property value; results
+            not filterable by all properties.
+          required: false
+          schema:
+            type: string
+        - name: $count
+          in: query
+          description: >-
+            Included if "$count" = "true", the total number of results will be
+            included in the response
+          required: false
+          schema:
+            type: boolean
+        - name: $orderby
+          in: query
+          description: >-
+            OData expression, please see
+            https://learn.microsoft.com/en-us/odata/client/query-options#orderby
+          required: false
+          schema:
+            type: string
+        - name: $skip
+          in: query
+          description: >-
+            Number of records to skip, please see
+            https://learn.microsoft.com/en-us/odata/client/query-options#skip
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $top
+          in: query
+          description: >-
+            Maximum number of records to return, please see
+            https://learn.microsoft.com/en-us/odata/client/query-options#top
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $apply
+          in: query
+          description: >-
+            OData expression, GROUPBY operations available for fields where
+            grouping is supported
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ODataEnvelopeOfFileReport'
+        '400':
+          description: Parameter validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+components:
+  schemas:
+    FileEntry:
+      required:
+        - fileName
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the file
+          readOnly: true
+        fileSetId:
+          type: string
+          description: The unique identifier of the file set
+        version:
+          type: integer
+          description: File version number
+          format: int32
+        createdAt:
+          type: string
+          description: >-
+            Creation date of the file, if null at creation, will default to
+            current time
+          format: date-time
+        fileName:
+          type: string
+          description: Filename associated with file
+        status:
+          type: string
+          description: File Status Code
+          readOnly: true
+        sourceSystemCode:
+          type: string
+          description: >-
+            Source System Code, only specified on input for trusted system
+            access
+        fileTypeCode:
+          type: string
+          description: File Type Code
+        sasUri:
+          type: string
+          description: >-
+            URI with embedded Shared Access Signature for retrieving or
+            uploading file
+          readOnly: true
+        sasExpires:
+          type: string
+          description: Time at which the Shared Access Signature in the sasUri will expire
+          format: date-time
+          readOnly: true
+        parameters:
+          type: object
+          additionalProperties:
+            type: object
+            description: Additional parameters to accompany the file registration
+          description: Additional parameters to accompany the file registration
+        srcAccountId:
+          type: string
+          description: Optional account Id when uploading a file for a different account
+        srcResourceId:
+          type: string
+          description: Resource Id when uploading a resource-specific file
+        publicFile:
+          type: boolean
+          description: File access flag
+      description: A file entry
+    FileReport:
+      type: object
+      properties:
+        fileId:
+          type: string
+        fileSetId:
+          type: string
+        srcAcctId:
+          type: string
+        srcAcctIdentifier:
+          type: string
+        accountName:
+          type: string
+        srcResourceId:
+          type: string
+        srcResourceIdentifier:
+          type: string
+        resourceName:
+          type: string
+        fileName:
+          type: string
+        generatedFileName:
+          type: string
+        fileTypeCode:
+          type: string
+        fileTypeName:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        uploadedBy:
+          type: string
+        userId:
+          type: string
+        version:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int64
+        displaySize:
+          type: string
+        publicFile:
+          type: boolean
+        allowPublicFile:
+          type: boolean
+      description: File Report
+    FileType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        code:
+          type: string
+        name:
+          type: string
+        shortName:
+          type: string
+        fileTypeSpecificityCode:
+          type: string
+          enum:
+            - ACCOUNT
+            - RESOURCE
+            - ACCOUNT_OR_RESOURCE
+        singleInstance:
+          type: boolean
+        allowPublicFile:
+          type: boolean
+      description: A file type
+    ODataEnvelopeOfFileReport:
+      required:
+        - value
+      type: object
+      properties:
+        '@count':
+          type: integer
+          description: The total number of results (only present if requested)
+          format: int32
+        value:
+          type: array
+          description: Rows of information
+          items:
+            $ref: '#/components/schemas/FileReport'
+      description: Container for OData-like rows of information
+    ValidationError:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        parameter:
+          type: string
+        message:
+          type: string
+  securitySchemes:
+    JWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

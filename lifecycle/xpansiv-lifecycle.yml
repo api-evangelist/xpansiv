@@ -1,0 +1,106 @@
+generated: '2026-09-04'
+method: derived
+source: openapi/*.yml + https://developer.xpansiv.com/developer-portal (probed 2026-09-04)
+provider: Xpansiv
+versioning:
+  style: path-segment
+  note: >-
+    Every REST surface carries a major version in the path — /app/api/v1 for Xpansiv
+    Connect and Managed Solutions, /fileRegistry/v1, /meter/v1, /reporting/v1,
+    /resource/v1 and /transfer/v1 for Optimal Outcomes, /clientapi with /api/... for the
+    NAR and TIGR registries. Only v1 exists publicly; no v2 or /v0 surface was found.
+  spec_versions:
+  - api: Xpansiv Connect API
+    info_version: 1.0.0-beta
+    openapi: 3.0.1
+    note: The provider labels its own general-availability commodity API "beta" in
+      info.version.
+  - api: Xpansiv Managed Solutions API
+    info_version: '1.10'
+    openapi: 3.0.0
+  - api: APX Power Markets File Registry API
+    info_version: 1.1.49
+    openapi: 3.0.1
+    note: The only Xpansiv description carrying a patch-level version, and the only
+      visible evidence of iterative release numbering.
+  - api: NAR Registry Client API
+    info_version: 1.0.0
+    openapi: 3.0.1
+  - api: TIGRS Registry Client API
+    info_version: 1.0.0
+    openapi: 3.0.0
+  - api: Optimal Outcomes (six descriptions)
+    info_version: 1.0.0
+    openapi: 3.0.1 (3.1.0 for Transfer Position External API)
+deprecation:
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  deprecated_operations: 0
+  note: >-
+    No operation, parameter or schema in any of the eleven descriptions carries
+    deprecated: true, and no deprecation or sunset policy page exists on the developer
+    portal. No `Deprecation` pointer is emitted — there is no policy to point at.
+change_communication:
+  changelog_published: false
+  probed:
+  - url: https://developer.xpansiv.com/changelog
+    status: 404
+  - url: https://developer.xpansiv.com/developer-portal/changelog
+    status: 404
+  - url: https://developer.xpansiv.com/release-notes
+    status: 404
+  note: >-
+    No dated developer changelog. The one dated change record Xpansiv publishes is the
+    inline history comment inside the APXScheduleAPI XSD at
+    https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/xsds, whose
+    most recent entries are "Feb 21, 2025 Removed reference to MISO and PJM in the
+    <Region> enumeration", "Feb 21, 2025 Added AS-Only in the <TransactionType>
+    enumeration" and "May 6, 2026 Added 4 new products for CAISO DAME market change".
+    That is a schema comment, not a changelog, and it covers only the power-markets file
+    contracts. No `ChangeLog` pointer is emitted.
+  corporate_news: https://www.xpansiv.com/news
+status_page:
+  published: false
+  probed:
+  - url: https://status.xpansiv.com/
+    status: 0
+    note: DNS does not resolve.
+  - url: https://status.apx.com/
+    status: 0
+    note: DNS does not resolve.
+  - url: https://xpansiv.statuspage.io/
+    status: 200
+    note: >-
+      Redirects to https://www.atlassian.com/software/statuspage — the vendor's own
+      marketing page, i.e. the subdomain is unclaimed. NOT an Xpansiv status page.
+  note: >-
+    No public status or uptime page. The nearest operational signals a client has are the
+    two ping health endpoints published in the contracts — GET /api/system/ping on the
+    NAR and TIGR registry client APIs and GET /optimal/v1/system/ping on the Optimal
+    System API — both of which require credentials. No `StatusPage` pointer is emitted.
+sla:
+  published: false
+  note: No public SLA. https://www.xpansiv.com/general-terms-of-use governs use of the
+    website and services; no availability commitment is published for the APIs.
+environments:
+- name: Production
+  connect: https://connect.xpansiv.com/app/api/v1
+  managed_solutions: https://www.ms.xpansiv.com/app/api/v1
+  data: https://api.data.xpansiv.com
+  nar: https://narenewables2.apx.com/clientapi/
+  tigr: https://tigrsregistry.apx.com/clientapi/
+  optimal: https://optimalapi-ext.apx.com
+  power_markets: https://pm-file-api.apx.com
+  auth: https://auth.xpansiv.com/oauth/token and https://apxjwtauthprod.apx.com/oauth/token
+- name: UAT
+  connect: https://uat.preprod.connect.xpansiv.com/app/api/v1
+  nar: https://NAR-app-uat01.apx.com/clientapi/
+  tigr: https://tigrs-app-uat01.apx.com/clientapi/
+  optimal: https://optimalapi-uat-ext.apx.com
+  auth: https://auth.preprod.xpansiv.com/oauth/token and
+    https://apxjwtauthuat.apx.com/oauth/token
+- name: Sandbox
+  connect: https://sandbox.preprod.connect.xpansiv.com/app/api/v1
+  note: Declared in servers[] of the Xpansiv Connect description. See
+    sandbox/xpansiv-sandbox.yml.

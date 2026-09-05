@@ -1,0 +1,388 @@
+openapi: 3.0.1
+info:
+  title: Reporting Service V1
+  version: 1.0.0
+servers:
+  - url: https://optimalapi-ext.apx.com/reporting/v1
+  - url: https://optimalapi-uat-ext.apx.com/reporting/v1
+security:
+  - JWT: []
+tags:
+  - name: report-issuance-v1
+    description: Issuance Reports
+  - name: report-resource-v1
+    description: Resource Reports
+paths:
+  /issuance/public:
+    get:
+      tags:
+        - report-issuance-v1
+      summary: Public Issuance Report
+      operationId: ISSUANCE_PUBLIC
+      parameters:
+        - name: programCertificationGroupCode
+          in: query
+          description: Program Certification Group Code
+          required: true
+          schema:
+            type: string
+        - name: $filter
+          in: query
+          description: >-
+            OData expression, filter results by specific Property value; results
+            not filterable by all properties.
+          required: false
+          schema:
+            type: string
+        - name: $count
+          in: query
+          description: >-
+            Included if "$count" = "true", the total number of results will be
+            included in the response
+          required: false
+          schema:
+            type: boolean
+        - name: $orderby
+          in: query
+          description: >-
+            OData expression, please see
+            https://learn.microsoft.com/en-us/odata/client/query-options#orderby
+          required: false
+          schema:
+            type: string
+        - name: $skip
+          in: query
+          description: >-
+            Number of records to skip, please see
+            https://learn.microsoft.com/en-us/odata/client/query-options#skip
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $top
+          in: query
+          description: >-
+            Maximum number of records to return, please see
+            https://learn.microsoft.com/en-us/odata/client/query-options#top
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $apply
+          in: query
+          description: >-
+            OData expression, GROUPBY operations available for fields where
+            grouping is supported
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ODataEnvelopeOfExtIssuancePublic'
+        '400':
+          description: Parameter validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /resource/public:
+    get:
+      tags:
+        - report-resource-v1
+      summary: Public Resource Report
+      operationId: RESOURCE_PUBLIC
+      parameters:
+        - name: programCode
+          in: query
+          description: Program Code
+          required: true
+          schema:
+            type: string
+        - name: $filter
+          in: query
+          description: >-
+            OData expression, filter results by specific Property value; results
+            not filterable by all properties.
+          required: false
+          schema:
+            type: string
+        - name: $count
+          in: query
+          description: >-
+            Included if "$count" = "true", the total number of results will be
+            included in the response
+          required: false
+          schema:
+            type: boolean
+        - name: $orderby
+          in: query
+          description: >-
+            OData expression, please see
+            https://learn.microsoft.com/en-us/odata/client/query-options#orderby
+          required: false
+          schema:
+            type: string
+        - name: $skip
+          in: query
+          description: >-
+            Number of records to skip, please see
+            https://learn.microsoft.com/en-us/odata/client/query-options#skip
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $top
+          in: query
+          description: >-
+            Maximum number of records to return, please see
+            https://learn.microsoft.com/en-us/odata/client/query-options#top
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $apply
+          in: query
+          description: >-
+            OData expression, GROUPBY operations available for fields where
+            grouping is supported
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ODataEnvelopeOfExtResourcePublic'
+        '400':
+          description: Parameter validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+components:
+  schemas:
+    ExtIssuancePublic:
+      type: object
+      properties:
+        accountName:
+          type: string
+        sourceAccountId:
+          type: string
+        sourceAccountIdentifier:
+          type: string
+        parentResourceProgramName:
+          type: string
+        parentProgramAssignedIdentifier:
+          type: string
+        parentClassificationName1:
+          type: string
+        parentClassificationName2:
+          type: string
+        parentClassificationName3:
+          type: string
+        parentClassificationName4:
+          type: string
+        parentClassificationName5:
+          type: string
+        certificateTypeName:
+          type: string
+        certificateTypeCode:
+          type: string
+        parentResourceProjectName:
+          type: string
+        resourceProgramName:
+          type: string
+        programAssignedIdentifier:
+          type: string
+        classificationName1:
+          type: string
+        classificationName2:
+          type: string
+        classificationName3:
+          type: string
+        classificationName4:
+          type: string
+        classificationName5:
+          type: string
+        resourceTypeName:
+          type: string
+        issuanceInTypeList:
+          type: string
+        issuanceOutTypeList:
+          type: string
+        programPeriod:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        serialNumber:
+          type: string
+        quantity:
+          type: number
+        programProtocol:
+          type: string
+        program:
+          type: string
+        protocol:
+          type: string
+        programCertificationGroupCode:
+          type: string
+        countrySubdivisionName:
+          type: string
+        productionTimeBeginInclusive:
+          type: string
+          format: date-time
+        productionTimeEndExclusive:
+          type: string
+          format: date-time
+        parentResourceClassificationTypeCode:
+          type: string
+        issuanceInputTypeCodes:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        issuanceOutputTypeCodes:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+      description: Rows of information
+    ExtResourcePublic:
+      type: object
+      properties:
+        establishingResourceProgramName:
+          type: string
+        establishingProgramAssignedIdentifier:
+          type: string
+        parentEstablishingResourceProgramName:
+          type: string
+        parentEstablishingProgramAssignedIdentifier:
+          type: string
+        accountDisplayName:
+          type: string
+        sourceAccountIdentifier:
+          type: string
+        resourceProgramName:
+          type: string
+        programAssignedIdentifier:
+          type: string
+        resourceProponentList:
+          type: string
+        resourceTypeName:
+          type: string
+        program:
+          type: string
+        protocol:
+          type: string
+        programProtocol:
+          type: string
+        classificationName1:
+          type: string
+        classificationName2:
+          type: string
+        classificationName3:
+          type: string
+        classificationName4:
+          type: string
+        classificationName5:
+          type: string
+        parentClassificationName1:
+          type: string
+        parentClassificationName2:
+          type: string
+        parentClassificationName3:
+          type: string
+        parentClassificationName4:
+          type: string
+        parentClassificationName5:
+          type: string
+        resourceProgramDescription:
+          type: string
+        resourceProgramStatusName:
+          type: string
+        addressLine:
+          type: string
+        countrySubdivisionName:
+          type: string
+        countryIso3Code:
+          type: string
+        resourceProjectName:
+          type: string
+        projectStartDate:
+          type: string
+        isAggregate:
+          type: boolean
+        embeddedResource:
+          type: boolean
+        resourceProcessIoNameList:
+          type: string
+        processInputName:
+          type: string
+        processOutputName:
+          type: string
+        estAvgAmtOfReducOrAvoid:
+          type: number
+          format: double
+        initAuditorName:
+          type: string
+        priorProgramName:
+          type: string
+        priorProgramAssignedIdentifier:
+          type: string
+        priorProgramDescription:
+          type: string
+        resourceIdentifier:
+          type: string
+      description: Rows of information
+    ODataEnvelopeOfExtIssuancePublic:
+      required:
+        - value
+      type: object
+      properties:
+        '@count':
+          type: integer
+          description: The total number of results (only present if requested)
+          format: int32
+        value:
+          type: array
+          description: Rows of information
+          items:
+            $ref: '#/components/schemas/ExtIssuancePublic'
+      description: Container for OData-like rows of information
+    ODataEnvelopeOfExtResourcePublic:
+      required:
+        - value
+      type: object
+      properties:
+        '@count':
+          type: integer
+          description: The total number of results (only present if requested)
+          format: int32
+        value:
+          type: array
+          description: Rows of information
+          items:
+            $ref: '#/components/schemas/ExtResourcePublic'
+      description: Container for OData-like rows of information
+    ValidationError:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        parameter:
+          type: string
+        message:
+          type: string
+  securitySchemes:
+    JWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,246 @@
+generated: '2026-09-04'
+method: derived
+source: >-
+  openapi/*.yml (110 operations across 11 descriptions) + the four published
+  authentication pages and the Xpansiv Data errors page on developer.xpansiv.com
+provider: Xpansiv
+scope_note: >-
+  Xpansiv is not one API with one set of conventions; it is five product families
+  assembled partly by acquisition (APX, 2022; Evolution Markets; Evident). Conventions
+  differ per family and that difference is the finding. Where a convention is
+  family-specific it is named as such rather than generalised.
+authentication:
+  style: bearer JWT on every REST surface
+  token_issuers:
+  - https://auth.xpansiv.com/oauth/token — Xpansiv Connect and Xpansiv Data (Auth0,
+    password-realm extension grant, audience https://xpansiv/platform)
+  - https://apxjwtauthprod.apx.com/oauth/token — NAR Registry, TIGR Registry and APX
+    Power Markets (OAuth2 RFC 6749 password grant, Basic {client:secret} on the token
+    request)
+  - Managed Solutions issues a long-lived API key from the account API Access page and
+    sends it as a bearer token; there is no token endpoint.
+  header: 'Authorization: Bearer {access_token}'
+  token_lifetime: >-
+    Connect returns expires_in 86400 (24h). The registry and power-markets token
+    endpoints return expires_in but the value is not documented; the docs describe the
+    credential as "short-lived".
+  refresh: >-
+    Xpansiv Data alone publishes a refresh flow — GET /auth/login returns {token,
+    refreshToken}; POST /auth/refresh exchanges the refresh token; POST /auth/logout
+    invalidates it. No other family documents refresh; clients re-run the grant.
+  cross_link: authentication/xpansiv-authentication.yml
+idempotency:
+  coverage: none
+  mechanism: none
+  header: none
+  scope: []
+  evidence: >-
+    No Idempotency-Key, X-Idempotency-Key, request-id-as-key or equivalent request header
+    is declared on any of the 110 operations, and no idempotency, replay, deduplication
+    or "safe retry" language appears anywhere on the developer portal. Checked every
+    mutating operation, including createRetirement, createTransfers, deposit, withdraw,
+    withdrawAndRetire, settle (Xpansiv Connect); retire, interaccountTransfer,
+    subaccountTransfer (NAR); retireUsingPOST (TIGR); initiateRetirements,
+    initiateAccountTransfers, initiateSubaccountTransfers (Optimal Transfer Position);
+    submitMeterReading, createFacility (Managed Solutions); uploadFile (APX Power
+    Markets).
+  risk_note: >-
+    This matters more here than on a typical API. A retirement permanently cancels an
+    environmental commodity instrument and a transfer moves it between counterparties;
+    both are financially material and neither is protected against a duplicate submission
+    caused by a timeout-and-retry. Clients must build their own deduplication —
+    check-before-write via searchRetirements / checkStatus / searchTransfers, or a
+    client-side transaction ledger. An agent must not blind-retry a 5xx on any write
+    operation in this catalog.
+  partial_mitigations:
+  - Xpansiv Connect publishes POST /retirements/account/{AccountIdentifier}/action/check-status
+    (operationId checkStatus), which lets a client confirm whether a retirement landed
+    before resubmitting. This is a check-after-write affordance, not idempotency.
+  - Registry transfers are two-phase — createTransfers is initiated by the sender and
+    must be accepted by the counterparty (acceptTransfers) — so a duplicated initiation
+    is visible as a duplicated pending transfer before it settles.
+reversibility:
+  grade: documented
+  na: false
+  note: >-
+    Reversal operations exist and are named in the contracts, but Xpansiv publishes no
+    time window for any of them, so this grades `documented` rather than `verified`. No
+    window is asserted below that the provider does not state — and for retirements the
+    finding is that there is no reversal at all.
+  write_surfaces:
+  - surface: Xpansiv Connect — transfers
+    reversal: true
+    operations:
+    - operationId: cancelTransfers
+      path: POST /transfers/account/{AccountIdentifier}/program/{ProgramCode}/action/cancel
+      role: sender cancels a transfer it initiated
+    - operationId: rejectTransfers
+      path: POST /transfers/account/{AccountIdentifier}/program/{ProgramCode}/action/reject
+      role: recipient refuses an inbound transfer
+    window: >-
+      Not stated. Structurally the reversal is available while the transfer is pending —
+      createTransfers requires a counterparty acceptTransfers to complete — but the docs
+      state no duration, and the point of no return is the counterparty's action, not a
+      clock.
+    docs: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - surface: NAR Registry — pending transfers
+    reversal: true
+    operations:
+    - operationId: actionPendingTransfers
+      path: POST /api/ledger/transfer/pending/action
+      role: act on (accept or reject) transfers listed by getPendingTransfers
+    window: Not stated.
+    docs: https://developer.xpansiv.com/developer-portal/nar-registry
+  - surface: Optimal Outcomes — transfer batches
+    reversal: true
+    operations:
+    - operationId: acknowledgeTransferBatches
+      path: POST /api/ledger/{ledgerIdentifier}/transferBatch/open/action
+      role: act on open (pending) transfer batches
+    window: Not stated. getOpenTransferBatches enumerates what is still reversible.
+    docs: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - surface: Retirements (Xpansiv Connect createRetirement, NAR retire, TIGR
+      retireUsingPOST, Optimal initiateRetirements)
+    reversal: false
+    window: none
+    note: >-
+      No cancel, void, reverse, unretire or restore operation exists for a retirement in
+      any of the eleven descriptions, and none is documented. Retirement is the terminal
+      state of an environmental commodity instrument by design — the certificate is
+      permanently withdrawn from circulation so its environmental attribute can be
+      claimed exactly once. An agent must treat every retirement call as irreversible and
+      confirm the program rules first via getRegistryRules
+      (GET /retirements/program/{RetirementProgramCode}/rules), which is the only
+      pre-flight check published.
+  - surface: Xpansiv Connect — deposits, withdrawals and settlement
+    reversal: partial
+    operations:
+    - operationId: withdraw
+      path: POST /exchanges/{ExchangeCode}/accounts/{AccountIdentifier}/action/withdraw
+      role: withdraws a deposit, i.e. reverses a deposit that has not settled
+    window: Not stated. `settle` is the terminal operation on this flow.
+  - surface: Xpansiv Managed Solutions — facility applications
+    reversal: partial
+    operations:
+    - operationId: updateFacility
+      path: PATCH /facilities/{facility_id}
+      role: amend before completeFacility is called
+    - operationId: facilityUploadApplyFixBulk
+      path: POST /uploads/{upload_id}/errors/fix
+      role: correct a failed bulk upload in place rather than resubmitting
+    window: Not stated; completeFacility submits the application.
+dry_run_mode:
+  available: partial
+  note: >-
+    No operation takes a dry_run / preview / simulate flag. Three published affordances
+    are the closest equivalent, and all three are pre-flight reads rather than rehearsed
+    writes — GET /facilities/{facility_id}/validate (validateFacility) validates a
+    Managed Solutions facility before completeFacility; GET
+    /facilities/{facility_id}/generation/meters/{meter_id}/readings/eligibility
+    (userCanSubmitMeterReading) tests whether a meter reading may be submitted before
+    submitting it; and the Managed Solutions upload error-preview operations
+    (facilityUploadErrorPreviewBulk, facilityUploadSingleRowErrorPreview) show what a
+    correction would do before applying it.
+pagination:
+  style: mixed, per family
+  connect:
+    style: POST-based search with request-body criteria
+    note: >-
+      Xpansiv Connect models list retrieval as POST .../action/search across
+      retirements, transfers, issuances, split lots, forward deals, projects,
+      generators, instruments, account positions and deposits. Paging parameters live in
+      the request body, not the query string, so the calls are not cacheable and not
+      link-followable.
+  optimal:
+    style: page-based
+    note: Optimal Telemetry exposes getIdentifiersPage
+      (GET /api/usagePointIdentifier/{readingProfileCode}), the only explicitly
+      page-named operation in the catalog.
+  managed_solutions:
+    style: query-parameter list operations (GET /facilities, /utilities, /building_types,
+      /remote_data_collectors, /qualified_reporting_entities)
+  cursor_support: none declared
+  link_header: none declared
+field_expansion:
+  supported: false
+  note: >-
+    No expand / include / fields / sparse-fieldset parameter is declared anywhere. Two
+    operations offer a fixed fat variant instead of a general mechanism —
+    getResourceWithForm and createResourceDraft (…/withForm) on the Optimal Resource API
+    return the resource together with its form definition.
+metadata:
+  custom_fields: not declared as a general facility
+  note: The Optimal Resource API is form-driven — getCookedFormMetadata
+    (GET /form/core/cooked/metadata/{formCode}) returns the field definitions for a
+    resource type, which is how per-program extensibility is expressed rather than a
+    metadata bag.
+request_tracing:
+  request_id_header: none declared
+  correlation_field: correlationId (request body, registry and Optimal families)
+  support_handle: submissionId (server-issued, registry and Optimal families)
+  note: >-
+    No X-Request-Id, traceparent or equivalent HTTP header is declared on any operation.
+    The registry and Optimal families instead carry tracing IN THE BODY, and document it
+    precisely: correlationId is described in the contracts as "an opaque value that will
+    be returned in the responses and error messages to correlate the response or error
+    with the corresponding request" (NAR, TIGR) and "Client system correlation Id -
+    allows the caller to correlate between requests and responses" (Optimal Transfer
+    Position). Responses echo it back ("The correlation identifier from the input",
+    "Matches the correlationId provided in the inter-account transfer request").
+    Alongside it, submissionId is a server-issued value the contracts describe as a
+    "Submission identifier for issue investigation" — the handle to quote to Xpansiv
+    support. Xpansiv Connect and Managed Solutions declare neither.
+  important: >-
+    correlationId is a CORRELATION identifier, not an idempotency key. The contracts
+    define it as echoed for matching responses to requests; nothing states that resending
+    the same correlationId suppresses a duplicate write. Do not use it as one.
+  other_handles:
+  - fileHandle — returned by APX Power Markets uploadFile, used with getStatus to
+    retrieve asynchronous scheduling validation errors
+  - upload_id — used by the Managed Solutions upload error preview and fix operations
+versioning:
+  style: path-segment major version (/v1)
+  cross_link: lifecycle/xpansiv-lifecycle.yml
+error_envelope:
+  shape: no single envelope
+  rfc9457: false
+  note: >-
+    application/json on 222 error responses, */* on 89, application/problem+json on
+    none. Branch on HTTP status. The Marketplace FIX surface uses FIX rejects
+    (35=j, 35=3) and no HTTP status at all.
+  cross_link: errors/xpansiv-problem-types.yml
+rate_limit_signaling:
+  headers: none declared
+  status_on_exhaustion: 429
+  note: >-
+    429 is declared on 15 operations and documented in the Xpansiv Data error table
+    ("Too Many Requests -- You're requesting too many times! Slow down!"), but no
+    Retry-After, RateLimit-* or X-RateLimit-* header is declared or documented, and no
+    numeric limit is published. An agent cannot compute a backoff from the response.
+  cross_link: rate-limits/xpansiv-rate-limits.yml
+content_negotiation:
+  request: application/json; application/x-www-form-urlencoded on the OAuth2 token
+    endpoints; multipart file upload on APX Power Markets uploadFile and Managed
+    Solutions document/image upload
+  response: application/json, plus binary file download (APX Power Markets getFile) and
+    NCSV time-series CSV on Xpansiv Data
+  ncsv: >-
+    Xpansiv Data publishes its own Time Series CSV specification (NCSV) at
+    https://developer.xpansiv.com/developer-portal/xpansiv-data/ncsv — a first-party
+    interchange format, not a general standard.
+non_http_surface:
+  fix:
+    protocol: FIX 4.4
+    session_types: [Transaction, DropCopy, MarketData]
+    docs: https://developer.xpansiv.com/developer-portal/marketplace/fix-api
+    note: >-
+      Order entry and real-time market data for CBL are FIX, not REST. None of the
+      conventions above apply to that surface; it follows FIX Trading Community
+      semantics with Xpansiv-specific truncation of over-length String values.
+  xsd:
+    docs: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/xsds
+    note: >-
+      ISO scheduling payloads submitted through the APX Power Markets file registry are
+      governed by the APXScheduleAPI XSD (targetNamespace
+      http://service.apx.com/schedule), not by OpenAPI body schemas. The HTTP contract
+      describes the envelope; the XSD describes the content.

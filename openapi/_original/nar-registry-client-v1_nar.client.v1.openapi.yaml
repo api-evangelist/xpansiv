@@ -1,0 +1,1616 @@
+openapi: 3.0.1
+info:
+  version: 1.0.0
+  title: NAR Registry Client API
+  description: >
+
+    This API is used for retrieving and transacting NAR Monthly vintage
+    certificates. APIs require an OAuth Authentication token. To create API
+    credentials, see <a
+    href="https://nar.zendesk.com/hc/en-us/articles/25002082817175-Account-Holder-API">Creating
+    an API Login</a>.
+  contact:
+    email: nar@apx.com
+servers:
+  - url: https://narenewables2.apx.com/ClientAPI
+    description: Generated server url
+security:
+  - JWT: []
+tags:
+  - name: account
+    description: Account Information
+  - name: ledger
+    description: Ledger Operations
+  - name: subaccount
+    description: Subaccount Operations
+  - name: system
+    description: System Information
+paths:
+  /api/ledger/transfer:
+    post:
+      tags:
+        - ledger
+      summary: Inter-Account Transfers
+      description: >-
+        Initiate certificate transfers to other registry account holders.
+        Transfers must then be confirmed by the counterparty.
+      operationId: interaccountTransfer
+      parameters:
+        - name: onBehalfOfAccountId
+          in: query
+          description: >-
+            Account id for which the request is being made: defaults to the
+            primary account id of the requester unless specified
+          required: false
+          schema:
+            type: string
+            description: >-
+              Account id for which the request is being made: defaults to the
+              primary account id of the requester unless specified
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InteraccountTransferRequestDto'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ResponseContainerInteraccountTransferResponse
+        '400':
+          description: Invalid parameter(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '403':
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '413':
+          description: Request payload is too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '429':
+          description: Server too busy or acceptable use policy violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '500':
+          description: An unexpected error has occurred
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+  /api/ledger/transfer/pending/action:
+    post:
+      tags:
+        - ledger
+      summary: Pending Transfer Actions
+      description: >-
+        Perform actions on pending transfers of monthly certificates between
+        accounts (either incoming or outgoing). Note that actions for incoming
+        and outgoing transfers can be included in the same submission. 
+      operationId: actionPendingTransfers
+      parameters:
+        - name: onBehalfOfAccountId
+          in: query
+          description: >-
+            Account id for which the request is being made: defaults to the
+            primary account id of the requester unless specified
+          required: false
+          schema:
+            type: string
+            description: >-
+              Account id for which the request is being made: defaults to the
+              primary account id of the requester unless specified
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PendingTransferActionRequestDto'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ResponseContainerPendingTransferActionResponse
+        '400':
+          description: Invalid parameter(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '403':
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '413':
+          description: Request payload is too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '429':
+          description: Server too busy or acceptable use policy violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '500':
+          description: An unexpected error has occurred
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+  /api/ledger/subaccountTransfer:
+    post:
+      tags:
+        - ledger
+      summary: SubAccount Transfers
+      description: >-
+        Initiate transfers of monthly certificates to other sub-accounts within
+        an account.
+      operationId: subaccountTransfer
+      parameters:
+        - name: onBehalfOfAccountId
+          in: query
+          description: >-
+            Account id for which the request is being made: defaults to the
+            primary account id of the requester unless specified
+          required: false
+          schema:
+            type: string
+            description: >-
+              Account id for which the request is being made: defaults to the
+              primary account id of the requester unless specified
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubaccountTransferRequestDTO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ResponseContainerSubaccountTransferResponse
+        '400':
+          description: Invalid parameter(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '403':
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '413':
+          description: Request payload is too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '429':
+          description: Server too busy or acceptable use policy violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '500':
+          description: An unexpected error has occurred
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+  /api/ledger/retire:
+    post:
+      tags:
+        - ledger
+      summary: Retirements
+      description: Initiate retirements of monthly certificates within an account.
+      operationId: retire
+      parameters:
+        - name: onBehalfOfAccountId
+          in: query
+          description: >-
+            Account id for which the request is being made: defaults to the
+            primary account id of the requester unless specified
+          required: false
+          schema:
+            type: string
+            description: >-
+              Account id for which the request is being made: defaults to the
+              primary account id of the requester unless specified
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RetireRequestDto'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContainerRetireResponse'
+        '400':
+          description: Invalid parameter(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '403':
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '413':
+          description: Request payload is too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '429':
+          description: Server too busy or acceptable use policy violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '500':
+          description: An unexpected error has occurred
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+  /api/system/ping:
+    get:
+      tags:
+        - system
+      summary: Ping System
+      description: >-
+        For connectivity testing. Checks for server health and ensures a valid
+        auth token is being properly provided.
+      operationId: ping
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pong'
+        '400':
+          description: Invalid parameter(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '403':
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '429':
+          description: Server too busy or acceptable use policy violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '500':
+          description: An unexpected error has occurred
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+  /api/account/counterparty:
+    get:
+      tags:
+        - account
+      summary: Counterparties
+      description: >-
+        A request to retrieve a list of accounts in the registry that are valid
+        for certificate transfers. This should be all NAR accounts that can buy
+        or sell certificates (this will not include MA Biomass accounts).
+      operationId: getCounterparties
+      parameters:
+        - name: counterpartyAccountIds
+          in: query
+          description: >-
+            Counterparty account ids: if specified, limits the results to the
+            counterparty accounts whose ids match the provided set
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int32
+        - name: $filter
+          in: query
+          description: OData-like filter expression
+          required: false
+          schema:
+            type: string
+        - name: $orderby
+          in: query
+          description: Comma-separated list of columns for sorting
+          required: false
+          schema:
+            type: string
+        - name: $skip
+          in: query
+          description: Number of records to skip
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $top
+          in: query
+          description: Maximum number of records to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $apply
+          in: query
+          description: OData-like apply expression with groupby and aggregate only
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ODataEnvelopeWithTotalCountOfCounterparty'
+        '400':
+          description: Invalid parameter(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '403':
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '429':
+          description: Server too busy or acceptable use policy violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '500':
+          description: An unexpected error has occurred
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+  /api/ledger/holding:
+    get:
+      tags:
+        - ledger
+      summary: Certificate Holdings
+      description: >-
+        Retrieve the list of all monthly certificates held by the API user
+        (hourly certificates are not included). This will return certificates
+        belonging to the API user that are in active and retired states.
+      operationId: getHoldings
+      parameters:
+        - name: accountIds
+          in: query
+          description: >-
+            Account ids: if specified, limits results to the items related to
+            the accounts whose ids match the provided set; otherwise, all
+            results related to any authorized account will be returned
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - name: vintageStart
+          in: query
+          description: Vintage start (inclusive)
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: vintageEnd
+          in: query
+          description: Vintage end (exclusive)
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: subaccountTypeCode
+          in: query
+          description: >-
+            Subaccount type code. If not specified, holdings will be returned
+            regardless of status. 
+          required: false
+          schema:
+            type: string
+        - name: $filter
+          in: query
+          description: OData-like filter expression
+          required: false
+          schema:
+            type: string
+        - name: $orderby
+          in: query
+          description: Comma-separated list of columns for sorting
+          required: false
+          schema:
+            type: string
+        - name: $skip
+          in: query
+          description: Number of records to skip
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $top
+          in: query
+          description: Maximum number of records to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $apply
+          in: query
+          description: OData-like apply expression with groupby and aggregate only
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ODataEnvelopeWithTotalCountOfHolding'
+        '400':
+          description: Invalid parameter(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '403':
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '429':
+          description: Server too busy or acceptable use policy violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '500':
+          description: An unexpected error has occurred
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+  /api/ledger/subaccount:
+    get:
+      tags:
+        - subaccount
+      summary: SubAccounts
+      description: Retrieve a list  of subaccounts.
+      operationId: getSubaccounts
+      parameters:
+        - name: accountIds
+          in: query
+          description: >-
+            Account ids: if specified, limits results to the items related to
+            the accounts whose ids match the provided set; otherwise, all
+            results related to any authorized account will be returned
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - name: subaccountType
+          in: query
+          description: Subaccount type code
+          required: false
+          schema:
+            type: string
+            enum:
+              - ACT
+              - RET
+        - name: $filter
+          in: query
+          description: OData-like filter expression
+          required: false
+          schema:
+            type: string
+        - name: $orderby
+          in: query
+          description: Comma-separated list of columns for sorting
+          required: false
+          schema:
+            type: string
+        - name: $skip
+          in: query
+          description: Number of records to skip
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $top
+          in: query
+          description: Maximum number of records to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $apply
+          in: query
+          description: OData-like apply expression with groupby and aggregate only
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ODataEnvelopeWithTotalCountOfLedgerSubaccount
+        '400':
+          description: Invalid parameter(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '403':
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '429':
+          description: Server too busy or acceptable use policy violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '500':
+          description: An unexpected error has occurred
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+  /api/ledger/transfer/pending:
+    get:
+      tags:
+        - ledger
+      summary: Pending Transfers
+      description: >-
+        Retrieve the list of all pending monthly certificate intra-registry
+        transfers for Monthly vintage certificates for an account/accounts.
+        Results do not include pending imports or export.
+      operationId: getPendingTransfers
+      parameters:
+        - name: accountIds
+          in: query
+          description: >-
+            Account ids: if specified, limits results to the items related to
+            the accounts whose ids match the provided set; otherwise, all
+            results related to any authorized account will be returned
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - name: direction
+          in: query
+          description: Transfer direction
+          required: false
+          schema:
+            type: string
+            enum:
+              - I
+              - O
+        - name: $filter
+          in: query
+          description: OData-like filter expression
+          required: false
+          schema:
+            type: string
+        - name: $orderby
+          in: query
+          description: Comma-separated list of columns for sorting
+          required: false
+          schema:
+            type: string
+        - name: $skip
+          in: query
+          description: Number of records to skip
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $top
+          in: query
+          description: Maximum number of records to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $apply
+          in: query
+          description: OData-like apply expression with groupby and aggregate only
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ODataEnvelopeWithTotalCountOfPendingTransfer
+        '400':
+          description: Invalid parameter(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '403':
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '429':
+          description: Server too busy or acceptable use policy violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '500':
+          description: An unexpected error has occurred
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+components:
+  schemas:
+    Counterparty:
+      required:
+        - accountId
+        - accountType
+        - name
+      type: object
+      properties:
+        accountId:
+          type: integer
+          description: The account identifier
+          format: int32
+          example: '55'
+        name:
+          type: string
+          description: The account name
+          example: Acme Corp.
+        accountType:
+          type: string
+          description: The account type
+          example: General Account
+        website:
+          type: string
+          description: The account website
+          example: acmecorp.com
+        isTransferor:
+          type: boolean
+          description: Indicates whether the account is eligible to sell certificates.
+        isTransferee:
+          type: boolean
+          description: Indicates whether the account is eligible to buy certificates.
+      description: Counterparty information
+    ErrorContainer:
+      type: object
+      properties:
+        submissionId:
+          type: string
+          description: Submission identifier for issue investigation
+        errors:
+          type: array
+          description: List of errors
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+      description: Container for errors
+    ErrorItem:
+      required:
+        - message
+      type: object
+      properties:
+        parameter:
+          type: string
+          description: The parameter in error, if applicable
+        correlationId:
+          type: string
+          description: The correlation identifier from the input
+        path:
+          type: string
+          description: The path to the field specifically in error, if applicable
+        field:
+          type: string
+        code:
+          type: string
+          description: The field in error, if applicable
+        message:
+          type: string
+          description: The error code
+      description: Describes a specific error
+    Holding:
+      required:
+        - accountId
+        - certificateSerialNumberRange
+        - countryIso2Code
+        - fuelTypeCode
+        - fuelTypeDescription
+        - notificationEmail
+        - notificationName
+        - quantity
+        - resourceName
+        - resourceProgramAssignedIdentifier
+        - vintageMonth
+      type: object
+      properties:
+        accountId:
+          type: string
+          description: The account identifier
+          example: '55'
+        notificationName:
+          type: string
+          description: The name of the beneficial owner of a retirement
+          example: John Doe
+        notificationEmail:
+          type: string
+          description: The email address of the beneficial owner of a retirement
+          example: jdoe@acmecorp.com
+        certificateSerialNumberRange:
+          type: string
+          description: The certificate serial number range
+          example: NAR-REC-1234-CA-06-2024-555555-1 to 66
+        certificateStatus:
+          type: string
+          description: The certificate status - Active, Pending, Retired
+          example: RETIRED
+        countryIso2Code:
+          type: string
+          description: The country to which resource belongs as an ISO-2 code
+          example: US
+        fuelTypeCode:
+          type: string
+          description: 'The fuel type code: see documentation for possible values'
+          example: H2O
+        fuelTypeDescription:
+          type: string
+          description: The fuel type description
+          example: Hydroelectric Water
+        quantity:
+          type: number
+          description: The holding quantity
+          example: 66
+        resourceName:
+          type: string
+          description: The resource name
+          example: Acme Hydro
+        resourceProgramAssignedIdentifier:
+          type: string
+          description: The resource identifier
+          example: GEN1234
+        retirementDate:
+          type: string
+          format: date-time
+          description: The date the holding was retired
+          example: '2024-10-06T22:38:15.08Z'
+        retirementDetails:
+          type: string
+          description: Additional retirement details
+          example: Retired of behalf of John Doe
+        retirementReasonCode:
+          type: string
+          description: 'The retirement reason code: see documentation for possible values'
+          example: '22'
+        retirementReasonDescription:
+          type: string
+          description: The retirement reason description
+          example: REC-Only Product
+        retirementComplianceState:
+          type: string
+          description: The State chosen for the retirement. (ISO 3166-2 code)
+          example: CA
+        retirementYear:
+          type: integer
+          description: The retirement year
+          format: int32
+          example: 2024
+        retirementTypeCode:
+          type: string
+          description: 'The retirement type code: see documentation for possible values'
+          example: GRN
+        retirementTypeDescription:
+          type: string
+          description: >-
+            The retirement type description: see documentation for possible
+            values
+          example: Green-e Energy Voluntary Market
+        subaccountType:
+          type: string
+          description: 'The subaccount type code: see documentation for possible values'
+          example: RET
+        subaccountId:
+          type: string
+          description: The subaccount identifier
+          example: '321'
+        subaccountName:
+          type: string
+          description: The subaccount name
+          example: Green-e Retirements 2024
+        vintageMonth:
+          type: string
+          description: The vintage month (rendered as an ISO-8601 date)
+          example: 06/2024
+        eligibilities:
+          type: string
+          description: >-
+            a comma-delimited list of eligibility codes: see documentation for
+            possible values
+          example: CRS Listed
+      description: Holding information
+    InteraccountTransferRequest:
+      required:
+        - certificateSerialNumberRange
+        - quantity
+        - transfereeId
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: >-
+            Correlation identifier: an opaque value that will be returned in the
+            responses and error messages to correlate the response or error with
+            the corresponding request
+          example: '1'
+        certificateSerialNumberRange:
+          type: string
+          description: >-
+            The certificate serial number range: certificate ranges as returned
+            by the holdings call, may not be combined with other ranges, even if
+            contiguous
+          example: NAR-REC-1234-CA-06-2024-555555-1 to 66
+        quantity:
+          type: number
+          description: The quantity of the transaction
+          example: 55
+        transfereeId:
+          type: string
+          description: The transferee (buyer) account identifier
+          example: '77'
+      description: Request to transfer credits to another account
+    InteraccountTransferRequestDto:
+      type: object
+      properties:
+        requests:
+          type: array
+          description: List of requests
+          items:
+            $ref: '#/components/schemas/InteraccountTransferRequest'
+      description: Transfer requests
+    InteraccountTransferResponse:
+      required:
+        - certificateSerialNumberRange
+        - quantity
+        - transferId
+        - transfereeId
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: >-
+            Correlation identifier: an opaque value that will be returned in the
+            responses and error messages to correlate the response or error with
+            the corresponding request
+          example: '1'
+        certificateSerialNumberRange:
+          type: string
+          description: >-
+            The certificate serial number range: certificate ranges as returned
+            by the holdings call, may not be combined with other ranges, even if
+            contiguous
+          example: NAR-REC-1234-CA-06-2024-555555-1 to 66
+        quantity:
+          type: number
+          description: The quantity of the transaction
+          example: 55
+        transfereeId:
+          type: string
+          description: The transferee (buyer) account identifier
+          example: '77'
+        transferId:
+          type: string
+          description: The transfer identifier
+          example: '5678'
+        remainingCertificateSerialNumberRange:
+          type: string
+          description: >-
+            The certificate serial number range remaining in the account after
+            the operation
+          example: NAR-REC-1234-CA-06-2024-555555-56 to 66
+      description: Response to a transfer request to another account
+    LedgerSubaccount:
+      required:
+        - accountId
+        - open
+        - subaccountId
+        - subaccountName
+        - subaccountType
+      type: object
+      properties:
+        accountId:
+          type: integer
+          description: The account identifier
+          format: int32
+          example: 55
+        subaccountId:
+          type: string
+          description: The subaccount identifier
+          example: '321'
+        subaccountType:
+          type: string
+          description: The subaccount type
+          enum:
+            - ACT
+            - RET
+            - KSG
+          example: ACT
+        subaccountName:
+          type: string
+          description: The subaccount name
+          example: Active Hydro Certificates
+        open:
+          type: boolean
+          description: Whether the subaccount is open
+      description: Subaccount information
+    ODataEnvelopeWithTotalCountOfCounterparty:
+      required:
+        - countExceeded
+        - value
+      type: object
+      properties:
+        '@count':
+          type: integer
+          format: int32
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Counterparty'
+        totalCount:
+          type: integer
+          format: int32
+        countExceeded:
+          type: boolean
+      description: Container for OData-like rows of information with count
+    ODataEnvelopeWithTotalCountOfHolding:
+      required:
+        - countExceeded
+        - value
+      type: object
+      properties:
+        '@count':
+          type: integer
+          format: int32
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Holding'
+        totalCount:
+          type: integer
+          format: int32
+        countExceeded:
+          type: boolean
+      description: Container for OData-like rows of information with count
+    ODataEnvelopeWithTotalCountOfLedgerSubaccount:
+      required:
+        - countExceeded
+        - value
+      type: object
+      properties:
+        '@count':
+          type: integer
+          format: int32
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/LedgerSubaccount'
+        totalCount:
+          type: integer
+          format: int32
+        countExceeded:
+          type: boolean
+      description: Container for OData-like rows of information with count
+    ODataEnvelopeWithTotalCountOfPendingTransfer:
+      required:
+        - countExceeded
+        - value
+      type: object
+      properties:
+        '@count':
+          type: integer
+          format: int32
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/PendingTransfer'
+        totalCount:
+          type: integer
+          format: int32
+        countExceeded:
+          type: boolean
+      description: Container for OData-like rows of information with count
+    PendingTransfer:
+      required:
+        - accountId
+        - certificateSerialNumberRange
+        - dateInitiated
+        - direction
+        - fuelTypeCode
+        - quantity
+        - resourceName
+        - resourceProgramAssignedIdentifier
+        - transferId
+        - transfereeId
+        - transferorId
+        - vintageMonth
+      type: object
+      properties:
+        accountId:
+          type: string
+          description: The account identifier
+          example: '55'
+        certificateSerialNumberRange:
+          type: string
+          description: The certificate serial number range
+          example: NAR-REC-1234-CA-06-2024-555555-1 to 66
+        dateInitiated:
+          type: string
+          description: The date the transfer was initiated
+          format: date-time
+          example: '2024-10-06T22:38:15.08Z'
+        direction:
+          type: string
+          description: 'The transfer direction: I=Incoming, O=Outgoing'
+          enum:
+            - I
+            - O
+          example: O
+        eligibilities:
+          type: string
+          description: >-
+            a comma-delimited list of eligibility codes: see documentation for
+            possible values
+          example: CRS Listed
+        fuelTypeCode:
+          type: string
+          description: 'The fuel type code: see documentation for possible values'
+          example: H2O
+        resourceName:
+          type: string
+          description: The resource name
+          example: Acme Hydro
+        resourceProgramAssignedIdentifier:
+          type: string
+          description: The resource identifier
+          example: GEN1234
+        countrySubdivisionCode:
+          type: string
+          description: State or Province that the resource is located in (ISO 3166-2 code)
+          example: CA
+        notes:
+          type: string
+          description: notes
+          example: For contract XYZ
+        quantity:
+          type: number
+          description: The transfer quantity
+          example: 66
+        transfereeId:
+          type: string
+          description: The transferee (buyer) account identifier
+          example: '77'
+        transferId:
+          type: string
+          description: The transfer identifier
+          example: '5678'
+        transferorId:
+          type: string
+          description: The transferor (seller) account identifier
+          example: '55'
+        vintageMonth:
+          type: string
+          description: The vintage month (rendered as an ISO-8601 date)
+          example: 06/2024
+      description: Pending transfer information
+    PendingTransferActionRequest:
+      required:
+        - action
+        - transferId
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: >-
+            Correlation identifier: an opaque value that will be returned in the
+            responses and error messages to correlate the response or error with
+            the corresponding request
+          example: '1'
+        transferId:
+          type: string
+          description: The transfer identifier
+          example: '5678'
+        action:
+          type: string
+          description: The transfer action
+          enum:
+            - CONFIRM
+            - REJECT
+            - WITHDRAW
+          example: CONFIRM
+        subaccountId:
+          type: string
+          description: >-
+            ID of the subaccount into which Confirmed transfers will be
+            deposited.
+          example: '77'
+      description: Request to take action on a pending transfer
+    PendingTransferActionRequestDto:
+      type: object
+      properties:
+        requests:
+          type: array
+          description: List of requests
+          items:
+            $ref: '#/components/schemas/PendingTransferActionRequest'
+      description: Transfer action requests
+    PendingTransferActionResponse:
+      required:
+        - action
+        - transferId
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: >-
+            Correlation identifier: an opaque value that will be returned in the
+            responses and error messages to correlate the response or error with
+            the corresponding request
+          example: '1'
+        transferId:
+          type: string
+          description: The transfer identifier
+          example: '5678'
+        action:
+          type: string
+          description: The transfer action
+          enum:
+            - CONFIRM
+            - REJECT
+            - WITHDRAW
+          example: CONFIRM
+        subaccountId:
+          type: string
+          description: >-
+            ID of the subaccount into which Confirmed transfers will be
+            deposited. 
+          example: '77'
+      description: Response to a pending transfer action request
+    Pong:
+      required:
+        - pong
+      type: object
+      properties:
+        pong:
+          type: string
+          format: date-time
+          example: '2024-10-22T19:26:52.641Z'
+      description: Response indicating server is online and auth token is valid
+    ResponseContainerInteraccountTransferResponse:
+      required:
+        - submissionId
+      type: object
+      properties:
+        submissionId:
+          type: string
+          description: Submission identifier for issue investigation
+          example: '1'
+        responses:
+          type: array
+          description: List of responses
+          items:
+            $ref: '#/components/schemas/InteraccountTransferResponse'
+      description: Container for responses
+    ResponseContainerPendingTransferActionResponse:
+      required:
+        - submissionId
+      type: object
+      properties:
+        submissionId:
+          type: string
+          description: Submission identifier for issue investigation
+          example: '1'
+        responses:
+          type: array
+          description: List of responses
+          items:
+            $ref: '#/components/schemas/PendingTransferActionResponse'
+      description: Container for responses
+    ResponseContainerRetireResponse:
+      required:
+        - submissionId
+      type: object
+      properties:
+        submissionId:
+          type: string
+          description: Submission identifier for issue investigation
+          example: '1'
+        responses:
+          type: array
+          description: List of responses
+          items:
+            $ref: '#/components/schemas/RetireResponse'
+      description: Container for responses
+    ResponseContainerSubaccountTransferResponse:
+      required:
+        - submissionId
+      type: object
+      properties:
+        submissionId:
+          type: string
+          description: Submission identifier for issue investigation
+          example: '1'
+        responses:
+          type: array
+          description: List of responses
+          items:
+            $ref: '#/components/schemas/SubaccountTransferResponse'
+      description: Container for responses
+    RetireRequest:
+      required:
+        - certificateSerialNumberRange
+        - quantity
+        - retirementTypeCode
+        - subaccountId
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: >-
+            An opaque value that will be returned in the responses and error
+            messages to correlate the response or error with the corresponding
+            request
+          example: '1'
+        certificateSerialNumberRange:
+          type: string
+          description: >-
+            Certificate serial number ranges as returned by the holdings call,
+            may not be combined with other ranges, even if contiguous
+          example: NAR-REC-1234-CA-06-2024-555555-1 to 66
+        quantity:
+          type: number
+          description: The quantity of the transaction
+          example: '55'
+        subaccountId:
+          type: string
+          description: The subaccount identifier
+          example: '77'
+        isPublic:
+          type: boolean
+          description: Whether the retirement will be public
+        retirementTypeCode:
+          type: string
+          description: 'The retirement type code: see documentation for allowed values'
+          example: GRN
+        retirementReasonCode:
+          type: string
+          description: 'The retirement reason code: see documentation for allowed values'
+          example: '22'
+        countrySubdivisionCode:
+          type: string
+          description: The retirement state, ISO-3166-2 for US states
+          example: CA
+        retirementYear:
+          type: integer
+          description: The retirement/compliance year
+          format: int32
+          example: 2024
+        notificationName:
+          type: string
+          description: The name of the notification recipient (e.g, beneficial owner)
+          example: John Doe
+        notificationEmail:
+          type: string
+          description: >-
+            The e-mail address(es) of the notification recipient (e.g,
+            beneficial owner)
+          example: jdoe@acmecorp.com
+        additionalDetails:
+          type: string
+          description: >-
+            Additional details text, may be required in some cases: see
+            documentation for more information
+          example: Voluntary Retirement for Acme Corp.
+        retirementCertificateType:
+          type: string
+          description: '''SINGLE''. Only used for retirementTypeCodes GRN and  BBO'
+          example: SINGLE
+      description: Request to retire credits
+    RetireRequestDto:
+      type: object
+      properties:
+        requests:
+          type: array
+          description: List of requests
+          items:
+            $ref: '#/components/schemas/RetireRequest'
+      description: Retire requests
+    RetireResponse:
+      required:
+        - certificateSerialNumberRange
+        - quantity
+        - retirementTypeCode
+        - subaccountId
+        - transferId
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: >-
+            An opaque value that will be returned in the responses and error
+            messages to correlate the response or error with the corresponding
+            request
+          example: '1'
+        certificateSerialNumberRange:
+          type: string
+          description: >-
+            Certificate serial number ranges as returned by the holdings call,
+            may not be combined with other ranges, even if contiguous
+          example: NAR-REC-1234-CA-06-2024-555555-1 to 66
+        quantity:
+          type: number
+          description: The quantity of the transaction
+          example: '55'
+        subaccountId:
+          type: string
+          description: The subaccount identifier
+          example: '77'
+        isPublic:
+          type: boolean
+          description: Whether the retirement will be public
+        retirementTypeCode:
+          type: string
+          description: 'The retirement type code: see documentation for allowed values'
+          example: GRN
+        retirementReasonCode:
+          type: string
+          description: 'The retirement reason code: see documentation for allowed values'
+          example: '22'
+        countrySubdivisionCode:
+          type: string
+          description: The retirement state, ISO-3166-2 for US states
+          example: CA
+        retirementYear:
+          type: integer
+          description: The retirement/compliance year
+          format: int32
+          example: 2024
+        notificationName:
+          type: string
+          description: The name of the notification recipient (e.g, beneficial owner)
+          example: John Doe
+        notificationEmail:
+          type: string
+          description: >-
+            The e-mail address(es) of the notification recipient (e.g,
+            beneficial owner)
+          example: jdoe@acmecorp.com
+        additionalDetails:
+          type: string
+          description: >-
+            Additional details text, may be required in some cases: see
+            documentation for more information
+          example: Voluntary Green-e retirement
+        retirementCertificateType:
+          type: string
+          description: '''SINGLE''. Only used for retirementTypeCodes GRN and  BBO '
+          example: SINGLE
+        transferId:
+          type: string
+          description: The transfer identifier
+          example: '5678'
+        remainingCertificateSerialNumberRange:
+          type: string
+          description: >-
+            The certificate serial number range remaining in the account after
+            the operation
+          example: NAR-REC-1234-CA-06-2024-555555-56 to 66
+      description: Response to an retire request
+    SubaccountTransferRequest:
+      required:
+        - certificateSerialNumberRange
+        - quantity
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: >-
+            An opaque value that will be returned in the responses and error
+            messages to correlate the response or error with the corresponding
+            request
+          example: '1'
+        certificateSerialNumberRange:
+          type: string
+          description: >-
+            Certificate serial number ranges as returned by the holdings call,
+            may not be combined with other ranges, even if contiguous
+          example: NAR-REC-1234-CA-06-2024-555555-1 to 66
+        quantity:
+          type: number
+          description: The quantity of the transaction
+          example: '55'
+        subaccountId:
+          type: string
+          description: >-
+            The subaccount identifier. If not specified, indicates a transfer to
+            the primary account
+          example: '77'
+      description: Request to transfer credits between active subaccounts
+    SubaccountTransferRequestDTO:
+      type: object
+      properties:
+        requests:
+          type: array
+          description: List of requests
+          items:
+            $ref: '#/components/schemas/SubaccountTransferRequest'
+      description: Subaccount transfer requests
+    SubaccountTransferResponse:
+      required:
+        - certificateSerialNumberRange
+        - quantity
+        - transferId
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: >-
+            An opaque value that will be returned in the responses and error
+            messages to correlate the response or error with the corresponding
+            request
+          example: '1'
+        certificateSerialNumberRange:
+          type: string
+          description: >-
+            Certificate serial number ranges as returned by the holdings call,
+            may not be combined with other ranges, even if contiguous
+          example: NAR-REC-1234-CA-06-2024-555555-1 to 66
+        quantity:
+          type: number
+          description: The quantity of the transaction
+          example: '55'
+        subaccountId:
+          type: string
+          description: >-
+            The subaccount identifier. If not specified, indicates a transfer to
+            the primary account
+          example: '77'
+        transferId:
+          type: string
+          description: The transfer identifier
+          example: '5678'
+        remainingCertificateSerialNumberRange:
+          type: string
+          description: >-
+            The certificate serial number range remaining in the account after
+            the operation
+          example: NAR-REC-1234-CA-06-2024-555555-56 to 66
+      description: Response to a transfer request between active subaccounts
+    ValidationError:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        parameter:
+          type: string
+        message:
+          type: string
+  securitySchemes:
+    JWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

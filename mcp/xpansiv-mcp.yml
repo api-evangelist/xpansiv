@@ -1,0 +1,76 @@
+generated: '2026-09-04'
+method: probed
+source: https://developer.xpansiv.com/mcp (POST tools/list, HTTP 200, 2026-09-04)
+provider: Xpansiv
+name: Xpansiv Developer Portal MCP Server
+status: live
+deployment:
+  mode: remote
+  endpoint: https://developer.xpansiv.com/mcp
+  auth: none
+  verified: probed
+transport: streamable-http (SSE response framing on tools/list)
+protocol_evidence:
+  fetched: '2026-09-04'
+  url: https://developer.xpansiv.com/mcp
+  method: POST
+  request: '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+  http_status: 200
+  content_type: text/event-stream
+  anonymous: true
+  saved: mcp/xpansiv-mcp-tools-list.json
+oauth:
+  protected_resource_metadata: https://developer.xpansiv.com/.well-known/oauth-protected-resource/mcp
+  authorization_servers:
+  - https://developer.xpansiv.com
+  scopes_supported:
+  - openid
+  - profile
+  - email
+  - offline_access
+  note: >-
+    RFC 9728 protected-resource metadata is published, but tools/list answered
+    anonymously with the full tool set and input schemas. Authentication appears to
+    scope the whoami tool and any account-bound content rather than gate discovery.
+note: >-
+  This is a DOCUMENTATION MCP server, not a business-operations one. It is served from
+  Xpansiv's own developer portal host and is reachable by an agent today, but its seven
+  tools read the portal's OpenAPI descriptions and search its documentation — they do
+  not call Xpansiv Connect, the registries, Xpansiv Data or the Marketplace. An agent can
+  use it to discover and understand every Xpansiv API, then must call those APIs directly
+  over REST or FIX with its own credentials. The server is provided by Redocly, the
+  platform the portal runs on; the authorization-server metadata names
+  auth.cloud.redocly.com as issuer. Xpansiv publishes no MCP server that fronts the APIs
+  themselves.
+tool_count: 7
+tools:
+- name: whoami
+  description: Get information about the currently authenticated user
+  input_schema_properties: []
+- name: list-apis
+  description: Lists available APIs with their context and purpose
+  input_schema_properties:
+  - name (string, optional) — API name or part of it
+- name: get-endpoints
+  description: Get all endpoints for a specific API
+  input_schema_properties:
+  - name (string, required) — API name or part of it
+- name: get-endpoint-info
+  description: Get comprehensive information about specific endpoint including parameters,
+    security, and examples
+  input_schema_properties:
+  - name (string, required)
+  - path (string, required)
+  - method (string, required, enum of HTTP methods)
+- name: get-security-schemes
+  description: Get the security schemes for a specific API
+  input_schema_properties:
+  - name (string, required)
+- name: get-full-spec-document
+  description: Get the complete OpenAPI spec document for an API
+  input_schema_properties:
+  - name (string, required)
+- name: search
+  description: Search across the documentation to fetch relevant content for a given query
+  input_schema_properties:
+  - query (string, required)

@@ -1,0 +1,104 @@
+generated: '2026-09-04'
+method: derived
+source: mcp/xpansiv-mcp-tools-list.json + openapi/*.yml (11 harvested OpenAPI descriptions)
+provider: Xpansiv
+note: >-
+  The crosswalk is unusual for this provider and the shape is the finding. Xpansiv's MCP
+  server is a DOCUMENTATION server: every one of its seven tools operates ON the OpenAPI
+  descriptions and docs, not on the environmental-commodity resources those descriptions
+  govern. So no MCP tool binds to any Xpansiv operationId — all seven are mcp_only, and
+  all 110 REST operations are rest_only. This is not a gap in our mapping; it is the
+  actual divergence between the two surfaces, and it is what an agent needs to know
+  before planning a workflow: it can DISCOVER every Xpansiv API through MCP, and must
+  EXECUTE against REST (or FIX) with separately issued credentials.
+surfaces:
+  openapi:
+    count: 11
+    operations: 110
+    files: openapi/*.yml
+    gated: false
+    note: All eleven descriptions are published anonymously at
+      https://developer.xpansiv.com/_spec/openapi/... ; the APIs they describe require
+      credentials.
+  mcp:
+    url: https://developer.xpansiv.com/mcp
+    gated: false
+    note: tools/list answered anonymously with full inputSchema for all 7 tools.
+  graphql:
+    present: false
+  fix:
+    protocol: FIX 4.4
+    docs: https://developer.xpansiv.com/developer-portal/marketplace/fix-api
+    gated: false
+    note: Session-based binary/tag-value protocol; not addressable by an MCP tool or an
+      OpenAPI operationId. Order entry and market data for CBL live here, not in REST.
+crosswalk: []
+mcp_only:
+- tool: whoami
+  reason: Portal identity introspection; no Xpansiv business API exposes the caller's
+    portal identity.
+- tool: list-apis
+  reason: Meta-operation over the portal's spec catalog. The nearest REST analogue would
+    be an /.well-known/api-catalog document, which Xpansiv does not serve.
+- tool: get-endpoints
+  reason: Reads paths[] out of a stored OpenAPI description; no runtime API operation
+    backs it.
+- tool: get-endpoint-info
+  reason: Reads one operation object (parameters, security, examples) out of a stored
+    OpenAPI description.
+- tool: get-security-schemes
+  reason: Reads components.securitySchemes out of a stored OpenAPI description.
+- tool: get-full-spec-document
+  reason: Returns a whole spec document. Equivalent to GET
+    https://developer.xpansiv.com/_spec/openapi/<bundle>/<file>.yaml, which is a static
+    docs asset rather than an API operation.
+- tool: search
+  reason: Full-text documentation search. Xpansiv publishes no search API.
+rest_only:
+  count: 110
+  note: >-
+    Every operation in all eleven descriptions has no backing MCP tool. Highest-value
+    unserved flows for an agent, by product — Xpansiv Connect: createRetirement,
+    checkStatus, createTransfers, acceptTransfers, cancelTransfers, rejectTransfers,
+    searchAccountPositions, getRegistryRules, deposit, withdraw,
+    withdrawAndRetire; NAR Registry: retire, interaccountTransfer, subaccountTransfer,
+    actionPendingTransfers, getHoldings; TIGR Registry: retireUsingPOST, getHoldings,
+    createSubaccountsUsingPOST; Optimal Transfer Position: initiateRetirements,
+    initiateAccountTransfers, acknowledgeTransferBatches, getLedgerHoldings,
+    getLedgerHistory; Managed Solutions: createFacility, submitMeterReading,
+    completeFacility, searchMarket; APX Power Markets: uploadFile, getScheduleData,
+    getStatus, getReport.
+  by_api:
+  - api: Xpansiv Connect API
+    operations: 28
+  - api: Xpansiv Managed Solutions API
+    operations: 29
+  - api: Optimal Transfer Position External API
+    operations: 14
+  - api: NAR Registry Client API
+    operations: 9
+  - api: Optimal Resource API
+    operations: 7
+  - api: APX Power Markets File Registry API
+    operations: 7
+  - api: TIGRS Registry Client API
+    operations: 5
+  - api: Optimal File Registry API
+    operations: 4
+  - api: Optimal Telemetry API
+    operations: 4
+  - api: Optimal Reporting Service
+    operations: 2
+  - api: Optimal System API
+    operations: 1
+coverage:
+  mcp_tools: 7
+  mcp_tools_bound_to_rest: 0
+  rest_operations: 110
+  rest_operations_with_tool: 0
+  binding_rate: 0.0
+  confidence: high
+  basis: >-
+    Confidence is high precisely because the answer is zero — the tool descriptions and
+    input schemas were read from a live anonymous tools/list, and none of them names a
+    Xpansiv resource. This is a measured divergence, not an unmapped one.

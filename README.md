@@ -64,5 +64,46 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Xpansiv is a company surfaced via the API Evangelist harvest backlog (source: secondary-market) and added to the network as a stub for full-pipeline profiling.
-- https://forgeglobal.com/xpansiv_stock/
+Xpansiv is market infrastructure for global environmental and energy commodities — carbon
+credits, renewable energy certificates, water, low-carbon fuels and recycled materials. It
+operates CBL, the largest spot exchange for environmental commodities, the Evolution
+Markets and OTX execution desks, the H2OX water market, and the environmental registries it
+acquired with APX in 2022 (NAR, TIGR, I-REC, I-TRACK-G and the digital fuels registries).
+
+## What this profile found
+
+Xpansiv publishes a substantial, machine-readable API surface at
+[developer.xpansiv.com](https://developer.xpansiv.com/) — a Redocly portal that also serves
+an `llms.txt` and a live remote MCP server.
+
+- **11 OpenAPI descriptions, 110 operations, 492 schemas** — harvested verbatim to
+  `openapi/_original/`. Xpansiv Connect (28 ops), Xpansiv Managed Solutions (29), the
+  Optimal Outcomes suite (32 across six services), the NAR (9) and TIGRS (5) registry client
+  APIs, and the APX Power Markets file registry (7).
+- **A FIX 4.4 marketplace protocol specification** — CBL order entry and real-time market
+  data are FIX, not REST, and Xpansiv publishes its full rules of engagement.
+- **A live remote MCP server** at `https://developer.xpansiv.com/mcp`, answering
+  `tools/list` anonymously with 7 tools. It is a *documentation* server: none of its tools
+  binds to any of the 110 business operations (see `mcp/xpansiv-tool-crosswalk.yml`).
+- **One first-party SDK** — `xpansiv-data` on PyPI, v1.0.2.post1, published 2026-03-12.
+- **Four separate credential systems** behind one `Authorization: Bearer` header, with no
+  token accepted across families — a direct consequence of growth by acquisition.
+
+Three gaps are worth naming because they carry real risk on a catalog that moves and cancels
+financial instruments: **no idempotency key exists on any of the 110 operations**,
+**retirements are irreversible** with no cancel or restore path anywhere, and **no rate
+limit is published** despite 429 being declared on 15 operations. The `conventions/`,
+`errors/` and `rate-limits/` artifacts record each with evidence.
+
+Xpansiv publishes no status page, no changelog, no security.txt, no trust center and no
+public pricing.
+
+## Artifacts
+
+`openapi/` · `overlays/` · `mcp/` · `llms/` · `well-known/` · `packages/` ·
+`authentication/` · `scopes/` · `conventions/` · `errors/` · `conformance/` · `lifecycle/` ·
+`data-model/` · `rate-limits/` · `plans/` · `sandbox/` · `security/` · `skills/`
+
+- Website: https://www.xpansiv.com/
+- Developer portal: https://developer.xpansiv.com/
+- Support: https://support.xpansiv.com/

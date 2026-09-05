@@ -1,0 +1,68 @@
+generated: '2026-09-04'
+method: searched
+source: >-
+  openapi/xpansiv-connect-openapi.yml servers[] ,
+  https://developer.xpansiv.com/developer-portal/nar-registry/urls ,
+  https://developer.xpansiv.com/developer-portal/tigr-registry/urls ,
+  https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+provider: Xpansiv
+self_serve: false
+note: >-
+  Xpansiv publishes pre-production environments but no self-serve sandbox. Every
+  environment below requires credentials that Xpansiv issues to a contracted client —
+  the Connect getting-started page says plainly "To generate bearer token one has request
+  credentials from Xpansiv", and the TIGR authentication page says to "reach out to the
+  TIGR administrator". There are no test keys, no test cards, no magic identifiers, no
+  time simulation and no fixture/trigger tooling published. NEVER invent one: the write
+  surface here retires and transfers real environmental commodity instruments.
+environments:
+- name: SANDBOX
+  api: Xpansiv Connect API
+  url: https://sandbox.preprod.connect.xpansiv.com/app/api/v1
+  source: servers[] description "SANDBOX" in the published Connect description
+  credentials: issued by Xpansiv on request
+- name: UAT
+  api: Xpansiv Connect API
+  url: https://uat.preprod.connect.xpansiv.com/app/api/v1
+  auth_server: https://auth.preprod.xpansiv.com/oauth/token
+  source: servers[] description "UAT" + the getting-started page, whose worked example
+    calls the UAT host
+- name: UAT
+  api: NAR Registry Client API
+  url: https://NAR-app-uat01.apx.com/clientapi/
+  auth_server: https://apxjwtauthuat.apx.com/oauth/token
+  source: https://developer.xpansiv.com/developer-portal/nar-registry/urls
+- name: UAT
+  api: TIGRS Registry Client API
+  url: https://tigrs-app-uat01.apx.com/clientapi/
+  auth_server: https://apxjwtauthuat.apx.com/oauth/token
+  source: https://developer.xpansiv.com/developer-portal/tigr-registry/urls
+- name: UAT
+  api: Optimal Outcomes APIs
+  url: https://optimalapi-uat-ext.apx.com
+  source: second servers[] entry in each of the six Optimal descriptions
+tooling:
+- name: MarketSuite Sandbox Environment (Postman)
+  url: https://developer.xpansiv.com/assets/marketsuite_sandbox_devportal.postman_environment.3cf3711b3e03466da26e83662dadae29fac1a75605eebd44abd76cfd2d7da5e9.5dcc6978.json
+  docs: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+  note: >-
+    Pre-configured environment variables for the APX MarketSuite sandbox. The provider
+    states "Add authentication credentials" — the file ships variable names, not working
+    test credentials.
+test_data:
+  test_keys: none published
+  test_cards: not applicable
+  magic_identifiers: none published
+  time_simulation: none published
+  fixtures: none published
+safe_read_operations:
+  note: >-
+    The closest thing to a no-risk first call an integrator has, all read-only and all
+    still requiring a token.
+  operations:
+  - GET /api/system/ping (NAR Registry Client API, operationId ping)
+  - GET /api/system/ping (TIGRS Registry Client API, operationId pingUsingGET)
+  - GET /optimal/v1/system/ping (Optimal System API, operationId ping)
+  - GET /reference-data (Xpansiv Connect API, operationId getReferenceData)
+  - GET /retirements/program/{RetirementProgramCode}/rules (Xpansiv Connect API,
+    operationId getRegistryRules)

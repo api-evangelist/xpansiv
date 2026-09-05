@@ -1,0 +1,148 @@
+generated: '2026-09-04'
+method: searched
+source: >-
+  https://developer.xpansiv.com/developer-portal/marketplace/fix-api ,
+  https://developer.xpansiv.com/developer-portal/nar-registry/authentication ,
+  https://auth.xpansiv.com/.well-known/openid-configuration ,
+  https://developer.xpansiv.com/.well-known/oauth-protected-resource/mcp ,
+  openapi/*.yml
+provider: Xpansiv
+note: >-
+  Every entry below is anchored to a location in a contract or a discovery document that
+  was actually fetched, not to a marketing claim. Nothing is asserted for a standard the
+  provider does not demonstrably speak.
+conformance:
+- id: fix-4.4
+  name: FIX Protocol 4.4 (FIX Trading Community)
+  conforms: true
+  domain_standard: true
+  evidence: >-
+    https://developer.xpansiv.com/developer-portal/marketplace/fix-api — "Xpansiv
+    Marketplace Server API (rules of engagement) are based on FIX 4.4 specification and
+    best practice guidelines as published by the FIX Trading Community. Unless
+    specifically stated, field numbers, names, and data types are as published by the FIX
+    specification." The page publishes the standard header (tag 8 BeginString, valid
+    value FIX.4.4; 9 BodyLength; 35 MsgType; 49 SenderCompID; 56 TargetCompID), the
+    supported administrative and application message set, and the three session types
+    (Transaction, DropCopy, MarketData). Unsupported messages are rejected with
+    BusinessMessageReject (35=j); malformed ones with a session-level Reject (35=3).
+  note: >-
+    This is the domain-standard signature for Xpansiv's market. A counterparty that
+    already runs a FIX engine connects to CBL order entry and market data with no bespoke
+    connector; one that does not needs a bilateral integration. The declaration is in the
+    contract itself (tag numbers and message types), not in prose about the contract.
+- id: oauth2-rfc6749
+  name: OAuth 2.0 (RFC 6749) — resource owner password credentials grant
+  conforms: true
+  evidence: >-
+    https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+    links RFC 6749 §4.3.2 directly and documents POST to
+    https://apxjwtauthprod.apx.com/oauth/token with Basic {client:secret},
+    Content-Type application/x-www-form-urlencoded, grant_type=password, returning
+    access_token / token_type / expires_in / scope. The same flow is documented for the
+    NAR and TIGR registry client APIs.
+- id: oauth2-auth0-password-realm
+  name: OAuth 2.0 password-realm extension grant (Auth0)
+  conforms: true
+  evidence: >-
+    https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started —
+    grant_type=http://auth0.com/oauth/grant-type/password-realm against
+    https://auth.xpansiv.com/oauth/token with audience https://xpansiv/platform.
+  note: A vendor extension grant, not a registered IETF grant type. Recorded as it is
+    documented, and flagged as non-standard for an integrator's planning.
+- id: oidc-discovery
+  name: OpenID Connect Discovery 1.0
+  conforms: true
+  evidence: >-
+    https://auth.xpansiv.com/.well-known/openid-configuration returns HTTP 200 with
+    issuer https://auth.xpansiv.com/, authorization_endpoint, token_endpoint,
+    jwks_uri, userinfo_endpoint, registration_endpoint, revocation_endpoint,
+    device_authorization_endpoint and code_challenge_methods_supported [S256, plain].
+    https://support.xpansiv.com/.well-known/openid-configuration also returns 200
+    (Salesforce Experience Cloud).
+- id: rfc9728-oauth-protected-resource
+  name: OAuth 2.0 Protected Resource Metadata (RFC 9728)
+  conforms: true
+  evidence: >-
+    https://developer.xpansiv.com/.well-known/oauth-protected-resource/mcp returns 200
+    with resource https://developer.xpansiv.com/mcp, authorization_servers,
+    bearer_methods_supported [header] and scopes_supported.
+- id: rfc7519-jwt
+  name: JSON Web Token (RFC 7519)
+  conforms: true
+  evidence: >-
+    bearerFormat JWT declared in components.securitySchemes of
+    openapi/xpansiv-connect-openapi.yml, openapi/xpansiv-nar-registry-client-openapi.yml
+    and the six Optimal Outcomes descriptions; the auth docs describe the returned
+    credential as a "short-lived JSON Web Token".
+- id: openapi-3
+  name: OpenAPI Specification 3.x
+  conforms: true
+  evidence: >-
+    Eleven descriptions published at https://developer.xpansiv.com/_spec/openapi/... —
+    nine at 3.0.1, one at 3.0.0 (TIGRS), one at 3.1.0 (Optimal Transfer Position).
+- id: xml-schema-1.0
+  name: W3C XML Schema (XSD) — APXScheduleAPI file contracts
+  conforms: true
+  evidence: >-
+    https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/xsds publishes
+    the full APXScheduleAPI XSD inline, targetNamespace
+    http://service.apx.com/schedule, with a dated change history (most recent entry
+    "May 6, 2026 Added 4 new products for CAISO DAME market change"). The ISO scheduling
+    file payloads carried by the File Registry API are governed by this schema, not by
+    the OpenAPI body schemas.
+- id: rfc9457-problem-details
+  name: RFC 9457 Problem Details for HTTP APIs
+  conforms: false
+  evidence: >-
+    No response in any of the eleven descriptions declares application/problem+json;
+    error bodies are application/json (222 declarations) or */* (89). Error shapes differ
+    per product family rather than sharing one envelope.
+- id: json-api
+  name: JSON:API
+  conforms: false
+  evidence: No application/vnd.api+json media type in any description.
+- id: odata
+  name: OData
+  conforms: false
+  partial: true
+  evidence: >-
+    No $metadata surface, no $filter/$select/$expand query conventions and no
+    OData-Version header, so this is not OData. But the NAR, TIGR and Optimal families do
+    borrow the OData RESPONSE ENVELOPE and say so in their own schema descriptions —
+    components.schemas.ODataEnvelopeWithTotalCountOfCounterparty (NAR) and
+    ODataEnvelopeOfCorporateEntities (TIGR) are titled "Container for OData-like rows of
+    information with count" and carry an "@count" integer alongside a "value" array,
+    with totalCount and countExceeded on the NAR variant. Recorded as OData-shaped, not
+    OData-conformant — a client cannot issue OData queries against these APIs.
+- id: scim
+  name: SCIM (RFC 7643/7644)
+  conforms: false
+  evidence: No urn:ietf:params:scim schema URN in any description; user provisioning is
+    not part of the public surface.
+- id: idempotency-key
+  name: Idempotency-Key header (draft-ietf-httpapi-idempotency-key)
+  conforms: false
+  evidence: >-
+    No Idempotency-Key or equivalent request header is declared on any of the 110
+    operations, including the retirement, transfer, deposit and withdrawal writes. See
+    conventions/xpansiv-conventions.yml.
+- id: rate-limit-headers
+  name: RateLimit header fields (draft-ietf-httpapi-ratelimit-headers)
+  conforms: false
+  evidence: >-
+    HTTP 429 is declared on 15 operations and documented in the Xpansiv Data error table,
+    but no RateLimit-*, X-RateLimit-* or Retry-After response header is declared or
+    documented anywhere. See rate-limits/xpansiv-rate-limits.yml.
+- id: sunset-header-rfc8594
+  name: Sunset HTTP header (RFC 8594)
+  conforms: false
+  evidence: No Sunset or Deprecation response header declared; no deprecation policy
+    published on the developer portal.
+compliance_programs: []
+compliance_note: >-
+  No trust center, SOC 2 / ISO 27001 / PCI / HIPAA / FedRAMP certification page, or
+  published compliance program was found on xpansiv.com, developer.xpansiv.com or
+  apx.com (which now 301s to www.xpansiv.com). probe-security-programs.py returned
+  vdp=none trust=none on 2026-09-04. No `Compliance` or `TrustCenter` pointer is
+  therefore emitted — an absence, honestly recorded, rather than a claim.

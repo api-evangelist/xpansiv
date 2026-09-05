@@ -1,0 +1,2270 @@
+openapi: 3.1.0
+info:
+  title: Transfer Position External API
+  description: Use API credentials to view and manage instruments.
+  version: 1.0.0
+servers:
+  - url: https://optimalapi-ext.apx.com/transfer/v1
+  - url: https://optimalapi-uat-ext.apx.com/transfer/v1
+tags:
+  - name: transferbatch-v1
+    description: >-
+      Initiate a transfer request (between subaccounts or another account
+      holder), view or act upon pending transfers, as well as view historical
+      transfer details.
+  - name: retirementbatch-v1
+    description: >-
+      View or submit a retirement request, or redemption claim, on
+      instrument(s).
+  - name: ledger-v1
+    description: View an Account's current and historical instrument details
+  - name: subaccount-v1
+    description: >-
+      View or create subaccounts. Use subaccounts to organize your account’s
+      instruments. All accounts have a "Default" subaccount, where all new
+      issuances and incoming transfers will be deposited. Subaccounts may also
+      be used to delegate instrument management to an authorized third party.
+paths:
+  /api/ledger/{ledgerIdentifier}/transfer:
+    post:
+      tags:
+        - transferbatch-v1
+      summary: Initiate counterparty transfer
+      description: >-
+        Initiate transfer will propose the transaction to the counterparty,
+        after which the counterparty will be prompted to act on the proposal.
+      operationId: initiateAccountTransfers
+      parameters:
+        - name: ledgerIdentifier
+          in: path
+          description: Ledger identifier, can be found using /api/ledger endpoint
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      requestBody:
+        description: Bulk Transfer Request payload
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkTransferRequest'
+        required: true
+      responses:
+        '200':
+          description: success
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BulkTransferResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GeneralError'
+                  - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger/{ledgerIdentifier}/transferBatch/open/action:
+    post:
+      tags:
+        - transferbatch-v1
+      summary: Act on a proposed transfer
+      description: >-
+        Actions include accept, reject or withdrawal of a proposed transfer,
+        using the transfer batch identifier.
+      operationId: acknowledgeTransferBatches
+      parameters:
+        - name: ledgerIdentifier
+          in: path
+          description: Ledger identifier, can be found using /api/ledger endpoint
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      requestBody:
+        description: Populated ActionTransferBatches payload
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionTransferBatches'
+        required: true
+      responses:
+        '200':
+          description: success
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GeneralError'
+                  - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger/{ledgerIdentifier}/transferBatch/byIdentifier:
+    post:
+      tags:
+        - transferbatch-v1
+      summary: Retrieve transfer request details
+      description: >-
+        View the details behind a transfer request, using the transfer batch
+        identifier.
+      operationId: getTransferBatchesByIdentifier
+      parameters:
+        - name: ledgerIdentifier
+          in: path
+          description: Ledger identifier, can be found using /api/ledger endpoint
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      requestBody:
+        description: Populated TransferBatchRetrieveByIdentifierRequest
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferBatchRetrieveByIdentifierRequest'
+        required: true
+      responses:
+        '200':
+          description: success
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TransferBatchRetrieveByIdentifierResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GeneralError'
+                  - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger/{ledgerIdentifier}/transfer/subaccount:
+    post:
+      tags:
+        - transferbatch-v1
+      summary: Transfer holdings between subaccounts
+      description: Transfers holdings between active subaccounts, within the same account.
+      operationId: initiateSubaccountTransfers
+      parameters:
+        - name: ledgerIdentifier
+          in: path
+          description: Ledger identifier, can be found using /api/ledger endpoint
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      requestBody:
+        description: Bulk Subaccount Transfer request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkSubaccountTransferRequest'
+        required: true
+      responses:
+        '200':
+          description: success
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BulkSubaccountTransferResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GeneralError'
+                  - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger/{ledgerIdentifier}/subaccount:
+    get:
+      tags:
+        - subaccount-v1
+      summary: Retrieve sub-accounts
+      description: Retrieve available subaccounts by account.
+      operationId: getSubaccounts
+      parameters:
+        - name: ledgerIdentifier
+          in: path
+          description: Ledger identifier, can be found using /api/ledger endpoint
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+        - name: onBehalfOfSrcAcctId
+          in: query
+          description: >-
+            If permitted, allows the caller to create subaccounts on behalf of
+            another account holder, identifying that account holder by their
+            system-assigned srcAcctId.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Subaccounts'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GeneralError'
+                  - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+    post:
+      tags:
+        - subaccount-v1
+      summary: Create sub-account
+      description: >-
+        Create a new subaccount to organize your account’s instruments or to
+        delegate transaction authority to an authorized third party. All
+        accounts have a "Default" subaccount.
+      operationId: createSubaccount
+      parameters:
+        - name: ledgerIdentifier
+          in: path
+          description: Ledger identifier, can be found using /api/ledger endpoint
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      requestBody:
+        description: Subaccount payload
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subaccount'
+        required: true
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GeneralError'
+                  - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger/{ledgerIdentifier}/retirementBatch/byIdentifier:
+    post:
+      tags:
+        - retirementbatch-v1
+      summary: Retrieve retirement request details
+      description: View retirement details using the retirement batch identifier
+      operationId: getRetirementBatchesByIdentifier
+      parameters:
+        - name: ledgerIdentifier
+          in: path
+          description: Ledger identifier, can be found using /api/ledger endpoint
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      requestBody:
+        description: Populated RetirementBatchRetrieveByIdentifierRequest
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RetirementBatchRetrieveByIdentifierRequest'
+        required: true
+      responses:
+        '200':
+          description: success
+          content:
+            '*/*':
+              schema:
+                $ref: >-
+                  #/components/schemas/RetirementBatchRetrieveByIdentifierResponse
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GeneralError'
+                  - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger/{ledgerIdentifier}/retire:
+    post:
+      tags:
+        - retirementbatch-v1
+      summary: Initiate a retirement request
+      description: Retire, or claim, instruments against an obligation
+      operationId: initiateRetirements
+      parameters:
+        - name: ledgerIdentifier
+          in: path
+          description: Ledger identifier, can be found using /api/ledger endpoint
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      requestBody:
+        description: Populated BulkRetirementRequest
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkRetirementRequest'
+        required: true
+      responses:
+        '200':
+          description: success
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BulkRetirementResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GeneralError'
+                  - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger/{ledgerIdentifier}/issuance/byIdentifier:
+    post:
+      tags:
+        - ledger-v1
+      summary: Retrieve instrument details at origination
+      description: View instrument details at origination using the issuance identifier.
+      operationId: getIssuanceBatchByIdentifier
+      parameters:
+        - name: ledgerIdentifier
+          in: path
+          description: Ledger identifier, can be found using /api/ledger endpoint
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      requestBody:
+        description: Populated IssuanceRetrieveByIdentifierRequest
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssuanceRetrieveByIdentifierRequest'
+        required: true
+      responses:
+        '200':
+          description: success
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/IssuanceRetrieveByIdentifierResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GeneralError'
+                  - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger:
+    get:
+      tags:
+        - ledger-v1
+      summary: Retrieve available ledgers
+      description: View the list of available ledgers by registry
+      operationId: getLedgers
+      responses:
+        '200':
+          description: Ledgers retrieved
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OwnershipLedgers'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GeneralError'
+                  - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger/{ledgerIdentifier}/transferBatch/open:
+    get:
+      tags:
+        - transferbatch-v1
+      summary: Retrieve pending transfer requests
+      description: Retrieve list of currently pending transfers.
+      operationId: getOpenTransferBatches
+      parameters:
+        - name: ledgerIdentifier
+          in: path
+          description: Ledger identifier, can be found using /api/ledger endpoint
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+        - name: direction
+          in: query
+          description: >-
+            Specify whether you want only "in"bound or "out"bound pending
+            transfers. If omitted, both types will be returned.
+          required: false
+          schema:
+            type: string
+            enum:
+              - in
+              - out
+          example: direction="in"
+        - name: includeHoldings
+          in: query
+          description: Include transfer related holdings details
+          required: false
+          schema:
+            type: boolean
+          example: '?includeHoldings=true'
+        - name: onBehalfOfSrcAcctId
+          in: query
+          description: >-
+            If permitted, allows the caller to retrieve open transfer batches on
+            behalf of another account holder, identifying that account holder by
+            their system-assigned srcAcctId.
+          required: false
+          schema:
+            type: string
+        - name: $skip
+          in: query
+          description: Number of records to skip
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $top
+          in: query
+          description: Maximum number of records to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $filter
+          in: query
+          description: OData-like filter expression
+          required: false
+          schema:
+            type: string
+        - name: $apply
+          in: query
+          description: OData-like apply expression with groupby and aggregate only
+          required: false
+          schema:
+            type: string
+        - name: $orderby
+          in: query
+          description: Comma-separated list of columns for sorting
+          required: false
+          schema:
+            type: string
+        - name: $count
+          in: query
+          description: Whether to include the count of records with the result
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: transfer batches retrieved
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OpenTransferBatchResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GeneralError'
+                  - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger/{ledgerIdentifier}/holding:
+    get:
+      tags:
+        - ledger-v1
+      summary: Retrieve account holdings
+      description: View current instruments by ledger, using the ledger identifier.
+      operationId: getLedgerHoldings
+      parameters:
+        - name: ledgerIdentifier
+          in: path
+          description: Ledger identifier, can be found using /api/ledger endpoint
+          required: true
+          schema:
+            type: string
+          example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+        - name: asset
+          in: query
+          description: >-
+            If true, requests asset holdings, otherwise requests liability
+            holdings.
+          required: false
+          schema:
+            type: boolean
+          example: true
+        - name: onBehalfOfSrcAcctId
+          in: query
+          description: >-
+            If permitted, allows the caller to request holdings for another
+            account holder, identifying that account holder by their
+            system-assigned srcAcctId.
+          required: false
+          schema:
+            type: string
+          example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+        - name: transferTypeCode
+          in: query
+          description: >-
+            If specified, only holdings that qualify for the specified transfer
+            type will be returned
+          required: false
+          schema:
+            type: string
+          example: RET
+        - name: $skip
+          in: query
+          description: Number of records to skip
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $top
+          in: query
+          description: Maximum number of records to return
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $filter
+          in: query
+          description: OData-like filter expression
+          required: false
+          schema:
+            type: string
+        - name: $apply
+          in: query
+          description: OData-like apply expression with groupby and aggregate only
+          required: false
+          schema:
+            type: string
+        - name: $orderby
+          in: query
+          description: Comma-separated list of columns for sorting
+          required: false
+          schema:
+            type: string
+        - name: $count
+          in: query
+          description: Whether to include the count of records with the result
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Holdings retrieved
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Holdings'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GeneralError'
+                  - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger/{ledgerIdentifier}/history:
+    get:
+      tags:
+        - ledger-v1
+      summary: Retrieve account transfers and retirements
+      description: >-
+        View your account's ledger history, such as account-to-account transfers
+        and retirements.
+      operationId: getLedgerHistory
+      parameters:
+        - name: ledgerIdentifier
+          in: path
+          description: Ledger identifier, can be found using /api/ledger endpoint
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+        - name: onBehalfOfSrcAcctId
+          in: query
+          description: >-
+            If permitted, allows the caller to request transfer history on
+            behalf of another account holder, identifying that account holder by
+            their system-assigned srcAcctId.
+          required: false
+          schema:
+            type: string
+          example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+        - name: $skip
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $top
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: $filter
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: $apply
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: $orderby
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: $count
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: transfer batches retrieved
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/LedgerHistoryList'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GeneralError'
+                  - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger/{ledgerIdentifier}/account:
+    get:
+      tags:
+        - ledger-v1
+      summary: Retrieves list of counterparties
+      description: >-
+        View counterparties for account-to-account transfers. Counterparties are
+        returned by Program Ledger.
+      operationId: getLedgerAccounts
+      parameters:
+        - name: ledgerIdentifier
+          in: path
+          description: Ledger identifier, can be found using /api/ledger endpoint
+          required: true
+          schema:
+            type: string
+          example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      responses:
+        '200':
+          description: Accounts retrieved
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/LedgerAccounts'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/GeneralError'
+                  - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+components:
+  schemas:
+    AbstractRestError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
+    GeneralError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
+    ErrorContainer:
+      type: object
+      properties:
+        submissionId:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+    ErrorItem:
+      type: object
+      properties:
+        parameter:
+          type: string
+        correlationId:
+          type: string
+        path:
+          type: string
+        field:
+          type: string
+        code:
+          type: string
+        message:
+          type: string
+    BulkTransferRequest:
+      type: object
+      properties:
+        onBehalfOfSrcAcctId:
+          type: string
+          description: >-
+            If permitted, allows the caller to initiate transfer batches on
+            behalf of another account holder, identifying that account holder by
+            their system-assigned srcAcctId.
+        requests:
+          type: array
+          description: Collection of Transfer requests
+          items:
+            $ref: '#/components/schemas/InteraccountTransferRequest'
+    InteraccountTransferRequest:
+      type: object
+      properties:
+        transfereeSrcAcctId:
+          type: string
+          description: >-
+            System-assigned account Identifier of the transfer counterparty;
+            recipient of the transfer request.
+          example: b5d8d6b3-bcaf-11ef-ae69-b61606fd520c
+        holdingCriteria:
+          type: array
+          description: Criteria for holdings to be associated with this transfer batch.
+          items:
+            $ref: '#/components/schemas/QuantifiedHolding'
+        correlationId:
+          type: string
+          description: >-
+            Client system correlation Id – allows the caller to correlate
+            between requests and responses
+        requestConfirmation:
+          type: boolean
+        toSubaccountIdentifier:
+          type: string
+          description: >-
+            Identifier of the subaccount in the transferee (receiving) account
+            into which to deposit the goods
+        totalPrice:
+          type: number
+          description: Indicates the total price of the transfer
+        currencyCode:
+          type: string
+          description: Indicates the currency of the price of the transfer
+        notes:
+          type: string
+          description: Contains the transfer notes
+      description: Interaccount Transfer Request
+    QuantifiedHolding:
+      type: object
+      properties:
+        holdingIdentifier:
+          type: string
+          description: Holding Identifier, as returned by the holdings API
+          example: '476099'
+        quantity:
+          type: number
+          description: Quantity of holding to be used in this operation
+          example: 3
+      description: Quantified Holding
+    BulkTransferResponse:
+      type: object
+      properties:
+        responses:
+          type: array
+          description: Bulk Transfer Response
+          items:
+            $ref: '#/components/schemas/InteraccountTransferResponse'
+      description: Bulk Transfer Response
+    InteraccountTransferResponse:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: >-
+            Matches the correlationId provided in the inter-account transfer
+            request.
+          example: '1234'
+        transferIdentifier:
+          type: string
+          description: >-
+            The transfer batch's system-assigned identifier used for
+            programmatic (API) interactions.
+          example: 5A9BBB98-73E5-4226-B55E-1B4AABFE3CF3
+      description: Interaccount Transfer Response
+    ActionTransferBatchItem:
+      type: object
+      properties:
+        batchIdentifier:
+          type: string
+          description: The system identifier for a specific transfer batch
+          example: 7644439A-A56B-45E5-AFE6-94E149CF014E
+    ActionTransferBatches:
+      type: object
+      properties:
+        onBehalfOfSrcAcctId:
+          type: string
+          description: >-
+            If permitted, allows the caller to perform actions on open transfer
+            batches on behalf of another account holder, identifying that
+            account holder by their system-assigned srcAcctId.
+        action:
+          type: string
+          description: >-
+            Specifies code of action to take; same action for all transfer
+            batches included in "items".
+          example: WITHDRAW
+          enum:
+            - CONFIRM
+            - WITHDRAW
+            - REJECT
+        items:
+          type: array
+          description: List of transfer batch identifiers
+          items:
+            $ref: '#/components/schemas/ActionTransferBatchItem'
+    TransferBatchRetrieveByIdentifierRequest:
+      type: object
+      properties:
+        onBehalfOfSrcAcctId:
+          type: string
+          description: >-
+            If permitted, allows the caller to initiate transfer batches on
+            behalf of another account holder, identifying that account holder by
+            their system-assigned srcAcctId.
+        transferBatchIdentifiers:
+          uniqueItems: true
+          type: array
+          description: >-
+            System-assigned identifiers associated with the transfer batches to
+            be retrieved.
+          items:
+            type: string
+        includeHoldings:
+          type: boolean
+          description: >-
+            If true, include holding details in response. Defaults to true if
+            not specified.
+    Holding:
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: The holding's system-assigned identifier.
+        resourceProgramAssignedIdentifier:
+          type: string
+          description: The associated resource's program assigned identifier.
+          example: GHG1021
+        holdingStatus:
+          $ref: '#/components/schemas/ReferenceDatum'
+        programPeriodBeginInclusive:
+          type: string
+          description: >-
+            Start of program period (vintage) associated to the holding record's
+            issuance.
+          format: date-time
+          example: '2022-01-01T00:00:00-05:00'
+        programPeriodEndExclusive:
+          type: string
+          description: >-
+            End of program period (vintage) associated to the holding record's
+            issuance.
+          format: date-time
+          example: '2023-01-01T00:00:00-05:00'
+        timeOfProductionBeginInclusive:
+          type: string
+          description: Start of production period associated to the holding's issuance
+          format: date-time
+          example: '2022-01-01T00:00:00-05:00'
+        timeOfProductionEndExclusive:
+          type: string
+          description: End of production period associated to the holding's issuance
+          format: date-time
+          example: '2023-01-01T00:00:00-05:00'
+        serialNumber:
+          type: string
+          description: The holding record's serial number.
+          example: APXOPCAR-GOC-GHG1021-US-2022--46-5701-6700
+        quantity:
+          type: number
+          description: The quantity of the holding record.
+          example: 1000
+        programVersions:
+          type: array
+          description: Associated programs and their versions.
+          items:
+            $ref: '#/components/schemas/ProgramVersion'
+        protocolVersions:
+          type: array
+          description: Associated protocols and their versions.
+          items:
+            $ref: '#/components/schemas/ProtocolVersion'
+        resourceInputTypeCodes:
+          type: array
+          description: >-
+            A list of resource input types associated with the holding record's
+            issuance.
+          items:
+            type: string
+        resourceOutputTypeCodes:
+          type: array
+          description: >-
+            A list of resource output types associated with the holding record's
+            issuance.
+          example: CARBON_REDUCTION
+          items:
+            type: string
+        subaccountIdentifier:
+          type: string
+          description: The  system-assigned identifier for the subaccount.
+          example: 5FF7ABAA-095D-11EF-B304-AA080FC10FFA
+        subaccountName:
+          type: string
+          description: Subaccount name, as inputted by subaccount owner.
+          example: My Linked Holdings
+        subaccountNumber:
+          type: string
+          description: Subaccount Id displayed on the Optimal Outcomes platform's UI.
+          example: '10033'
+        programCertificationGroupCode:
+          type: string
+          description: The issuing program certification group of the holding record.
+          example: NONAFOLU_GHG_MEASUREMENT_PROGRAM
+        upn:
+          type: string
+          description: >-
+            Xpansiv Connect Universal Project Number (UPN) for Resource
+            associated to the holding's issuance, if assigned.
+          example: 0999F5B4
+        ein:
+          type: string
+          description: Xpansiv Connect Environmental Instrument Number (EIN), if assigned.
+          example: 1246AFA3E2
+        einDescription:
+          type: string
+          description: >-
+            Xpansiv Connect Environmental Instrument Number (EIN) details, if
+            assigned
+          example: VCU-20120101-20121231-EDEM-3267-ZMB
+        shadowedLedgerName:
+          type: string
+          description: If shadowing = true, the external ledger's name.
+          example: Verra
+        managingExternalPlatformName:
+          type: string
+          description: >-
+            If the holding is held in an external subaccount, the name of the
+            managing external platform associated with the external subaccount.
+          example: Xpansiv Connect
+        holdingGroupIdentifier:
+          type: string
+          description: >-
+            Identifier for grouped holdings in transfer operations, if
+            applicable.
+        certificateType:
+          $ref: '#/components/schemas/ReferenceDatum'
+    NamedProtocolVersion:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Protocol code
+          example: AMS-I.D.
+        version:
+          type: string
+          description: Version of Protocol
+          example: 1.0.0
+        effectiveAt:
+          type: string
+          description: Start date of the Protocol Version
+          format: date-time
+        expiresAt:
+          type: string
+          description: End date of the Protocol Version
+          format: date-time
+        issuing:
+          type: boolean
+          description: Issuing/Adorning flag
+        shortName:
+          type: string
+          description: Protocol's short name
+          example: AMS-I.D.
+    ProgramVersion:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Program code
+          example: GHG_MEASUREMENT_PROGRAM
+        version:
+          type: string
+          description: Version of Program.
+          example: 5.0.0
+        shortName:
+          type: string
+          description: Program short name
+          example: Carbon Measurement
+        protocolVersions:
+          type: array
+          description: A list of Protocols associated with Program.
+          items:
+            $ref: '#/components/schemas/NamedProtocolVersion'
+    ProtocolVersion:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Protocol code
+          example: AMS-I.D.
+        version:
+          type: string
+          description: Version of Protocol
+          example: 1.0.0
+        effectiveAt:
+          type: string
+          description: Start date of the Protocol Version
+          format: date-time
+        expiresAt:
+          type: string
+          description: End date of the Protocol Version
+          format: date-time
+        issuing:
+          type: boolean
+          description: Issuing/Adorning flag
+    ReferenceDatum:
+      required:
+        - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: The reference data's value.
+        name:
+          type: string
+          description: The reference data's name
+      description: A reference datum data object
+    TransferBatch:
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: The system identifier for this transfer batch
+          example: 5A9BBB98-73E5-4226-B55E-1B4AABFE3CF3
+        fromSrcAcctId:
+          type: string
+          description: The transfer sender's system account identifier.
+          example: 009560e5-b724-11ef-a5d7-ee1d7e0f0847
+        fromSrcAcctIdentifier:
+          type: string
+          description: The transfer sender's account id, as displayed in the UI.
+          example: '14990148'
+        fromName:
+          type: string
+          description: The transfer sender's account name.
+          example: GHG Ohio
+        toSrcAcctId:
+          type: string
+          description: The transfer recipient's system-assigned unique account identifier.
+          example: b5d8d6b3-bcaf-11ef-ae69-b61606fd520c
+        toSrcAcctIdentifier:
+          type: string
+          description: The transfer recipient's account id, as displayed on the registry.
+        toName:
+          type: string
+          description: The transfer recipient's account name.
+          example: GHG Trading
+        initiationDate:
+          type: string
+          description: Time-stamp for when the transfer batch was initiated.
+          format: date-time
+        quantity:
+          type: number
+          description: Total quantity associated with the transfer batch
+        externalId:
+          type: string
+          description: If applicable, transfer identifier on the external ledger.
+        unitPriceCurrencyShortName:
+          type: string
+          description: >-
+            If applicable, the short name for currency associated with the
+            transfer.
+          example: USD
+        unitPriceAmount:
+          type: number
+          description: If applicable, the unit price associate with the transfer.
+        notes:
+          type: string
+          description: If applicable, any notes associate with the transfer.
+        actions:
+          uniqueItems: true
+          type: array
+          description: List of transfer actions the API user has authorities to request.
+          items:
+            type: string
+            enum:
+              - CONFIRM
+              - WITHDRAW
+              - REJECT
+        holdings:
+          type: array
+          description: Collection of holdings associated with this transfer batch.
+          items:
+            $ref: '#/components/schemas/Holding'
+        transferTypeCode:
+          type: string
+          description: The transfer type's system code.
+          example: INTRA
+        certificateTypeCode:
+          type: string
+          description: The holding's certificate type system code.
+          example: GOC
+        certificateTypeName:
+          type: string
+          description: The name of the holding's certificate type.
+          example: GhG Carbon Offset Credit
+        canWithdraw:
+          type: boolean
+          description: >-
+            Whether or not the API user has authorities required to withdraw the
+            transfer request.
+          example: true
+        totalPrice:
+          type: number
+        currencyCode:
+          type: string
+        toSubaccountIdentifier:
+          type: string
+        toSubaccountName:
+          type: string
+        toSubaccountNumber:
+          type: string
+    TransferBatchRetrieveByIdentifierResponse:
+      type: object
+      properties:
+        transferBatches:
+          type: array
+          description: Collection of retrieved Transfer Batches
+          items:
+            $ref: '#/components/schemas/TransferBatch'
+    BulkSubaccountTransferRequest:
+      type: object
+      properties:
+        onBehalfOfSrcAcctId:
+          type: string
+          description: >-
+            If permitted, allows the caller to initiate subaccount transfers on
+            behalf of another account holder, identifying that account holder by
+            their system-assigned srcAcctId.
+        requests:
+          type: array
+          description: Collection of Subaccount transfer requests
+          items:
+            $ref: '#/components/schemas/SubaccountTransferRequest'
+      description: Sub-account bulk transfer request
+    SubaccountTransferRequest:
+      type: object
+      properties:
+        subaccountIdentifier:
+          type: string
+          description: Id of the sub-account to which to transfer the goods
+        holdingCriteria:
+          type: array
+          description: >-
+            Criteria for holdings associated with the sub-account transfer
+            batch.
+          items:
+            $ref: '#/components/schemas/QuantifiedHolding'
+        correlationId:
+          type: string
+          description: >-
+            Client system correlation Id – allows the caller to correlate
+            between requests and responses
+      description: Sub-account transfer request
+    BulkSubaccountTransferResponse:
+      type: object
+      properties:
+        responses:
+          type: array
+          description: Bulk Subaccount Transfer response
+          items:
+            $ref: '#/components/schemas/SubaccountTransferResponse'
+    SubaccountTransferResponse:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: >-
+            Matches the correlationId provided in the subaccount transfer
+            request.
+        transferBatchIdentifier:
+          type: string
+          description: >-
+            Transfer batch identifier for the Subaccount Transfer Batch
+            associated with subaccount transfer
+      description: Sub-account bulk transfer response
+    Account:
+      type: object
+      properties:
+        srcAcctId:
+          type: string
+          description: >-
+            The Account's unique system-assigned identifier used for
+            programmatic (API) interactions.
+          example: 4edse581-b97a-11ef-ea69-b61606fd520c
+        identifier:
+          type: string
+          description: The Account's ID as displayed in the registry.
+          example: '15184192'
+        name:
+          type: string
+          description: The Account Operating Name on the registry.
+          example: APXOPCAR Project Manager
+      description: Account record
+    ExternalPlatform:
+      type: object
+      properties:
+        externalPlatformIdentifier:
+          type: string
+          description: The managing external platform's system-assigned identifier.
+          format: uuid
+          example: a5f8c9fa-001b-4444-b966-17b1a7871bbf
+        code:
+          type: string
+          description: The External Platform's system code, if applicable.
+        name:
+          type: string
+          description: The External Platform's name.
+          example: Xpansiv Connect
+        account:
+          $ref: '#/components/schemas/Account'
+        metadataConfig:
+          type: string
+          description: >-
+            Metadata configuration (JSON) for additional fields required by the
+            External Platform.
+    Subaccount:
+      required:
+        - name
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: The sub-account's system-assigned identifier.
+          readOnly: true
+          example: 6192c733-bbd2-11ef-acad-b63fd176813a
+        number:
+          type: string
+          description: Sub-account number
+          readOnly: true
+        account:
+          $ref: '#/components/schemas/Account'
+        name:
+          type: string
+          description: Sub-account name
+          example: Allocated
+        description:
+          type: string
+          description: Sub-account description
+          example: Holdings to retired & retired
+        _default:
+          type: boolean
+          description: If true, this is the default sub-account
+          writeOnly: true
+          example: true
+        status:
+          $ref: '#/components/schemas/ReferenceDatum'
+        viableStatusTransitions:
+          uniqueItems: true
+          type: array
+          description: Viable Sub-account transitions
+          readOnly: true
+          items:
+            type: string
+            description: Subaccount Transition
+            enum:
+              - edit
+              - activate
+              - deactivate
+        managingExternalPlatform:
+          $ref: '#/components/schemas/ExternalPlatform'
+        managingExternalPlatformAccountId:
+          type: string
+          description: >-
+            If this is a managed sub-account, the relevant account ID in the
+            external platform for the account associated with this sub-account.
+        managingExternalPlatformSubaccountMetadata:
+          type: string
+          description: >-
+            Optional JSON payload of managing external platform subaccount
+            metadata.
+        default:
+          type: boolean
+          description: If true, this is the default sub-account
+          readOnly: true
+          example: true
+      description: >-
+        This class contains caller-visible set of sub-accounts for either the
+        calling account or the account identified by onBehalfOfSrcAcctId
+    RetirementBatchRetrieveByIdentifierRequest:
+      type: object
+      properties:
+        onBehalfOfSrcAcctId:
+          type: string
+          description: >-
+            If permitted, allows the caller to retrieve retirement batches on
+            behalf of another account holder, identifying that account holder by
+            their system-assigned srcAcctId.
+        retirementBatchIdentifiers:
+          uniqueItems: true
+          type: array
+          description: >-
+            Identifiers associated with the retirement batch initiated by the
+            system
+          example: 3574500f-6df3-400e-abc9-e6aeb64f03c7
+          items:
+            type: string
+    JsonNode:
+      type: object
+    RetirementBatch:
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: The Retirement Batch's system-assigned identifier.
+        originalQuantity:
+          type: number
+          description: The total quantity of holdings included in the retirement batch.
+        liabilityIssuanceIdentifier:
+          type: string
+          description: >-
+            System-assigned identifier of the liability issuance associated with
+            the retirement
+        liabilityHoldingIdentifier:
+          type: string
+          description: >-
+            System-assigned Identifier of the liability holding against which
+            the retirement was performed.
+          example: '476022'
+        subaccount:
+          $ref: '#/components/schemas/Subaccount'
+        shadowedLedgerRetirementBatchIdentifier:
+          type: string
+          description: >-
+            If shadowing = true, the corresponding Retirement Batch identifier
+            from the external ledger.
+        positions:
+          type: array
+          description: Collection of the retirement batch's associated holdings.
+          items:
+            $ref: '#/components/schemas/Holding'
+        createdAt:
+          type: string
+          description: Created at timestamp for the Retirement Batch
+          format: date-time
+        lastUpdatedAt:
+          type: string
+          description: Last updated at timestamp for the Retirement Batch
+          format: date-time
+        retirementParameters:
+          $ref: '#/components/schemas/JsonNode'
+    RetirementBatchRetrieveByIdentifierResponse:
+      type: object
+      properties:
+        retirementBatches:
+          type: array
+          description: Collection of retrieved retirement batches
+          items:
+            $ref: '#/components/schemas/RetirementBatch'
+    BulkRetirementRequest:
+      type: object
+      properties:
+        onBehalfOfSrcAcctId:
+          type: string
+          description: >-
+            If permitted, allows the caller to retire on behalf of another
+            account holder, identifying that account holder by their
+            system-assigned srcAcctId.
+        requests:
+          type: array
+          description: retirement request
+          items:
+            $ref: '#/components/schemas/RetirementRequest'
+        shadowedLedgerRetirementOptions:
+          $ref: '#/components/schemas/ExtShadowedLedgerRetirementOptionsDTO'
+    ExtShadowedLedgerEntityIdentifierMappingDTO:
+      type: object
+      properties:
+        holdingIdentifier:
+          type: string
+        shadowedLedgerEntityIdentifier:
+          type: string
+    ExtShadowedLedgerRetirementOptionsDTO:
+      type: object
+      properties:
+        suppressShadowedLedgerInteraction:
+          type: boolean
+        shadowedLedgerRetirementIdentifiersByHoldingIdentifier:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ExtShadowedLedgerEntityIdentifierMappingDTO'
+    RetirementRequest:
+      type: object
+      properties:
+        liabilityHoldingIdentifier:
+          type: string
+          description: >-
+            Identifier of the liability holding against which this retirement
+            will be associated. Available liability holdings returned by GET
+            /api/ledger/{ledgerIdentifier}/holding with asset = false.
+          example: '476022'
+        retirementReasonCode:
+          type: string
+          description: Retirement reason code to be associated with retirement
+          example: COMPLIANCE_REQUIREMENTS
+        holdingCriteria:
+          type: array
+          description: Criteria for holdings associated with the retirement batch.
+          items:
+            $ref: '#/components/schemas/QuantifiedHolding'
+        correlationId:
+          type: string
+          description: >-
+            Client system correlation Id – allows the caller to correlate
+            between requests and responses
+        subaccountIdentifier:
+          type: string
+          description: >-
+            Target subaccount identifier – required if performing a retirement
+            against a ledger that has subaccounts enabled.
+        retirementParameters:
+          $ref: '#/components/schemas/JsonNode'
+    BulkRetirementResponse:
+      type: object
+      properties:
+        responses:
+          type: array
+          description: responses for the bulk retirement request
+          items:
+            $ref: '#/components/schemas/RetirementResponse'
+    RetirementResponse:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: Matches the correlationId provided in the retirement request.
+        retirementIdentifier:
+          type: string
+          description: >-
+            Identifier associated with the retirement batch initiated by the
+            system
+          example: b24ad896-d899-478d-9513-7061375b637c
+      description: Response for the balk retirement request
+    IssuanceRetrieveByIdentifierRequest:
+      type: object
+      properties:
+        onBehalfOfSrcAcctId:
+          type: string
+          description: >-
+            If permitted, allows the caller to retrieve issuances on behalf of
+            another account holder, identifying that account holder by their
+            system-assigned srcAcctId.
+        issuanceIdentifiers:
+          uniqueItems: true
+          type: array
+          description: Collection of issuance identifiers for the issuances to retrieve.
+          items:
+            type: string
+    Issuance:
+      type: object
+      properties:
+        identifier:
+          type: string
+        externalIdentifier:
+          type: string
+        resourceIdentifier:
+          type: string
+        resourceProgramAssignedIdentifier:
+          type: string
+        asset:
+          type: boolean
+        firm:
+          type: boolean
+        programCertificationGroupCode:
+          type: string
+        programPeriodBeginInclusive:
+          type: string
+        programPeriodEndExclusive:
+          type: string
+        certificateTypeCode:
+          type: string
+        serialNumberPrefix:
+          type: string
+        serialStart:
+          type: integer
+          format: int32
+        serialEnd:
+          type: integer
+          format: int32
+        quantity:
+          type: number
+        originalSrcAcctId:
+          type: string
+        originalSrcAcctIdentifier:
+          type: string
+        originalAcctName:
+          type: string
+        timeOfProductionBeginInclusive:
+          type: string
+          format: date-time
+        timeOfProductionEndExclusive:
+          type: string
+          format: date-time
+        deliveryLocationIdentifier:
+          type: string
+        externalSerialNumber:
+          type: string
+        inboundInterledgerTransferIdentifier:
+          type: string
+        batchNumber:
+          type: string
+        issuanceContractInstanceIdentifier:
+          type: string
+        ongoingAuditorIdentifier:
+          type: string
+        productIdentifier:
+          type: string
+        productLotIdentifier:
+          type: string
+        ein:
+          type: string
+        upn:
+          type: string
+        positions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Holding'
+    IssuanceRetrieveByIdentifierResponse:
+      type: object
+      properties:
+        issuances:
+          type: array
+          items:
+            $ref: '#/components/schemas/Issuance'
+    Marketplace:
+      required:
+        - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: The reference data's value.
+        name:
+          type: string
+          description: The reference data's name
+        marketplaceIdentifier:
+          type: string
+          description: The Marketplace's system-assigned identifier.
+          format: uuid
+          example: 732f1eaf-66db-44fa-aba8-036d184ae8e9
+        transactionsRequireContract:
+          type: boolean
+          description: >-
+            If true, transactions in this marketplace must be associated with a
+            contract
+          example: false
+        timeZone:
+          type: string
+          description: >-
+            The marketplace's Internet Assigned Numbers Authority (IANA) time
+            zone
+          example: America/New_York
+        requireTransactionProductLotSelection:
+          type: boolean
+          description: >-
+            If true, the entry of a transaction associated with this marketplace
+            will require the explicit quantified selection of product lots
+          example: false
+      description: A marketplace data object
+    OwnershipLedger:
+      type: object
+      properties:
+        ownershipLedgerIdentifier:
+          type: string
+          description: >-
+            The Ownership Ledger's system-assigned identifier for programmatic
+            (API) interactions.
+          format: uuid
+          example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+        marketplace:
+          $ref: '#/components/schemas/Marketplace'
+        code:
+          type: string
+          description: The ownership ledger's system code.
+          example: PLASTIC_WASTE_REDUCTION_PROGRAM
+        name:
+          type: string
+          description: Ownership ledger's name
+          example: Plastic Waste Reduction Offset Credit
+        description:
+          type: string
+          description: The ownership ledger's description, if applicable.
+        supportsSubaccounts:
+          type: boolean
+          description: If "true", the ownership ledger supports sub-accounts.
+          example: true
+        shadowing:
+          type: boolean
+          description: >-
+            If "true", the ownership ledger contains replicas of instruments
+            held in an external ledger.
+          example: false
+        ownershipLedgerTypeDTO:
+          $ref: '#/components/schemas/OwnershipLedgerType'
+        supportsTransferBatchNotes:
+          type: boolean
+          description: >-
+            This parameter is true when ownership ledger supports transfer batch
+            notes
+        supportsTransferBatchPricing:
+          type: boolean
+          description: >-
+            This parameter is true when ownership ledger supports transfer batch
+            pricing
+      description: Ownership Ledger
+    OwnershipLedgerType:
+      required:
+        - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: The reference data's value.
+        name:
+          type: string
+          description: The reference data's name
+        ownershipLedgerTypeIdentifier:
+          type: string
+          description: The ownership ledger type's system-assigned identifier.
+          format: uuid
+          example: 7562eb1e-fe02-41f6-911a-aa3a805a1e29
+        centralized:
+          type: boolean
+          description: If true, the ownership ledger is centralized
+          example: true
+        serialized:
+          type: boolean
+          description: If true, goods tracked on this ownership ledger are serialized.
+          example: true
+      description: Ownership Ledger Type
+    OwnershipLedgers:
+      type: object
+      properties:
+        ownershipLedgers:
+          type: array
+          description: A list of available ownership ledgers.
+          items:
+            $ref: '#/components/schemas/OwnershipLedger'
+      description: Ownership Ledgers
+    OpenTransferBatchResponse:
+      type: object
+      properties:
+        inbound:
+          type: array
+          description: >-
+            Inbound transfer batches that are visible-to-the-caller; as the
+            transfer recipient, the API user can usually accept or reject.
+          items:
+            $ref: '#/components/schemas/TransferBatch'
+        outbound:
+          type: array
+          description: >-
+            Outbound transfer batches that are visible-to-the-caller; as the
+            transfer initiator, the API user can usually withdraw.
+          items:
+            $ref: '#/components/schemas/TransferBatch'
+      description: >-
+        Includes visible-to-the-caller transfer batches – both incoming and
+        outgoing. If includeHoldings = true, it has the holding collection
+        associated with each of those transfer batches is populated with the
+        holding details
+    Subaccounts:
+      type: object
+      properties:
+        subaccounts:
+          type: array
+          description: Subaccounts
+          items:
+            $ref: '#/components/schemas/Subaccount'
+      description: Subaccounts
+    Holdings:
+      required:
+        - value
+      type: object
+      properties:
+        '@count':
+          type: integer
+          description: The total number of results (only present if requested)
+          format: int32
+        value:
+          type: array
+          description: Rows of information
+          items:
+            $ref: '#/components/schemas/Holding'
+    LedgerHistory:
+      type: object
+      properties:
+        ledgerEntryType:
+          type: string
+          description: >-
+            The ledger entry type: TRANSFERBATCH = Transfer Batch (includes both
+            inter-account and subaccount transfers); RETIREMENTBATCH =
+            Retirement Batch; ISSUANCE = Issuance; ENCUMBRANCEBATCH =
+            Encumbrance Batch; INTERLEDGERTRANSFER = Inter-Ledger Transfer
+          example: ISSUANCE
+        identifier:
+          type: string
+          description: The  system-assigned identifier for the ledger entry.
+          example: 3F06C260-5760-4DFA-BE70-407067D60704
+        statusCode:
+          type: string
+          description: The ledger entry's current status code.
+          example: ISSUED
+        createdAt:
+          type: string
+          description: Timestamp for when ledger entry was created
+          format: date-time
+        lastModifiedAt:
+          type: string
+          description: Timestamp for when ledger entry was last modified
+          format: date-time
+    LedgerHistoryList:
+      type: object
+      properties:
+        ledgerHistoryRecords:
+          type: array
+          description: A collection of ledger history entries.
+          items:
+            $ref: '#/components/schemas/LedgerHistory'
+    LedgerAccount:
+      type: object
+      properties:
+        account:
+          $ref: '#/components/schemas/Account'
+        privileges:
+          uniqueItems: true
+          type: array
+          description: >-
+            A list of the Account's participation privileges on the specified
+            ownership ledger.
+          items:
+            type: string
+    LedgerAccounts:
+      type: object
+      properties:
+        ledgerAccounts:
+          type: array
+          description: A list of accounts related to the specified ownership ledger.
+          items:
+            $ref: '#/components/schemas/LedgerAccount'

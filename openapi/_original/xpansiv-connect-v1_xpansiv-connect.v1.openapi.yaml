@@ -1,0 +1,4086 @@
+openapi: 3.0.1
+info:
+  description: >-
+    This is the OpenAPI spec for Xpansiv Connect API. Documentation:
+    https://developer.xpansiv.com/developer-portal/
+  title: Xpansiv Connect API
+  version: 1.0.0-beta
+servers:
+  - url: https://sandbox.preprod.connect.xpansiv.com/app/api/v1
+    description: SANDBOX
+  - url: https://uat.preprod.connect.xpansiv.com/app/api/v1
+    description: UAT
+  - url: https://connect.xpansiv.com/app/api/v1
+    description: PROD
+tags:
+  - name: Account
+    description: >
+      The Account API allows uses of Xpansiv Connect to pull a list of their
+      registry sub-accounts. As related to the  retirement activity, the list
+      reflects the retirement sub-accounts which are required when executing
+      retirements  in specific registries or when searching retirement history.
+      The registries with data to return for this call  are NEPOOL, M_RETS, NAR,
+      MIRECS, NCRETS, NYGATS, TIGR, CAR, VCS, ACR, RMS AND TERCS.
+  - name: Exchange
+    description: >
+      The Exchange APIs allow users to take various actions, both read and
+      write, for their interactions with  execution venues, such as the CBL
+      platform. The Search Deposits API allows the user to search the current
+      deposits placed on execution venues. The Deposit Creation API allows the
+      user to place inventory on deposit on a target execution venue.  The
+      Deposit Withdraw API allows the user to withdraw and place back into
+      inventory deposits held on an execution venue.  The Deposit Withdraw and
+      Create Retirements API allows the user to withdraw and retire deposits
+      held on an  execution venue.  The Deposit Settlement API call would be
+      used to settle executed trades on an execution venue by an execution 
+      venue operator.
+  - name: Forward Deals
+    description: >
+      The Forward Deals API allows the user to search The Forward Deals
+      associated with their Xpansiv Connect account  and/or other Xpansiv
+      Connect accounts that have granted their user that access. Forward Deal
+      information is  returned based on a Deal's last updated date. Note that
+      this call has a number of optional fields that the users  needs to include
+      if desired in the output.
+  - name: Issuances
+    description: >
+      The Issuance API allows the user to pull information on any Issuances
+      associated with their account,  or permissioned account, for the various
+      registries they are linked with. The Instrument details on the  Issuance
+      will be returned in the format of a Carbon Instrument (type CARBON) or a
+      REC Instrument (type REC)  as appropriate. Each of the types are returned
+      with data specific to the Carbon or REC attributes.
+  - name: Portfolio
+    description: >
+      The Portfolio API allows the user to search their credit inventory (tax
+      lot) data on active positions  across all registry accounts linked to
+      their Xpansiv Connect account and/or other Xpansiv Connect accounts  that
+      have granted their user that access. Note that This call has a number of
+      optional fields that the user  needs to include if desired in the output.
+  - name: Projects
+    description: >
+      The Project API allows the user to pull publicly available information
+      about carbon projects registered  in the registries that are integrated
+      with Xpansiv Connect. Note - this call has a number of optional fields 
+      that the user needs to include if desired in the output.
+  - name: ReferenceData
+    description: >-
+      The Reference Data API enables discovering Xpansiv Connect reference data
+      types and values.
+  - name: Reports
+    description: >
+      The Reports API allows the user to retrieve a comprehensive credit
+      inventory (aka Tax Lot by Program Report)  on all active positions with a
+      single call across all registry accounts linked to their Xpansiv Connect
+      account  or other Xpansiv Connect accounts that have granted their user
+      that access. Note - this call has a number of  optional fields that the
+      user needs to include if desired in the output.
+  - name: Retirements
+    description: >
+      The Retirements APIs allow users to take various actions, both read and
+      write, for their retirement  activity. The Create Retirements API allows
+      users of Xpansiv Connect to retire one or more positions from  their
+      linked registry accounts and/or other Xpansiv Connect accounts that have
+      granted their API user with  that access. The Get Registry Rules API call
+      provides the user with the information required to pass the  correct rule
+      attributes specific to each registry with each retirement attempt. The
+      Check Retirement Status  API allows users to query the status of their
+      retirements. The Search retirements API allows users search their 
+      retirement history. Note - this call has a number of optional fields that
+      the user needs to include if  desired in the output.
+  - name: Split Lots
+    description: >
+      The Split Lots API allows the user to search split lot data on their
+      Xpansiv Connect account and/or other  Xpansiv Connect accounts that have
+      granted your user that access.
+  - name: Transfers
+    description: >
+      The Transfers APIs allow users to  take various actions, both read and
+      write, for their bilateral transaction  activity. The Search Transfers API
+      allows the user to search registry transfer data for their Xpansiv 
+      Connect account and/or other Xpansiv Connect accounts that have granted
+      your user that access. Note - this  call has a number of optional fields
+      that the user needs to include if desired in the output.  The Create
+      Transfers API allows the user to create new bilateral transfers. The
+      Cancel Transfers API allows  the user to cancel/withdrawal any pending
+      outgoing transfers. The Reject Transfers API allows the user to  reject
+      any pending incoming transfer. The Accept Transfers API allows the user to
+      accept any pending incoming transfer.
+security:
+  - bearerToken: []
+paths:
+  /reference-data:
+    get:
+      tags:
+        - ReferenceData
+      operationId: getReferenceData
+      summary: Retrieve list of reference data
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          code:
+                            type: string
+                          description:
+                            type: string
+                          order:
+                            type: integer
+                            format: int64
+                          value:
+                            type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /account/{AccountIdentifier}/program/{ProgramCode}/subaccounts:
+    get:
+      tags:
+        - Account
+      operationId: getSubAccountsByProgram
+      summary: Get sub-accounts
+      description: Get sub-accounts for a given account and program
+      parameters:
+        - $ref: '#/components/parameters/AccountIdentifier'
+        - $ref: '#/components/parameters/ProgramCode'
+      responses:
+        '200':
+          description: List of sub-accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - code
+                    - name
+                    - subAccountType
+                    - active
+                    - public
+                  properties:
+                    code:
+                      type: string
+                      description: Unique identifier.
+                    name:
+                      type: string
+                      description: Name of the Sub-Account in the registry.
+                    subAccountType:
+                      $ref: '#/components/schemas/Ref.SubAccountType'
+                    active:
+                      type: boolean
+                      description: True/False.
+                    public:
+                      type: boolean
+                      description: True/False.
+                    complianceStatus:
+                      $ref: '#/components/schemas/Ref.ComplianceStatus'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_PROGRAM
+                  message:
+                    type: string
+                  field:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /account/{AccountIdentifier}:
+    get:
+      summary: Search for account
+      tags:
+        - Account
+      operationId: accountSearch
+      parameters:
+        - $ref: '#/components/parameters/AccountIdentifier'
+        - $ref: '#/components/parameters/Include'
+      responses:
+        '200':
+          description: Account found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_REQUEST
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /account-holders/action/search:
+    post:
+      operationId: searchAccountHolders
+      tags:
+        - AccountHolders
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+      summary: Account Holders search
+      requestBody:
+        description: Account Holders search endpoint
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                registryAccountId:
+                  type: string
+                  description: ID of the account on the registry.
+                registryAccountName:
+                  type: string
+                program:
+                  $ref: '#/components/schemas/Ref.Program'
+                accountType:
+                  type: string
+                  description: Account type description.
+                active:
+                  type: boolean
+                  description: True/False.
+                generatorAccount:
+                  type: boolean
+                  description: True/False.
+      responses:
+        '200':
+          description: Account Holders search successfully executed
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AccountHolder'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_REQUEST
+                      - INVALID_PROGRAM
+                      - INVALID_PAGE_SIZE
+                      - INVALID_PAGE_NUMBER
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /exchanges/{ExchangeCode}/accounts/{AccountIdentifier}/action/search-deposits:
+    parameters:
+      - $ref: '#/components/parameters/ExchangeCode'
+      - $ref: '#/components/parameters/AccountIdentifier'
+    post:
+      summary: Search deposits
+      description: Get list of deposits for an exchange
+      tags:
+        - Exchange
+      operationId: searchDeposits
+      responses:
+        '200':
+          description: List of deposits
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - depositIdentifier
+                    - executionVenue
+                    - taxLot
+                    - instrument
+                    - quantity
+                    - availableQuantity
+                    - settledQuantity
+                    - status
+                  properties:
+                    depositIdentifier:
+                      type: string
+                      description: Unique identifier.
+                    executionVenue:
+                      type: object
+                      required:
+                        - code
+                        - name
+                      properties:
+                        code:
+                          $ref: '#/components/schemas/Ref.ExecutionVenue'
+                        name:
+                          type: string
+                          description: Target execution venue code name.
+                    depositMarket:
+                      type: object
+                      required:
+                        - market
+                        - marketModelInstrument
+                      properties:
+                        market:
+                          type: object
+                          required:
+                            - name
+                            - apiCode
+                          properties:
+                            name:
+                              type: string
+                              description: >-
+                                Name of the target market on the execution
+                                venue.
+                            apiCode:
+                              type: string
+                              description: AIP code sent to the execution venue.
+                        marketModelInstrument:
+                          type: object
+                          required:
+                            - description
+                            - price
+                          properties:
+                            description:
+                              type: string
+                              description: >-
+                                Description of the Market Model Instrument for
+                                the deposit.
+                            price:
+                              type: object
+                              required:
+                                - amount
+                              properties:
+                                amount:
+                                  type: number
+                                  format: double
+                                  description: Price, if applicable, for the deposit.
+                    taxLot:
+                      type: object
+                      required:
+                        - name
+                      properties:
+                        name:
+                          type: string
+                          description: The name of the TaxLot associated with the deposit.
+                    instrument:
+                      type: object
+                      required:
+                        - ein
+                        - description
+                        - program
+                        - vintage
+                        - resource
+                      properties:
+                        ein:
+                          type: string
+                          description: The EIN code for the deposit.
+                        description:
+                          type: string
+                          description: >-
+                            The Xpansiv Connect description for the EIN on the
+                            deposit.
+                        type:
+                          $ref: '#/components/schemas/Ref.InstrumentType'
+                        program:
+                          $ref: '#/components/schemas/Ref.Program'
+                        vintage:
+                          $ref: '#/components/schemas/Vintage'
+                        resource:
+                          type: object
+                          required:
+                            - name
+                          properties:
+                            name:
+                              type: string
+                              description: The registry name of the item on deposit.
+                            registryAssignedId:
+                              type: string
+                              description: >-
+                                The registry assigned id for the item on
+                                deposit.
+                    quantity:
+                      type: integer
+                      format: int64
+                      description: The original quantity of the deposit.
+                    availableQuantity:
+                      type: integer
+                      format: int64
+                      description: The remaining quantity of the deposit.
+                    settledQuantity:
+                      type: integer
+                      format: int64
+                      description: >-
+                        The quantity of the deposit settled as a result of
+                        trading activity.
+                    status:
+                      $ref: '#/components/schemas/Ref.DepositStatus'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_EXCHANGE
+                      - INVALID_ACCOUNT
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+  /exchanges/{ExchangeCode}/execution-venues/{ExecutionVenueCode}/accounts/{AccountIdentifier}/action/deposit:
+    parameters:
+      - $ref: '#/components/parameters/ExchangeCode'
+      - $ref: '#/components/parameters/ExecutionVenueCode'
+      - $ref: '#/components/parameters/AccountIdentifier'
+    post:
+      summary: Deposits creation
+      description: Deposits creation
+      tags:
+        - Exchange
+      operationId: deposit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - market
+                - deposits
+              properties:
+                market:
+                  type: string
+                deposits:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required:
+                      - taxLotId
+                      - quantity
+                    properties:
+                      taxLotId:
+                        type: integer
+                        format: int64
+                        description: >-
+                          TaxLot id of the inventory selected for the deposit to
+                          the execution venue.
+                      quantity:
+                        type: integer
+                        format: int64
+                        minimum: 1
+                        description: Quantity to be deposited.
+                      priority:
+                        type: integer
+                        format: int64
+                        description: >-
+                          Priority for the deposit to be used in the trade
+                          settlement process.
+      responses:
+        '200':
+          description: Deposits created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - depositIdentifier
+                  properties:
+                    depositIdentifier:
+                      type: string
+                      description: The depositIdentifier of create deposit.
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_REQUEST
+                      - INVALID_EXCHANGE
+                      - INVALID_ACCOUNT
+                      - INVALID_EXECUTION_VENUE
+                      - INVALID_DEPOSITS
+                      - INVALID_MARKET
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          enum:
+                            - NOT_ENOUGH_QUANTITY
+                            - DUPLICATE_TAX_LOT
+                            - TAX_LOT_NOT_FOUND
+                        message:
+                          type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+  /exchanges/{ExchangeCode}/accounts/{AccountIdentifier}/action/withdraw:
+    parameters:
+      - $ref: '#/components/parameters/ExchangeCode'
+      - $ref: '#/components/parameters/AccountIdentifier'
+    post:
+      summary: Deposits withdraw
+      description: Deposits withdraw
+      tags:
+        - Exchange
+      operationId: withdraw
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - withdrawals
+              properties:
+                withdrawals:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required:
+                      - depositIdentifier
+                      - quantity
+                    properties:
+                      depositIdentifier:
+                        type: string
+                        description: The depositIdentifier of the deposit to withdraw.
+                      quantity:
+                        type: integer
+                        format: int64
+                        description: Quantity of the amount on deposit to be withdrawn.
+                        minimum: 1
+      responses:
+        '200':
+          description: Deposits withdrawn
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - depositIdentifier
+                    - status
+                  properties:
+                    depositIdentifier:
+                      type: string
+                      description: >-
+                        The depositIdentifier with which the withdraw request
+                        was made.
+                    status:
+                      $ref: '#/components/schemas/Ref.WithdrawStatus'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_REQUEST
+                      - DEPOSIT_NOT_FOUND
+                      - INVALID_EXCHANGE
+                      - INVALID_WITHDRAWALS
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          enum:
+                            - NOT_ENOUGH_QUANTITY
+                        message:
+                          type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+  /exchanges/{ExchangeCode}/account/{AccountIdentifier}/program/{RetirementProgramCode}/action/withdraw-and-retire:
+    post:
+      tags:
+        - Exchange
+      operationId: withdrawAndRetire
+      parameters:
+        - $ref: '#/components/parameters/ExchangeCode'
+        - $ref: '#/components/parameters/AccountIdentifier'
+        - $ref: '#/components/parameters/RetirementProgramCode'
+      summary: Withdraw credits and create retirements
+      description: >-
+        Allows the combination of withdrawal of credits and creation of
+        retirements in bulk
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - dryRun
+                - retirements
+              properties:
+                dryRun:
+                  description: >-
+                    If true it will only do the validation of the request but
+                    not to create the retirements
+                  type: boolean
+                retirements:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - ein
+                      - quantity
+                    properties:
+                      ein:
+                        type: string
+                      quantity:
+                        type: integer
+                        format: int64
+                      externalIdentifier:
+                        type: string
+                attributes:
+                  type: object
+                  additionalProperties: true
+        required: true
+      responses:
+        '200':
+          description: Retirements
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - retirements
+                  - batchIdentifier
+                properties:
+                  retirements:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Retirement'
+                  batchIdentifier:
+                    type: string
+                    description: EMA retirement batch identifier
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_PROGRAM
+                      - INVALID_REQUEST
+                      - EMPTY_REQUEST
+                      - INVALID_ATTRIBUTES
+                      - INVALID_RETIREMENTS
+                      - INVALID_EXCHANGE
+                      - INVALID_ACCOUNT
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                        message:
+                          type: string
+                  attributeErrors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          enum:
+                            - INVALID_TYPE
+                            - INVALID_VALUE
+                            - UNEXPECTED_FIELD
+                            - UNAVAILABLE_FIELD
+                            - REQUIRED_FIELD
+                            - INVALID_SUB_ACCOUNT
+                            - INVALID_BENEFICIAL_OWNER_NAME
+                        message:
+                          type: string
+                        field:
+                          type: string
+                        value:
+                          type: string
+                  retirementErrors:
+                    type: array
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          code:
+                            type: string
+                            enum:
+                              - INVALID_VALUE
+                              - QUARANTINED_POSITION
+                              - INSUFFICIENT_QUANTITY
+                              - INVALID_EIN
+                              - DUPLICATE_EIN
+                              - INVALID_TAX_LOT_ALLOCATION_STRATEGY
+                              - INVALID_TAX_LOT_ALLOCATION
+                              - UNEXPECTED_QUANTITY_PER_TAX_LOT
+                              - ZERO_QUANTITY_TAX_LOTS
+                              - DUPLICATE_TAX_LOTS
+                              - ZERO_QUANTITY
+                              - INVALID_QUANTITY_SUM
+                              - EIN_CURRENTLY_LOCKED
+                          message:
+                            type: string
+                          field:
+                            type: string
+                          value:
+                            type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /exchanges/{ExchangeCode}/account/{AccountIdentifier}/program/{ProgramCode}/action/withdraw-and-export:
+    post:
+      tags:
+        - Exchange
+      operationId: withdrawAndExport
+      parameters:
+        - $ref: '#/components/parameters/ExchangeCode'
+        - $ref: '#/components/parameters/AccountIdentifier'
+        - $ref: '#/components/parameters/ProgramCode'
+      summary: Withdraw credits and create exports
+      description: >-
+        Allows the combination of withdrawal of credits and creation of export
+        in bulk
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - exports
+              properties:
+                dryRun:
+                  description: >-
+                    If true it will only do the validation of the request but
+                    not withdraw nor export
+                  type: boolean
+                exports:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - ein
+                      - quantity
+                    properties:
+                      ein:
+                        type: string
+                      quantity:
+                        type: integer
+                        format: int64
+                      externalIdentifier:
+                        type: string
+        required: true
+      responses:
+        '200':
+          description: Successful withdraw and export
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - batchIdentifier
+                  - exports
+                properties:
+                  batchIdentifier:
+                    type: string
+                    description: EMA export batch identifier
+                  exports:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - transferIdentifier
+                      properties:
+                        transferIdentifier:
+                          type: string
+                        externalIdentifier:
+                          type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_PROGRAM
+                      - INVALID_REQUEST
+                      - EMPTY_REQUEST
+                      - INVALID_EXPORTS
+                      - INVALID_ACCOUNT
+                      - INVALID_EXCHANGE
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          enum:
+                            - INVALID_VALUE
+                            - QUARANTINED_POSITION
+                            - INSUFFICIENT_QUANTITY
+                            - INVALID_EIN
+                            - DUPLICATE_EIN
+                            - ZERO_QUANTITY
+                            - EIN_CURRENTLY_LOCKED
+                            - INVALID_ACCOUNT
+                            - INVALID_QUANTITY
+                        message:
+                          type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /exchanges/{ExchangeCode}/execution-venues/{ExecutionVenueCode}/action/settle:
+    parameters:
+      - $ref: '#/components/parameters/ExchangeCode'
+      - $ref: '#/components/parameters/ExecutionVenueCode'
+    post:
+      summary: Deposits settlement
+      description: Deposits settlement
+      tags:
+        - Exchange
+      operationId: settle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tradeIdentifier
+                - sellerIdentifier
+                - buyerIdentifier
+                - productCode
+                - quantity
+                - price
+                - currency
+              properties:
+                tradeIdentifier:
+                  type: string
+                  minLength: 1
+                sellerIdentifier:
+                  type: string
+                  minLength: 8
+                  example: 098B0A25
+                buyerIdentifier:
+                  type: string
+                  minLength: 8
+                  example: 098B0A25
+                productCode:
+                  type: string
+                  minLength: 3
+                quantity:
+                  type: integer
+                  format: int64
+                  minimum: 0
+                  exclusiveMinimum: true
+                  example: 100
+                price:
+                  type: number
+                  format: double
+                  minimum: 0
+                  exclusiveMinimum: false
+                  example: 3.12
+                currency:
+                  $ref: '#/components/schemas/Ref.Currency'
+      responses:
+        '201':
+          description: Settlement created
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_REQUEST
+                      - DUPLICATED_REQUEST
+                      - INVALID_EXCHANGE
+                      - INVALID_EXECUTION_VENUE
+                      - ACCOUNT_NOT_FOUND
+                      - NOT_ENOUGH_QUANTITY
+                      - DEPOSIT_NOT_FOUND
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+  /portfolio/account/{AccountIdentifier}/position/action/search:
+    post:
+      tags:
+        - Portfolio
+      operationId: searchAccountPositions
+      summary: Search account positions
+      parameters:
+        - $ref: '#/components/parameters/AccountIdentifier'
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Include'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                programs:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Ref.Program'
+                resourceName:
+                  type: string
+                registryAssignedId:
+                  type: string
+                vintagePeriod:
+                  type: object
+                  properties:
+                    start:
+                      $ref: '#/components/schemas/Vintage'
+                    end:
+                      $ref: '#/components/schemas/Vintage'
+                upns:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: List of positions
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Position'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_REQUEST
+                      - INVALID_PROGRAM
+                      - INVALID_VINTAGE_PERIOD
+                      - INVALID_PAGE_SIZE
+                      - INVALID_PAGE_NUMBER
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /portfolio/account/{AccountIdentifier}/actions:
+    get:
+      tags:
+        - Portfolio
+      operationId: getPortfolioAccountActions
+      summary: Get portfolio account actions
+      parameters:
+        - $ref: '#/components/parameters/AccountIdentifier'
+      responses:
+        '200':
+          description: Portfolio account actions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  actions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PortfolioAction'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_REQUEST
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /reports/account/{AccountIdentifier}/type/tax-lots-by-program:
+    get:
+      operationId: taxLotsByProgramReport
+      summary: Get tax lots by program report
+      tags:
+        - Reports
+      parameters:
+        - $ref: '#/components/parameters/AccountIdentifier'
+        - $ref: '#/components/parameters/Include'
+      responses:
+        '200':
+          description: Tax lots by program report
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accountIdentifier:
+                    type: string
+                  accountName:
+                    type: string
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Position'
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /retirements/account/{AccountIdentifier}/action/check-status:
+    post:
+      tags:
+        - Retirements
+      operationId: checkStatus
+      parameters:
+        - $ref: '#/components/parameters/AccountIdentifier'
+      summary: Check retirements status
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                retirementIdentifiers:
+                  type: array
+                  items:
+                    type: string
+        required: true
+      responses:
+        '200':
+          description: Retirements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  retirementStatuses:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          $ref: '#/components/schemas/Ref.RetirementStatus'
+                        identifier:
+                          type: string
+                          description: The retirement identifier.
+                        externalIdentifier:
+                          type: string
+                          description: External retirement identifier, if provided.
+                        registryTransferIdentifier:
+                          type: string
+                          description: Retirement identifier supplied by the registry.
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_REQUEST
+                      - EMPTY_REQUEST
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /retirements/account/{AccountIdentifier}/action/search:
+    post:
+      tags:
+        - Retirements
+      operationId: searchRetirements
+      parameters:
+        - $ref: '#/components/parameters/AccountIdentifier'
+        - $ref: '#/components/parameters/Include'
+      summary: Search retirements
+      description: >-
+        Searches for all retirements for given program and/or between given date
+        range
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                program:
+                  $ref: '#/components/schemas/Ref.Program'
+                lastUpdatedDateFrom:
+                  type: string
+                  format: date-time
+                lastUpdatedDateTo:
+                  type: string
+                  format: date-time
+                externalIdentifier:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: Retirements
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - retirements
+                properties:
+                  retirements:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Retirement'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_PROGRAM
+                      - INVALID_REQUEST
+                      - INVALID_DATES
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: Not found
+        '500':
+          $ref: '#/components/responses/500'
+  /retirements/account/{AccountIdentifier}/program/{RetirementProgramCode}/action/create:
+    post:
+      tags:
+        - Retirements
+      operationId: createRetirement
+      parameters:
+        - $ref: '#/components/parameters/AccountIdentifier'
+        - $ref: '#/components/parameters/RetirementProgramCode'
+      summary: Create retirements
+      description: Allows creation retirements in bulk
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dryRun:
+                  description: >-
+                    If true it will only do the validation of the request but
+                    not to create the retirements
+                  type: boolean
+                retirements:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - ein
+                      - quantity
+                    properties:
+                      ein:
+                        type: string
+                      quantity:
+                        type: integer
+                        format: int64
+                      taxLotSelectionStrategy:
+                        $ref: '#/components/schemas/Ref.TaxLotSelectionStrategy'
+                      quantityPerTaxLot:
+                        type: array
+                        items:
+                          type: object
+                          required:
+                            - taxLotId
+                            - quantity
+                          properties:
+                            taxLotId:
+                              type: integer
+                              format: int64
+                            quantity:
+                              type: integer
+                              format: int64
+                      externalIdentifier:
+                        type: string
+                attributes:
+                  type: object
+                  additionalProperties: true
+        required: true
+      responses:
+        '200':
+          description: Retirements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  retirementIdentifiers:
+                    type: array
+                    items:
+                      type: string
+                  batchIdentifier:
+                    type: string
+                    description: EMA retirement batch identifier
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_PROGRAM
+                      - INVALID_REQUEST
+                      - EMPTY_REQUEST
+                      - INVALID_ATTRIBUTES
+                      - INVALID_RETIREMENTS
+                  attributeErrors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          enum:
+                            - INVALID_TYPE
+                            - INVALID_VALUE
+                            - UNEXPECTED_FIELD
+                            - UNAVAILABLE_FIELD
+                            - REQUIRED_FIELD
+                            - INVALID_SUB_ACCOUNT
+                            - INVALID_BENEFICIAL_OWNER_NAME
+                        message:
+                          type: string
+                        field:
+                          type: string
+                        value:
+                          type: string
+                  retirementErrors:
+                    type: array
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          code:
+                            type: string
+                            enum:
+                              - INVALID_VALUE
+                              - QUARANTINED_POSITION
+                              - INSUFFICIENT_QUANTITY
+                              - INVALID_EIN
+                              - DUPLICATE_EIN
+                              - INVALID_TAX_LOT_ALLOCATION_STRATEGY
+                              - INVALID_TAX_LOT_ALLOCATION
+                              - UNEXPECTED_QUANTITY_PER_TAX_LOT
+                              - ZERO_QUANTITY_TAX_LOTS
+                              - DUPLICATE_TAX_LOTS
+                              - ZERO_QUANTITY
+                              - INVALID_QUANTITY_SUM
+                              - EIN_CURRENTLY_LOCKED
+                          message:
+                            type: string
+                          field:
+                            type: string
+                          value:
+                            type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /retirements/program/{RetirementProgramCode}/rules:
+    get:
+      tags:
+        - Retirements
+      operationId: getRegistryRules
+      parameters:
+        - $ref: '#/components/parameters/RetirementProgramCode'
+      summary: Get registry rules
+      responses:
+        '200':
+          description: Retirement Rule
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          description: Not found
+        '500':
+          $ref: '#/components/responses/500'
+  /generators/action/search:
+    post:
+      operationId: searchGenerators
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Include'
+      summary: Generators search
+      requestBody:
+        description: Generators search endpoint
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                upn:
+                  type: string
+                name:
+                  type: string
+                program:
+                  $ref: '#/components/schemas/Ref.RecProgram'
+                registryAssignedId:
+                  type: string
+                  deprecated: true
+                registryAssignedIds:
+                  type: array
+                  items:
+                    type: string
+                hostCountry:
+                  $ref: '#/components/schemas/Ref.Country'
+                fuelType:
+                  $ref: '#/components/schemas/Ref.FuelType'
+                state:
+                  $ref: '#/components/schemas/Ref.StateProvince'
+      responses:
+        '200':
+          description: Generators search successfully executed
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Generator'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_REQUEST
+                      - INVALID_PROGRAM
+                      - INVALID_MARKET_SEARCH_TYPE
+                      - INVALID_FUEL_TYPE
+                      - INVALID_STATE
+                      - INVALID_COUNTRY
+                      - INVALID_PAGE_SIZE
+                      - INVALID_PAGE_NUMBER
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+      tags:
+        - Generators
+  /projects/action/search:
+    post:
+      operationId: searchProjects
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Include'
+      summary: Projects search
+      requestBody:
+        description: Projects search endpoint
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                upn:
+                  type: string
+                name:
+                  type: string
+                country:
+                  $ref: '#/components/schemas/Ref.Country'
+                status:
+                  $ref: '#/components/schemas/Ref.ProjectStatus'
+                program:
+                  $ref: '#/components/schemas/Ref.CarbonProgram'
+                registryAssignedId:
+                  type: string
+                certification:
+                  $ref: '#/components/schemas/Ref.Certification'
+      responses:
+        '200':
+          description: Projects search successfully executed
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Project'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_REQUEST
+                      - INVALID_PROJECT_STATUS
+                      - INVALID_PROGRAM
+                      - INVALID_COUNTRY
+                      - INVALID_CERTIFICATION
+                      - INVALID_PAGE_SIZE
+                      - INVALID_PAGE_NUMBER
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+      tags:
+        - Projects
+  /instruments/action/search:
+    post:
+      operationId: searchInstruments
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Include'
+      summary: Instruments search
+      requestBody:
+        description: Instruments search endpoint
+        required: true
+        content:
+          application/json:
+            schema:
+              description: Program is mandatory when EIN is not provided
+              type: object
+              properties:
+                ein:
+                  type: string
+                program:
+                  $ref: '#/components/schemas/Ref.Program'
+                registryAssignedId:
+                  type: string
+                upn:
+                  type: string
+                id:
+                  type: integer
+                  format: int64
+      responses:
+        '200':
+          description: Instruments search successfully executed
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Page'
+                  - type: object
+                    required:
+                      - content
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Instrument'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_REQUEST
+                      - INVALID_PROGRAM
+                      - INVALID_PAGE_SIZE
+                      - INVALID_PAGE_NUMBER
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+      tags:
+        - Instruments
+  /transfers/account/{AccountIdentifier}/action/search:
+    post:
+      tags:
+        - Transfers
+      operationId: searchTransfers
+      summary: Search transfers
+      parameters:
+        - $ref: '#/components/parameters/AccountIdentifier'
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Include'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transferIdentifier:
+                  type: string
+                type:
+                  $ref: '#/components/schemas/Ref.TransferType'
+                statuses:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Ref.TransferStatus'
+                registryStatuses:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Ref.RegistryTransferStatus'
+                lastUpdatedDateFrom:
+                  type: string
+                  format: date-time
+                lastUpdatedDateTo:
+                  type: string
+                  format: date-time
+                counterpartyName:
+                  type: string
+                programs:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Ref.Program'
+      responses:
+        '200':
+          description: List of transfers
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            identifier:
+                              type: string
+                              description: Unique identifier.
+                            counterparty:
+                              type: string
+                              description: Counterparty name.
+                            type:
+                              $ref: '#/components/schemas/Ref.TransferType'
+                            status:
+                              $ref: '#/components/schemas/Ref.TransferStatus'
+                            registryStatus:
+                              $ref: '#/components/schemas/Ref.RegistryTransferStatus'
+                            quantity:
+                              type: integer
+                              format: int64
+                              description: Transfer quantity.
+                            dealIds:
+                              type: array
+                              description: Deal id's associated with the transfer.
+                              items:
+                                type: string
+                            externalTransferIdentifier:
+                              type: string
+                              description: >-
+                                External identifier if provided by the Xpansiv
+                                Connect client.
+                            createdDate:
+                              type: string
+                              format: date-time
+                              description: Transfer created date.
+                            transferDate:
+                              type: string
+                              format: date-time
+                              description: Transfer date.
+                            lastUpdatedDate:
+                              type: string
+                              format: date-time
+                              description: Last updated date.
+                            expectedSettlementDate:
+                              type: string
+                              format: date-time
+                              description: Expected settle date.
+                            actualSettlementDate:
+                              type: string
+                              format: date-time
+                              description: Actual settle date.
+                            registryTransferIdentifier:
+                              type: string
+                              description: Registry identifier if provided.
+                            unitPrice:
+                              $ref: '#/components/schemas/Price'
+                            showPriceInRegistry:
+                              type: boolean
+                              description: PJM and NEPOOL registries only.
+                            registryTransferPurpose:
+                              $ref: '#/components/schemas/Ref.RegistryTransferPurpose'
+                            instrument:
+                              $ref: '#/components/schemas/Instrument'
+                            batchIdentifier:
+                              type: string
+                              description: >-
+                                Tha batch identifier for the transfer
+                                transaction.
+                            transferTaxLots:
+                              description: Optional property. Use `include` param.
+                              type: array
+                              items:
+                                type: object
+                                required:
+                                  - taxLot
+                                properties:
+                                  taxLot:
+                                    $ref: '#/components/schemas/TaxLot'
+                                  quantity:
+                                    type: integer
+                                    format: int64
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_REQUEST
+                      - INVALID_PROGRAM
+                      - INVALID_TRANSFER_TYPE
+                      - INVALID_TRANSFER_STATUS
+                      - INVALID_REGISTRY_TRANSFER_STATUS
+                      - INVALID_DATE_RANGE
+                      - INVALID_PAGE_SIZE
+                      - INVALID_PAGE_NUMBER
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /transfers/account/{AccountIdentifier}/program/{ProgramCode}/action/create:
+    post:
+      tags:
+        - Transfers
+      operationId: createTransfers
+      parameters:
+        - $ref: '#/components/parameters/AccountIdentifier'
+        - $ref: '#/components/parameters/ProgramCode'
+      summary: Create transfers
+      description: Allows creation transfers in bulk
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Registry transfer purpose is required for PJM
+              required:
+                - counterpartyRegistryName
+                - settlementDate
+                - transfers
+              properties:
+                dryRun:
+                  description: >-
+                    If true it will only do the validation of the request but
+                    not to create the transfers
+                  type: boolean
+                counterpartyRegistryName:
+                  type: string
+                registryTransferPurpose:
+                  $ref: '#/components/schemas/Ref.RegistryTransferPurpose'
+                settlementDate:
+                  type: string
+                  format: date
+                  description: Date when transfers should be settled in EST time zone
+                showPriceInRegistry:
+                  type: boolean
+                  description: >-
+                    Required for PJM and NEPOOL. Price will be communicated to
+                    registry on placement.
+                notes:
+                  type: string
+                transfers:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - price
+                      - ein
+                      - transferData
+                    properties:
+                      externalTransferIdentifier:
+                        type: string
+                      ein:
+                        type: string
+                      unitPrice:
+                        $ref: '#/components/schemas/Price'
+                      transferData:
+                        discriminator:
+                          propertyName: transferDataType
+                          mapping:
+                            STRATEGY: '#/components/schemas/TransferDataStrategy'
+                            TAX_LOTS: '#/components/schemas/TransferDataTaxLots'
+                        oneOf:
+                          - $ref: '#/components/schemas/TransferDataStrategy'
+                          - $ref: '#/components/schemas/TransferDataTaxLots'
+      responses:
+        '200':
+          description: Transfers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transfers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        externalTransferIdentifier:
+                          type: string
+                        transferIdentifier:
+                          type: string
+                  batchIdentifier:
+                    type: string
+                    description: EMA transfer batch identifier
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_PROGRAM
+                      - INVALID_REQUEST
+                      - EMPTY_REQUEST
+                      - REQUEST_TOO_LARGE
+                      - SETTLEMENT_DATE_IN_PAST
+                      - SETTLEMENT_DATE_HOLIDAY
+                      - SETTLEMENT_DATE_OUTSIDE_TRADING_WINDOW
+                      - INVALID_COUNTERPARTY_NAME
+                      - INVALID_REGISTRY_TRANSFER_PURPOSE
+                      - INVALID_SHOW_PRICE_IN_REGISTRY
+                      - INVALID_TRANSFERS
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          enum:
+                            - INVALID_TRANSFER_DATA
+                            - INVALID_TAX_LOT_SELECTION_STRATEGY
+                            - DUPLICATE_TAX_LOT
+                            - DUPLICATE_EIN
+                            - INVALID_EIN
+                            - QUARANTINED_POSITION
+                            - INVALID_TAX_LOT
+                            - INVALID_QUANTITY
+                            - INVALID_PRICE
+                            - UNAVAILABLE_QUANTITY
+                        message:
+                          type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /transfers/account/{AccountIdentifier}/program/{ProgramCode}/action/cancel:
+    post:
+      tags:
+        - Transfers
+      operationId: cancelTransfers
+      parameters:
+        - $ref: '#/components/parameters/AccountIdentifier'
+        - $ref: '#/components/parameters/ProgramCode'
+      summary: Cancel transfers
+      description: Allows cancellation transfers in bulk
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dryRun:
+                  type: boolean
+                notes:
+                  type: string
+                batchIdentifier:
+                  type: string
+                transfers:
+                  description: Transfer identifiers
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Transfers cancelled successfully
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_PROGRAM
+                      - INVALID_REQUEST
+                      - EMPTY_REQUEST
+                      - REQUEST_TOO_LARGE
+                      - TRANSFERS_OR_BATCH
+                      - BATCH_REQUIRED_M_RETS
+                      - INVALID_TRANSFERS
+                      - INVALID_BATCH
+                      - INVALID_BATCH_TRANSFERS
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          enum:
+                            - DUPLICATE_TRANSFER
+                            - INVALID_TRANSFER
+                            - INVALID_TRANSFER_PROGRAM
+                            - INVALID_TRANSFER_STATUS
+                            - INVALID_TRANSFER_REGISTRY_STATUS
+                        message:
+                          type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /transfers/account/{AccountIdentifier}/program/{ProgramCode}/action/reject:
+    post:
+      tags:
+        - Transfers
+      operationId: rejectTransfers
+      parameters:
+        - $ref: '#/components/parameters/AccountIdentifier'
+        - $ref: '#/components/parameters/ProgramCode'
+      summary: Reject transfers
+      description: Allows rejection transfers in bulk
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dryRun:
+                  type: boolean
+                notes:
+                  type: string
+                transfers:
+                  description: Transfer identifiers
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Transfers rejected successfully
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_PROGRAM
+                      - INVALID_REQUEST
+                      - EMPTY_REQUEST
+                      - REQUEST_TOO_LARGE
+                      - INCOMPLETE_M_RETS_BATCH
+                      - INVALID_TRANSFERS
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          enum:
+                            - DUPLICATE_TRANSFER
+                            - INVALID_TRANSFER
+                            - INVALID_TRANSFER_PROGRAM
+                            - INVALID_TRANSFER_STATUS
+                            - INVALID_TRANSFER_REGISTRY_STATUS
+                        message:
+                          type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /transfers/account/{AccountIdentifier}/program/{ProgramCode}/action/accept:
+    post:
+      tags:
+        - Transfers
+      operationId: acceptTransfers
+      parameters:
+        - $ref: '#/components/parameters/AccountIdentifier'
+        - $ref: '#/components/parameters/ProgramCode'
+      summary: Accept transfers
+      description: Allows acceptance transfers in bulk
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - transfers
+              properties:
+                dryRun:
+                  type: boolean
+                notes:
+                  type: string
+                transfers:
+                  description: Transfer identifiers
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - transferIdentifier
+                      - price
+                    properties:
+                      transferIdentifier:
+                        type: string
+                      externalTransferIdentifier:
+                        type: string
+                      price:
+                        $ref: '#/components/schemas/Price'
+      responses:
+        '200':
+          description: Transfers accepted successfully
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_PROGRAM
+                      - INVALID_REQUEST
+                      - EMPTY_REQUEST
+                      - REQUEST_TOO_LARGE
+                      - SETTLEMENT_DATE_IN_PAST
+                      - SETTLEMENT_DATE_HOLIDAY
+                      - SETTLEMENT_DATE_OUTSIDE_TRADING_WINDOW
+                      - INCOMPLETE_M_RETS_BATCH
+                      - INVALID_TRANSFERS
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          enum:
+                            - DUPLICATE_TRANSFER
+                            - INVALID_TRANSFER
+                            - INVALID_TRANSFER_PROGRAM
+                            - INVALID_PRICE
+                            - INVALID_TRANSFER_STATUS
+                            - INVALID_TRANSFER_REGISTRY_STATUS
+                        message:
+                          type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /issuances/account/{AccountIdentifier}/action/search:
+    post:
+      tags:
+        - Issuances
+      operationId: searchIssuances
+      summary: Search issuances
+      parameters:
+        - $ref: '#/components/parameters/AccountIdentifier'
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Include'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                identifier:
+                  type: string
+                createdDateFrom:
+                  type: string
+                  format: date-time
+                createdDateTo:
+                  type: string
+                  format: date-time
+                programs:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Ref.Program'
+      responses:
+        '200':
+          description: List of issuances
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            identifier:
+                              type: string
+                              description: Unique identifier.
+                            type:
+                              type: string
+                              description: Issuance type.
+                              default: ISSUANCE
+                            status:
+                              type: string
+                              description: Issuance status.
+                              default: Issued
+                            quantity:
+                              type: integer
+                              format: int64
+                              description: Issuance quantity.
+                            unitPrice:
+                              allOf:
+                                - $ref: '#/components/schemas/Price'
+                              description: Issuance price.
+                            createdDate:
+                              type: string
+                              format: date-time
+                              description: Issuance created date.
+                            lastUpdatedDate:
+                              type: string
+                              format: date-time
+                              description: Issuance last updated date.
+                            externalTransferIdentifier:
+                              type: string
+                              description: Issuance external transfer identifier.
+                            taxLot:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  format: int64
+                                  description: TaxLot identifier.
+                                name:
+                                  type: string
+                                  description: TaxLot name.
+                            instrument:
+                              $ref: '#/components/schemas/Instrument'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_REQUEST
+                      - INVALID_PROGRAM
+                      - INVALID_DATE_RANGE
+                      - INVALID_PAGE_SIZE
+                      - INVALID_PAGE_NUMBER
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /split-lots/account/{AccountIdentifier}/action/search:
+    post:
+      tags:
+        - Split Lots
+      operationId: searchSplitLots
+      summary: Search split lots
+      parameters:
+        - $ref: '#/components/parameters/AccountIdentifier'
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                programs:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Ref.Program'
+                createdDateFrom:
+                  type: string
+                  format: date-time
+                createdDateTo:
+                  type: string
+                  format: date-time
+                counterpartyName:
+                  type: string
+      responses:
+        '200':
+          description: List of split lots
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            identifier:
+                              type: string
+                              description: Unique identifier.
+                            counterpartyName:
+                              type: string
+                              description: Counterparty name.
+                            type:
+                              type: string
+                              default: SPLIT
+                              description: Type of the split lot.
+                            status:
+                              type: string
+                              default: Success
+                              description: Status of the split lot.
+                            quantity:
+                              type: integer
+                              format: int64
+                              description: Quantity for the split lot.
+                            taxLotId:
+                              type: integer
+                              format: int64
+                              description: TaxLot id for the split lot.
+                            taxLotName:
+                              type: string
+                              description: TaxLot id for the split lot.
+                            sourceTaxLotId:
+                              type: integer
+                              format: int64
+                              description: The identifier of the source TaxLot.
+                            sourceTaxLotName:
+                              type: string
+                              description: The name of the source TaxLot.
+                            externalTransferIdentifier:
+                              type: string
+                              description: >-
+                                the external transfer identifier for the split
+                                lot.
+                            createdDate:
+                              type: string
+                              format: date-time
+                              description: Split lot created date.
+                            lastUpdatedDate:
+                              type: string
+                              format: date-time
+                              description: Split lot last updated date.
+                            unitPrice:
+                              $ref: '#/components/schemas/Price'
+                            ein:
+                              type: string
+                              description: >
+                                Environment Instrument Number. Unique identifier
+                                associated with an issuance of credits from a
+                                given project,  vintage, technology/fuel type
+                                and associated certification(s)/eligibility(s).
+                                An EIN is associated with a  position and a
+                                position will never be associated with more than
+                                1 EIN.
+                            program:
+                              $ref: '#/components/schemas/Ref.Program'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_REQUEST
+                      - INVALID_PROGRAM
+                      - INVALID_DATE_RANGE
+                      - INVALID_PAGE_SIZE
+                      - INVALID_PAGE_NUMBER
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /forward-deals/account/{AccountIdentifier}/action/search:
+    post:
+      tags:
+        - Forward Deals
+      operationId: searchForwardDeals
+      summary: Search forward deals
+      parameters:
+        - $ref: '#/components/parameters/AccountIdentifier'
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/PageSize'
+        - $ref: '#/components/parameters/Include'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                programs:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Ref.Program'
+                lastUpdatedDateFrom:
+                  type: string
+                  format: date-time
+                lastUpdatedDateTo:
+                  type: string
+                  format: date-time
+                counterpartyName:
+                  type: string
+                  description: >-
+                    If this search parameter is passed as ““  then deals with no
+                    counterparty identifier specified will be returned.
+                dealName:
+                  type: string
+      responses:
+        '200':
+          description: List of forward deals
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              description: Name of the forward deal.
+                            memo:
+                              type: string
+                              description: Memo if provided by the XC user.
+                            executionDate:
+                              type: string
+                              format: date-time
+                              description: Execution date.
+                            externalDealId:
+                              type: string
+                              description: Optional external ID.
+                            type:
+                              $ref: '#/components/schemas/Ref.ForwardDealType'
+                            status:
+                              $ref: '#/components/schemas/Ref.ForwardDealStatus'
+                            transactionSideType:
+                              $ref: '#/components/schemas/Ref.TransactionSideType'
+                            program:
+                              $ref: '#/components/schemas/Ref.Program'
+                            vintageType:
+                              $ref: '#/components/schemas/Ref.VintageType'
+                            createdBy:
+                              type: string
+                              description: Created by id.
+                            trader:
+                              type: string
+                              description: Trader name associated with the deal.
+                            privateCounterpartyDetails:
+                              type: object
+                              properties:
+                                contactName:
+                                  type: string
+                                  description: Optional contact name.
+                                name:
+                                  type: string
+                                  description: Optional counterparty name.
+                                tradeDate:
+                                  type: string
+                                  format: date-time
+                                  description: Optional trade date.
+                                contractNumber:
+                                  type: string
+                                  description: Optional contract number.
+                            unitOfMeasure:
+                              $ref: '#/components/schemas/Ref.UnitOfMeasure'
+                            counterpartyName:
+                              type: string
+                              description: >-
+                                Name of the counterparty in the registry for
+                                this deal.
+                            brokerDetails:
+                              type: object
+                              properties:
+                                identifier:
+                                  type: string
+                                  description: Broker id.
+                                name:
+                                  type: string
+                                  description: Broker name.
+                                fee:
+                                  allOf:
+                                    - $ref: '#/components/schemas/Price'
+                                  description: Broker fee.
+                            lastUpdatedDate:
+                              type: string
+                              format: date-time
+                              description: Last updated date.
+                            forwardPortfolio:
+                              type: object
+                              properties:
+                                identifier:
+                                  type: string
+                                name:
+                                  type: string
+                            confirmDetails:
+                              type: object
+                              properties:
+                                comments:
+                                  type: string
+                                  description: >-
+                                    Comments associated with the confirm action
+                                    if provided by the XC client.
+                                brokerInWriting:
+                                  type: boolean
+                                  description: >-
+                                    Flag for if confirm was agreed with broker
+                                    in writing.
+                                receivedDate:
+                                  type: string
+                                  format: date-time
+                                  description: Date the confirm was received.
+                                executionDate:
+                                  type: string
+                                  format: date-time
+                                  description: >-
+                                    Date of deal execution related to this
+                                    confirm action.
+                            statusEvents:
+                              type: array
+                              items:
+                                type: object
+                                allOf:
+                                  - $ref: '#/components/schemas/ForwardStatusEvent'
+                                properties:
+                                  type:
+                                    $ref: '#/components/schemas/Ref.ForwardDealStatus'
+                              description: Optional property. Use `include` param.
+                            forwardTransactions:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  identifier:
+                                    type: string
+                                    description: Unique identifier.
+                                  deliveryDate:
+                                    type: string
+                                    format: date-time
+                                    description: Schedule delivery date.
+                                  quantity:
+                                    type: integer
+                                    format: int64
+                                    description: Scheduled delivery quantity.
+                                  quantityType:
+                                    $ref: >-
+                                      #/components/schemas/Ref.ForwardTransactionQuantityType
+                                  status:
+                                    $ref: >-
+                                      #/components/schemas/Ref.ForwardTransactionStatus
+                                  deliveryScheduleType:
+                                    $ref: >-
+                                      #/components/schemas/Ref.ForwardDeliveryScheduleType
+                                  contractedDetails:
+                                    $ref: '#/components/schemas/ForwardContract'
+                                  deliveredDetails:
+                                    $ref: '#/components/schemas/ForwardContract'
+                                  netOpenVolume:
+                                    type: integer
+                                    format: int64
+                                    description: Remaining open volume.
+                                  createdDate:
+                                    type: string
+                                    format: date-time
+                                    description: Delivery created date.
+                                  lastUpdatedDate:
+                                    type: string
+                                    format: date-time
+                                    description: Delivery last updated date.
+                                  forwardInstrument:
+                                    type: object
+                                    properties:
+                                      type:
+                                        type: string
+                                      deliveryDateRange:
+                                        $ref: '#/components/schemas/ForwardDateRange'
+                                    discriminator:
+                                      propertyName: type
+                                      mapping:
+                                        BUNDLE: >-
+                                          #/components/schemas/ForwardInstrumentAttributeBundle
+                                        MMI: >-
+                                          #/components/schemas/ForwardInstrumentMarketModelInstrument
+                                    oneOf:
+                                      - $ref: >-
+                                          #/components/schemas/ForwardInstrumentAttributeBundle
+                                      - $ref: >-
+                                          #/components/schemas/ForwardInstrumentMarketModelInstrument
+                                  deliveryNotes:
+                                    type: string
+                                  statusEvents:
+                                    type: array
+                                    items:
+                                      type: object
+                                      allOf:
+                                        - $ref: '#/components/schemas/ForwardStatusEvent'
+                                      properties:
+                                        type:
+                                          $ref: >-
+                                            #/components/schemas/Ref.ForwardTransactionStatus
+                                    description: >-
+                                      Optional property. Use `include` param.
+                                      Status event types.
+                                  linkedTransfers:
+                                    type: array
+                                    items:
+                                      type: string
+                                    description: >
+                                      Optional property. Use `include` param.
+                                      Each value represents a transaction ID for
+                                      the linked  transfer.
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - INVALID_REQUEST
+                      - INVALID_PROGRAM
+                      - INVALID_DATE_RANGE
+                      - INVALID_PAGE_SIZE
+                      - INVALID_PAGE_NUMBER
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+components:
+  schemas:
+    NotAuthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+    NotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+    Ref.CarbonProgram:
+      type: string
+      description: Ref.Data.CARBON_PROGRAM
+    Ref.RegistryLinkStatus:
+      type: string
+      description: Ref.Data.REGISTRY_LINK_STATUS
+    Ref.AccountStatus:
+      type: string
+      example: APPROVED
+      description: Ref.Data.ACCOUNT_STATUS
+    Ref.ServiceType:
+      type: string
+      description: Ref.Data.SERVICE_TYPE
+    Ref.ServiceStatus:
+      type: string
+      description: Ref.Data.SERVICE_ACCOUNT_STATUS
+    Ref.OrganizationLegalStructure:
+      type: string
+      example: PRIVATELY_OWNED_CORP
+      description: Ref.Data.ORGANIZATION_LEGAL_STRUCTURE
+    Ref.OrganizationType:
+      type: string
+      example: BROKER
+      description: Ref.Data.ORGANIZATION_TYPE
+    Ref.CustodianProgram:
+      type: string
+      description: Ref.Data.CUSTODIAN_PROGRAM
+    Ref.Program:
+      type: string
+      description: Ref.Data.PROGRAM
+    Ref.RecProgram:
+      type: string
+      description: Ref.Data.REC_PROGRAM
+    Account:
+      type: object
+      required:
+        - id
+        - identifier
+        - noOfUsers
+        - status
+        - maxUsers
+        - childAccounts
+        - registryLinks
+        - organization
+        - services
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        identifier:
+          type: string
+          readOnly: true
+          example: 0980A123
+        noOfUsers:
+          type: integer
+          format: int64
+        status:
+          $ref: '#/components/schemas/Ref.AccountStatus'
+        maxUsers:
+          type: number
+        childAccounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Account'
+        registryLinks:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountRegistryLink'
+        organization:
+          $ref: '#/components/schemas/Organization'
+        services:
+          type: array
+          description: >
+            Service accounts for this EMA account. Each item is an
+            `AccountService`
+          items:
+            $ref: '#/components/schemas/AccountService'
+    AccountRegistryLink:
+      type: object
+      required:
+        - id
+        - program
+        - registryAccountId
+        - status
+      properties:
+        id:
+          type: integer
+          format: int64
+        program:
+          $ref: '#/components/schemas/Ref.Program'
+        registryAccountId:
+          type: string
+        status:
+          $ref: '#/components/schemas/Ref.RegistryLinkStatus'
+        lastSyncDate:
+          type: string
+          format: date-time
+          nullable: true
+          description: >
+            Incremental sync watermark (RFC 3339 date-time), equivalent to the
+            server's sync time identifier used for incremental sync. Omitted or
+            null when the registry link has never been synced.
+    Organization:
+      type: object
+      required:
+        - legalName
+        - structure
+        - type
+      properties:
+        iamOrgId:
+          type: string
+        legalName:
+          type: string
+          example: RVCMC Sub Default
+        structure:
+          $ref: '#/components/schemas/Ref.OrganizationLegalStructure'
+        type:
+          $ref: '#/components/schemas/Ref.OrganizationType'
+    AccountService:
+      type: object
+      description: >
+        Canonical account service response (`id`, `status`, `type`, optional
+        `attributes`). Used on `Account.services` and on standalone
+        service-account endpoints. Polymorphism is on `attributes`, selected
+        implicitly by `type`. If the service has no typed attributes (any `type`
+        other than ACX, SUBACCOUNT_SERVICE, or CUSTODIAN_SERVICE), do not
+        display `attributes` — omit the field, or return it as an empty object.
+      required:
+        - id
+        - status
+        - type
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          type: string
+          description: Ref.Data.SERVICE_ACCOUNT_STATUS
+          example: APPROVED
+          readOnly: true
+        type:
+          type: string
+          example: ACX
+          description: Ref.Data.SERVICE_TYPE
+        attributes:
+          $ref: '#/components/schemas/AccountServiceAttributes'
+    AccountServiceAttributes:
+      title: AccountServiceAttributes
+      description: >
+        Shape is determined by the parent service `type` (Ref.ServiceType),
+        using mapping: ACX → AcxAccountServiceAttributes; SUBACCOUNT_SERVICE →
+        SubaccountAccountServiceAttributes; CUSTODIAN_SERVICE →
+        CustodianAccountServiceAttributes. If there are no service attributes
+        (all other service types), do not display this object — omit
+        `attributes`, or return `attributes` as an empty object.
+      oneOf:
+        - $ref: '#/components/schemas/AcxAccountServiceAttributes'
+        - $ref: '#/components/schemas/SubaccountAccountServiceAttributes'
+        - $ref: '#/components/schemas/CustodianAccountServiceAttributes'
+    AcxAccountServiceAttributes:
+      title: AcxAccountServiceAttributes
+      type: object
+      description: |
+        Attributes for account service with `type` ACX.
+      required:
+        - acxAccountIdentifier
+      properties:
+        acxAccountIdentifier:
+          type: string
+    RetirementSubaccountCode:
+      type: object
+      description: List of retirement subaccounts
+      properties:
+        enabled:
+          type: boolean
+          description: If true subaccount is enabled
+        code:
+          type: string
+          description: Subaccount code
+        name:
+          type: string
+          description: Subaccount name
+      required:
+        - code
+        - enabled
+    SubaccountAccountServiceAttributes:
+      title: SubaccountAccountServiceAttributes
+      type: object
+      description: |
+        Attributes for account service with `type` SUBACCOUNT_SERVICE.
+      required:
+        - custodianEmaAccountIdentifier
+        - autoDeposit
+      properties:
+        custodianEmaAccountIdentifier:
+          type: string
+          description: The EMA account identifier of the custodian account
+        autoDeposit:
+          type: boolean
+          description: If set true - auto deposit mode will be enabled
+        retirementSubaccountCodes:
+          type: object
+          description: >-
+            Mapping of a program code to a list of retirement subaccounts.
+            Program codes are taken from ReferenceData.Program
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          example:
+            ACR:
+              - '12345'
+            CAR: []
+            VCS:
+              - '43134'
+              - '32141'
+        linkedRegistryAccountIds:
+          type: object
+          description: >-
+            Mapping of a program code to a registry account id. Program codes
+            are taken from ReferenceData.Program
+          additionalProperties:
+            type: string
+            description: Registry account id
+          example:
+            ACR: '098765'
+            CAR: null
+            VCS: '567890'
+    CustodianAccountServiceAttributes:
+      title: CustodianAccountServiceAttributes
+      type: object
+      description: |
+        Attributes for account service with `type` CUSTODIAN_SERVICE.
+      required:
+        - custodianProgramCode
+        - manualReplicaMode
+        - externalTransferAutoApproval
+      properties:
+        custodianProgramCode:
+          $ref: '#/components/schemas/Ref.CustodianProgram'
+        manualReplicaMode:
+          type: boolean
+          description: if set true - manual replica mode will be enabled
+        ledgerCode:
+          type: string
+        ledgerIdentifier:
+          type: string
+        accountHoldingsIdentifier:
+          type: string
+          description: account identifier on custodian program
+        accountHoldingsName:
+          type: string
+          description: account name on custodian program
+        replicaTargetSubaccountIdentifier:
+          type: string
+          description: default subaccount identifier to propagate replicas to
+        externalTransferAutoApproval:
+          type: boolean
+        retirementOperationsNotificationEmails:
+          type: array
+          description: >-
+            Optional addresses that receive a copy of retirement notifications,
+            merged with user-supplied email.
+          items:
+            type: string
+    Page:
+      type: object
+      required:
+        - page
+        - size
+        - totalPages
+        - totalElements
+      properties:
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+    Location:
+      title: Resource location
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+          description: Latitude.
+        longitude:
+          type: number
+          format: double
+          description: Longitude.
+    Ref.ExecutionVenue:
+      type: string
+      description: Ref.Data.EXECUTION_VENUE
+    Ref.Currency:
+      description: Ref.Data.CURRENCY
+      type: string
+      minLength: 3
+      example: USD
+    Ref.Country:
+      type: string
+      description: Ref.Data.COUNTRY
+    Ref.FuelType:
+      type: string
+      description: Ref.Data.REC_FUEL_TYPE
+    Ref.StateProvince:
+      type: string
+      description: Ref.Data.STATE_PROVINCE
+    Ref.Certification:
+      type: string
+      description: Certification code. Ref.Data.CARBON_CERTIFICATION
+    Ref.CreditType:
+      type: string
+      description: The type of the credit. Ref.Data.CARBON_CREDIT_TYPE
+    Ref.ProjectType:
+      type: string
+      description: The project type. Ref.Data.CARBON_PROJECT_TYPE
+    Ref.BaselineMethodology:
+      type: string
+      description: Ref.Data.BASELINE_METHODOLOGY
+    Ref.GeneratorStatus:
+      type: string
+      description: The status of the generator in the registry. Ref.Data.GENERATOR_STATUS
+    Ref.ForwardDealStatus:
+      type: string
+      description: Ref.Data.FORWARD_DEAL_STATUS
+    Ref.TransactionSideType:
+      type: string
+      description: Buy or Sell. Ref.Data.FORWARD_DEAL_TRANSACTION_TYPE
+    Ref.VintageType:
+      type: string
+      description: Ref.Data.FORWARD_DEAL_VINTAGE_TYPE
+    Ref.UnitOfMeasure:
+      type: string
+      description: Unit of measure. Ref.Data.UNIT_OF_MEASURE
+    Ref.ForwardTransactionQuantityType:
+      type: string
+      description: Quantity type. Ref.Data.FORWARD_DEAL_QUANTITY_TYPE
+    Ref.ForwardTransactionStatus:
+      type: string
+      description: Delivery status. Ref.Data.FORWARD_DEAL_TRANSACTION_STATUS
+    Ref.ForwardDeliveryScheduleType:
+      type: string
+      description: Delivery schedule type. Ref.Data.FORWARD_DEAL_DELIVERY_SCHEDULE_TYPE
+    Ref.ResourceInType:
+      type: string
+      description: Ref.Data.RESOURCE_INPUT_TYPE
+    Ref.ResourceOutType:
+      type: string
+      description: Ref.Data.RESOURCE_OUTPUT_TYPE
+    Ref.InstrumentType:
+      type: string
+      description: REC or CARBON. Ref.Data.INSTRUMENT_TYPE
+    Ref.SubAccountType:
+      type: string
+      description: Type of registry sub-account. Ref.Data.SUBACCOUNT_REGISTRY_TYPE
+    Ref.ComplianceStatus:
+      type: string
+      description: >-
+        Flag for whether sub-account is for compliance retirement activity.
+        Ref.Data.COMPLIANCE_STATUS
+    Ref.WithdrawStatus:
+      type: string
+      description: Status of the deposit withdrawal request. Ref.Data.WITHDRAW_STATUS
+    Ref.ForwardDealType:
+      type: string
+      default: PHYSICAL
+      description: >-
+        Type of deal as either Market or Project Specific.
+        Ref.Data.FORWARD_DEAL_TYPE
+    Ref.TaxLotSelectionStrategy:
+      type: string
+      description: Ref.Data.TAX_LOT_SELECTION_STRATEGY
+    Ref.ProjectRegistryStatus:
+      type: string
+      description: The registry status of the project. Ref.Data.PROJECT_REGISTRY_STATUS
+    Price:
+      type: object
+      required:
+        - currency
+        - amount
+      properties:
+        currency:
+          $ref: '#/components/schemas/Ref.Currency'
+        amount:
+          type: number
+          description: The numeric value of the price
+          minimum: 0
+    Vintage:
+      type: object
+      required:
+        - year
+      properties:
+        year:
+          type: integer
+          format: int32
+          description: Vintage year.
+        month:
+          type: integer
+          format: int32
+          description: Vintage month.
+    Position:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: >-
+            The unique identifier for the position in the portfolio. A postion
+            is made up of 1 or more Tax Lots.
+        tags:
+          type: array
+          description: >-
+            The name of the tag(s), if used, that are associated with the
+            position.
+          items:
+            type: string
+        taxLots:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLot'
+        instrument:
+          $ref: '#/components/schemas/Instrument'
+    TaxLot:
+      type: object
+      description: >-
+        A Tax Lot represents the incoming activity that resulted in the creation
+        or increase of a position against an EIN. The types of activities
+        represented by Tax Lots are; imported positions (at account linking);
+        incoming settled bilateral transfers; or credit issuance. Tax Lot is
+        associated with a Position, where 1 or more Tax Lots make up the
+        available quantity for a single Position
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: The unique identifier for the tax lot
+        name:
+          type: string
+          description: >-
+            The name of the tax lot, normally made up of tax lot type and
+            established date
+        establishedDate:
+          type: string
+          format: date-time
+          description: >-
+            The timestamp for when the tax lot was established, meaning when the
+            transaction that created the tax lot was accepted in XC
+        establishQuantity:
+          type: integer
+          format: int64
+          description: >-
+            The original quantity of credits that created the tax lot. Optional
+            property. Use `include` param.
+        pricePaid:
+          $ref: '#/components/schemas/Price'
+        availableQuantity:
+          type: integer
+          format: int64
+          description: The quantity available of the tax lot for transfer or retirement
+        encumberedQuantity:
+          type: integer
+          format: int64
+          description: >-
+            The quantity encumbered of the tax lot on an execution venue
+            integrated with XC
+        unsettledQuantity:
+          type: integer
+          format: int64
+          description: >-
+            The quantity unsettled of the tax lot. This can represent a quantity
+            that is in a bilateral transaction, buy or sell, that is pending and
+            not yet settled in the registry.
+        estimatedMarketPrice:
+          type: number
+          description: >-
+            The estimated price associated with the highest value market this
+            tax lot has a certification with  where prices have been uploaded
+            from the CBL Exchange. Optional property. Use `include` param.
+        estimatedMarketValue:
+          type: number
+          description: >-
+            Using the Estimated Market Price, this represents the estimated
+            market value of the tax lot based on the tax lot position quantity.
+            Optional property. Use `include` param.
+        estimatedGainLoss:
+          type: number
+          description: >-
+            Utilizing both Price Paid and Estimated Market Price against tax lot
+            quantity to determine if there was a financial gain or loss for this
+            tax lot. Optional property. Use `include` param.
+        previousCounterparty:
+          type: string
+          description: >-
+            The registry name of the counterparty that transferred the credits
+            of this tax lot to the XC client. Optional property. Use `include`
+            param.
+        externalTradeId:
+          type: string
+          description: >-
+            An external trade/transaction identifier as provided by the XC
+            client for this position. Optional property. Use `include` param.
+        dealId:
+          type: string
+          description: >-
+            A deal Identifier as provided by the XC client for this position if
+            associated with a forward deal delivery. Optional property. Use
+            `include` param.
+    Retirement:
+      type: object
+      required:
+        - instrument
+        - lastUpdatedDate
+        - createdDate
+        - quantity
+        - status
+        - batchIdentifier
+        - identifier
+      properties:
+        instrument:
+          $ref: '#/components/schemas/Instrument'
+        lastUpdatedDate:
+          type: string
+          format: date-time
+          description: Last updated date.
+        createdDate:
+          type: string
+          format: date-time
+          description: Creation date.
+        quantity:
+          type: integer
+          description: Retirement quantity.
+        status:
+          $ref: '#/components/schemas/Ref.RetirementStatus'
+        batchIdentifier:
+          type: string
+          description: XPC Retirement batch identifier
+        identifier:
+          type: string
+          description: XPC Retirement identifier
+        externalIdentifier:
+          type: string
+          description: >-
+            Retirement identifier provided by API client when creating the
+            retirement
+        registryTransferIdentifier:
+          type: string
+          description: Retirement identifier generated by the program
+        registryPositionId:
+          type: string
+          description: Id of the retired registry credits
+        attributes:
+          type: object
+          additionalProperties: true
+        transferTaxLots:
+          description: Optional property. Use `include` param.
+          type: array
+          items:
+            type: object
+            required:
+              - taxLot
+            properties:
+              taxLot:
+                $ref: '#/components/schemas/TaxLot'
+              quantity:
+                type: integer
+                format: int64
+    Ref.RetirementProgramCode:
+      type: string
+      description: Retirement program code. Ref.Data.RETIREMENT_PROGRAM
+    Ref.RetirementStatus:
+      type: string
+      description: Status of the retirement. Ref.Data.RETIREMENT_STATUS
+    Resource:
+      type: object
+      required:
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: The unique XC db identifier for the project or generator.
+        upn:
+          type: string
+          description: >
+            Universal Project Identifier. The unique identifier assigned by
+            Xpansiv Connect to every resource across all registries that  have
+            integrated with the Xpansiv Connect platform.
+        name:
+          type: string
+          description: The registry assigned name of the project or generator.
+    Ref.ResourceProgram:
+      type: string
+      description: Ref.Data.RESOURCE_PROGRAM
+    Ref.ResourceProjectStatus:
+      type: string
+      description: Ref.Data.RESOURCE_PROJECT_STATUS
+    AccountHolder:
+      type: object
+      required:
+        - registryAccountId
+        - registryAccountName
+        - program
+        - active
+      properties:
+        registryAccountId:
+          type: string
+          description: ID of the account on the registry.
+        registryAccountName:
+          type: string
+          description: Name of the account on the registry.
+        program:
+          $ref: '#/components/schemas/Ref.Program'
+        accountType:
+          type: string
+          description: Account type description.
+        managerName:
+          type: string
+          description: Name of the manager.
+        active:
+          type: boolean
+          description: True/False.
+        generatorAccount:
+          type: boolean
+          description: True/False.
+    Generator:
+      allOf:
+        - $ref: '#/components/schemas/Resource'
+        - type: object
+          properties:
+            program:
+              $ref: '#/components/schemas/Ref.RecProgram'
+            registryAssignedId:
+              type: string
+              description: The registry assigned identifier for the generator.
+            status:
+              $ref: '#/components/schemas/Ref.GeneratorStatus'
+            siteCode:
+              type: string
+              description: The Site Code of the generator if provided by the registry.
+            unitName:
+              type: string
+              description: The Unit Name of the generator in the registry.
+            controlArea:
+              type: string
+              description: The Control Area that the generator is located in.
+            parentCompanyName:
+              type: string
+              description: >-
+                The Parent Company Name of the generator if provided by the
+                registry.
+            powerCompanyName:
+              type: string
+              description: >-
+                The Power Company Name of the generator if provided by the
+                registry.
+            powerCompanyCode:
+              type: string
+              description: >-
+                The Power Company Code of the generator if provided by the
+                registry.
+            ownerName:
+              type: string
+              description: The Owner Name of the generator if provided by the registry
+            ownershipType:
+              type: string
+              description: The Ownership Type of the generator if provided by the registry.
+            countyName:
+              type: string
+              description: >-
+                The County Name locatio of the generator if provided by the
+                registry.
+            stateProvince:
+              $ref: '#/components/schemas/Ref.StateProvince'
+            country:
+              $ref: '#/components/schemas/Ref.Country'
+            contactInfo:
+              type: string
+              description: >-
+                Contact Information for the generator if provided by the
+                registry.
+            registryAcctHolderName:
+              type: string
+              description: >-
+                The Registry Account Holder name of the generator if provided by
+                the registry.
+            commencedDt:
+              type: string
+              format: date-time
+              description: >-
+                The Commenced Operation Date of the generator if provided by the
+                registry.
+            nameplateCapacity:
+              type: number
+              format: double
+              description: >-
+                The Nameplate Capacity of the generator if provided by the
+                registry.
+            facNoncompetitiveCertData:
+              type: string
+            fuelTypes:
+              type: array
+              description: >-
+                Additional information about a generator if it is multi-fuel.
+                Optional property. Use `include` param.
+              items:
+                title: Fuel Type Eligibility aggregation
+                type: object
+                required:
+                  - fuelType
+                properties:
+                  fuelType:
+                    $ref: '#/components/schemas/FuelType'
+                  stateEligibilities:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StateEligibility'
+                  voluntaryEligibilities:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VoluntaryEligibility'
+    FuelType:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The fuel type associated with the underlying asset.
+        type:
+          $ref: '#/components/schemas/Ref.FuelType'
+        fuelSource:
+          type: string
+          description: >-
+            The registry fuel source associated with the fuel type
+            (registry-dependent).
+    StateEligibility:
+      type: object
+      description: >-
+        Object to hold full state eligibility information - type of eligibility,
+        extendable with other information
+      properties:
+        name:
+          type: string
+          description: Name of the state eligibility.
+        type:
+          $ref: '#/components/schemas/Ref.StateEligibilityType'
+        stateIdentifier:
+          type: string
+          description: This is the identifier of the eligibility from the registry
+    VoluntaryEligibility:
+      type: object
+      description: >-
+        Object to hold full voluntary eligibility information - type of
+        eligibility, effective date, expiration, extendable with other
+        information
+      properties:
+        name:
+          type: string
+          description: The name of the registry voluntary eligibility.
+        type:
+          $ref: '#/components/schemas/Ref.VoluntaryEligibilityType'
+        effectiveDate:
+          type: string
+          format: date-time
+          description: The effective date of the eligibility.
+        expirationDate:
+          type: string
+          format: date-time
+          description: the expiration date of the eligibility.
+    Ref.StateEligibilityType:
+      type: string
+      description: The type of the state eligibility. Ref.Data.REC_STATE_ELIGIBILITY
+    Ref.VoluntaryEligibilityType:
+      type: string
+      description: >-
+        The type of the voluntary eligibility.
+        Ref.Data.REC_VOLUNTARY_ELIGIBILITY
+    Ref.ProjectStatus:
+      type: string
+      description: Ref.Data.PROJECT_STATUS
+    Project:
+      allOf:
+        - $ref: '#/components/schemas/Resource'
+        - type: object
+          required:
+            - programs
+          properties:
+            programs:
+              type: array
+              items:
+                type: object
+                title: ProjectProgram
+                required:
+                  - program
+                  - registryAssignedId
+                  - status
+                  - creditType
+                  - projectType
+                properties:
+                  program:
+                    $ref: '#/components/schemas/Ref.CarbonProgram'
+                  programName:
+                    type: string
+                    description: Registry name.
+                  registryAssignedId:
+                    type: string
+                    description: ID assigned by the registry.
+                  registryAccountHolderName:
+                    type: string
+                    description: Name of the registry account holder.
+                  status:
+                    $ref: '#/components/schemas/Ref.ProjectRegistryStatus'
+                  creditType:
+                    $ref: '#/components/schemas/Ref.CreditType'
+                  projectType:
+                    $ref: '#/components/schemas/Ref.ProjectType'
+                  baselineMethodologies:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Ref.BaselineMethodology'
+                  creditingPeriodBegin:
+                    type: string
+                    format: date-time
+                    description: Begin date for credit reporting.
+                  creditingPeriodEnd:
+                    type: string
+                    format: date-time
+                    description: End date for credit reporting.
+            description:
+              type: string
+              description: The full description from the registry.
+            status:
+              $ref: '#/components/schemas/Ref.ProjectStatus'
+            country:
+              $ref: '#/components/schemas/Ref.Country'
+            stateProvince:
+              type: string
+              description: State or Province
+            city:
+              type: string
+              description: City.
+            location:
+              $ref: '#/components/schemas/Location'
+            annualAverageOffsetQty:
+              type: integer
+              format: int64
+              description: Annual average offset quantity.
+            projectCertifications:
+              type: array
+              description: Optional property. Use `include` param.
+              items:
+                $ref: '#/components/schemas/ProjectCertification'
+            issuanceCertifications:
+              type: array
+              description: Optional property. Use `include` param.
+              items:
+                $ref: '#/components/schemas/IssuanceCertification'
+    ProjectCertification:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/Ref.Certification'
+        projectCertificationDateRanges:
+          type: array
+          items:
+            type: object
+            properties:
+              certificationStart:
+                type: string
+                format: date-time
+                description: The project certification start date.
+              certificationEnd:
+                type: string
+                format: date-time
+                description: The project certification end date.
+    IssuanceCertification:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/Ref.Certification'
+        vintageYears:
+          type: array
+          description: Vintage years.
+          items:
+            type: integer
+            format: int32
+    ResourceProject:
+      allOf:
+        - $ref: '#/components/schemas/Resource'
+        - type: object
+          required:
+            - programs
+          properties:
+            programs:
+              type: array
+              items:
+                type: object
+                title: ResourceProjectProgram
+                required:
+                  - program
+                  - registryAssignedId
+                properties:
+                  program:
+                    $ref: '#/components/schemas/Ref.ResourceProgram'
+                  programName:
+                    type: string
+                  registryAssignedId:
+                    type: string
+            status:
+              $ref: '#/components/schemas/Ref.ResourceProjectStatus'
+            country:
+              $ref: '#/components/schemas/Ref.Country'
+            accountName:
+              type: string
+            classification1:
+              type: string
+            classification2:
+              type: string
+            classification3:
+              type: string
+            childResourceProject:
+              $ref: '#/components/schemas/ChildResourceProject'
+            inOutTypes:
+              type: array
+              items:
+                type: object
+                required:
+                  - inType
+                  - outType
+                properties:
+                  inType:
+                    $ref: '#/components/schemas/Ref.ResourceInType'
+                  outType:
+                    $ref: '#/components/schemas/Ref.ResourceOutType'
+            typeName:
+              type: string
+    ChildResourceProject:
+      allOf:
+        - $ref: '#/components/schemas/Resource'
+        - type: object
+          properties:
+            accountName:
+              type: string
+            inOutTypes:
+              type: array
+              items:
+                type: object
+                required:
+                  - inType
+                  - outType
+                properties:
+                  inType:
+                    $ref: '#/components/schemas/Ref.ResourceInType'
+                  outType:
+                    $ref: '#/components/schemas/Ref.ResourceOutType'
+            programs:
+              type: array
+              items:
+                type: object
+                title: ChildResourceProjectProgram
+                required:
+                  - program
+                  - registryAssignedId
+                properties:
+                  program:
+                    $ref: '#/components/schemas/Ref.ResourceProgram'
+                  programName:
+                    type: string
+                  registryAssignedId:
+                    type: string
+    BaseInstrument:
+      type: object
+      required:
+        - type
+        - ein
+        - program
+        - vintage
+        - creditType
+      properties:
+        type:
+          $ref: '#/components/schemas/Ref.InstrumentType'
+        id:
+          type: integer
+          format: int64
+          description: Unique Xpansiv Connect identifier.
+        ein:
+          type: string
+          description: >
+            Environment Instrument Number. Unique identifier associated with an
+            issuance of credits from a given project,  vintage, technology/fuel
+            type and associated certification(s)/eligibility(s). An EIN is
+            associated with a  position and a position will never be associated
+            with more than 1 EIN.
+        description:
+          type: string
+          description: >
+            The Xpansiv Connect description associated with the instrument
+            providing information regarding location,  vintage, fuel type and
+            certifications.
+        program:
+          $ref: '#/components/schemas/Ref.Program'
+        vintage:
+          $ref: '#/components/schemas/Vintage'
+        markets:
+          type: array
+          description: Optional property. Use `include` param.
+          items:
+            $ref: '#/components/schemas/InstrumentMarket'
+        creditType:
+          type: string
+          description: The type of the credit.
+      discriminator:
+        propertyName: type
+        mapping:
+          CARBON: '#/components/schemas/CarbonInstrument'
+          REC: '#/components/schemas/RecInstrument'
+          RESOURCE_PROJECT: '#/components/schemas/ResourceInstrument'
+    CarbonInstrument:
+      allOf:
+        - $ref: '#/components/schemas/BaseInstrument'
+        - type: object
+          required:
+            - project
+          properties:
+            serialNumber:
+              type: string
+            issuanceCertifications:
+              type: array
+              description: Optional property. Use `include` param.
+              items:
+                $ref: '#/components/schemas/IssuanceCertification'
+            projectCertifications:
+              type: array
+              description: Optional property. Use `include` param.
+              items:
+                $ref: '#/components/schemas/ProjectCertification'
+            reportingPeriodStart:
+              type: string
+              format: date-time
+              description: Reporting period start date.
+            reportingPeriodEnd:
+              type: string
+              format: date-time
+              description: Reporting period end date.
+            project:
+              $ref: '#/components/schemas/Project'
+    RecInstrument:
+      allOf:
+        - $ref: '#/components/schemas/BaseInstrument'
+        - type: object
+          required:
+            - generator
+          properties:
+            fuelType:
+              $ref: '#/components/schemas/FuelType'
+            stateEligibilities:
+              type: array
+              description: Optional property. Use `include` param.
+              items:
+                type: object
+                description: >-
+                  Object to hold full state eligibility information - type of
+                  eligibility and name
+                properties:
+                  name:
+                    type: string
+                    description: Name of the state eligibility.
+                  type:
+                    $ref: '#/components/schemas/Ref.StateEligibilityType'
+            voluntaryEligibilities:
+              type: array
+              description: Optional property. Use `include` param.
+              items:
+                $ref: '#/components/schemas/VoluntaryEligibility'
+            generator:
+              $ref: '#/components/schemas/Generator'
+    ResourceInstrument:
+      allOf:
+        - $ref: '#/components/schemas/BaseInstrument'
+        - type: object
+          required:
+            - resourceProject
+          properties:
+            serialNumber:
+              type: string
+            inType:
+              $ref: '#/components/schemas/Ref.ResourceInType'
+            outType:
+              $ref: '#/components/schemas/Ref.ResourceOutType'
+            resourceProject:
+              $ref: '#/components/schemas/ResourceProject'
+    Instrument:
+      oneOf:
+        - $ref: '#/components/schemas/CarbonInstrument'
+        - $ref: '#/components/schemas/RecInstrument'
+        - $ref: '#/components/schemas/ResourceInstrument'
+    MarketModelInstrumentPrice:
+      properties:
+        amount:
+          type: number
+          format: double
+          description: Amount.
+        currency:
+          $ref: '#/components/schemas/Ref.Currency'
+        lastUpdatedDate:
+          type: string
+          format: date-time
+          description: Last updated date-time.
+    MarketModelInstrument:
+      properties:
+        ein:
+          type: string
+          description: >
+            Environment Instrument Number. Unique identifier associated with an
+            issuance of credits from a given project,  vintage, technology/fuel
+            type and associated certification(s)/eligibility(s).  An EIN is
+            associated with a position and a position will never be associated
+            with more than 1 EIN.
+        description:
+          type: string
+          description: Description.
+        price:
+          $ref: '#/components/schemas/MarketModelInstrumentPrice'
+    InstrumentMarket:
+      properties:
+        market:
+          $ref: '#/components/schemas/Market'
+        marketModelInstrument:
+          $ref: '#/components/schemas/MarketModelInstrument'
+    Market:
+      properties:
+        name:
+          type: string
+          description: Name of the market.
+        apiCode:
+          type: string
+          description: API code for market execution venue.
+        applicableExecutionVenues:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ref.ExecutionVenue'
+        applicablePrograms:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ref.Program'
+    Ref.DepositStatus:
+      type: string
+      description: >-
+        The current status of the deposit in relation to the execution venue.
+        Ref.Data.DEPOSIT_STATUS
+    Ref.TransferStatus:
+      type: string
+      description: Ref.Data.TRANSFER_STATUS
+    Ref.RegistryTransferStatus:
+      type: string
+      description: Ref.Data.TRANSFER_REGISTRY_STATUS
+    Ref.TransferType:
+      type: string
+      description: Ref.Data.TRANSFER_ACTION_TYPE
+    Ref.RegistryTransferPurpose:
+      type: string
+      description: Ref.Data.PJM_TRANSFER_PURPOSE
+    TransferDataStrategy:
+      type: object
+      required:
+        - transferDataType
+        - taxLotSelectionStrategy
+        - quantity
+      properties:
+        transferDataType:
+          type: string
+          default: STRATEGY
+        taxLotSelectionStrategy:
+          $ref: '#/components/schemas/Ref.TaxLotSelectionStrategy'
+        quantity:
+          type: integer
+          format: int64
+          minimum: 1
+    TransferDataTaxLots:
+      type: object
+      title: TransferDataTaxLots
+      required:
+        - transferDataType
+        - taxLots
+      properties:
+        transferDataType:
+          type: string
+          default: TAX_LOTS
+        taxLots:
+          type: array
+          items:
+            type: object
+            required:
+              - taxLotId
+              - quantity
+            properties:
+              taxLotId:
+                type: integer
+                format: int64
+              quantity:
+                type: integer
+                format: int64
+                minimum: 1
+    PortfolioAction:
+      type: object
+      properties:
+        fieldName:
+          type: string
+          description: Denotes how the transaction was initiated.
+          example: batchType
+        label:
+          type: string
+          description: Description of the fieldName.
+          example: Batch type
+        defaultValue:
+          type: string
+          description: Denotes the type of transaction.
+          example: CBL SIP Deposit
+        required:
+          type: boolean
+          example: true
+        values:
+          type: array
+          items:
+            type: object
+            properties:
+              value:
+                type: string
+                description: Value associated with the transaction.
+                example: '100'
+              name:
+                type: string
+                description: Description of the transaction type.
+                example: CBL SIP Deposit
+              dependencies:
+                type: array
+                example: project, market etc.
+                items:
+                  $ref: '#/components/schemas/PortfolioAction'
+    ForwardContract:
+      type: object
+      properties:
+        volume:
+          type: integer
+          format: int64
+          description: Delivered volume.
+        unitPrice:
+          allOf:
+            - $ref: '#/components/schemas/Price'
+          description: Delivered price.
+        value:
+          allOf:
+            - $ref: '#/components/schemas/Price'
+          description: Delivered value.
+    ForwardInstrumentAttributeBundle:
+      type: object
+      properties:
+        type:
+          type: string
+          default: BUNDLE
+        attributeBundle:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Bundle name.
+            dateRange:
+              $ref: '#/components/schemas/ForwardDateRange'
+            market:
+              $ref: '#/components/schemas/ForwardMarket'
+            projects:
+              type: array
+              items:
+                type: object
+                properties:
+                  upn:
+                    type: string
+                    description: >
+                      Universal Project Identifier. The unique identifier
+                      assigned to every resource across all registries that 
+                      have integrated with Xpansiv Connect.
+                  fuelType:
+                    $ref: '#/components/schemas/ForwardFuelType'
+    ForwardInstrumentMarketModelInstrument:
+      type: object
+      properties:
+        type:
+          type: string
+          default: MMI
+        marketModelInstrument:
+          type: object
+          properties:
+            dateRange:
+              $ref: '#/components/schemas/ForwardDateRange'
+            market:
+              $ref: '#/components/schemas/ForwardMarket'
+    ForwardDateRange:
+      type: object
+      properties:
+        startMonth:
+          type: integer
+          format: int32
+          description: Month of delivery start.
+        startYear:
+          type: integer
+          format: int32
+          description: Year of delivery start.
+        endMonth:
+          type: integer
+          format: int32
+          description: Month of delivery end.
+        endYear:
+          type: integer
+          format: int32
+          description: Year of delivery end.
+    ForwardMarket:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Instrument code.
+        name:
+          type: string
+          description: Instrument name.
+    ForwardFuelType:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/Ref.FuelType'
+        registryCode:
+          type: string
+          description: Registry fuel type code.
+    ForwardStatusEvent:
+      type: object
+      properties:
+        action:
+          type: string
+          description: Action for the statusEvent.
+        notes:
+          type: string
+          description: Notes for the statusEvent.
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp for the statusEvent.
+        user:
+          type: string
+          description: User for the statusEvent.
+  parameters:
+    AccountIdentifier:
+      description: Account identifier
+      name: AccountIdentifier
+      example: 098B0A25
+      in: path
+      required: true
+      schema:
+        type: string
+    ExchangeCode:
+      name: ExchangeCode
+      description: Exchange code
+      in: path
+      required: true
+      schema:
+        type: string
+        example: CBL , RVCMC
+    ExecutionVenueCode:
+      name: ExecutionVenueCode
+      description: Ref.Data.EXECUTION_VENUE
+      in: path
+      required: true
+      schema:
+        type: string
+    PageNumber:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    PageSize:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    Include:
+      name: include
+      description: Comma-separated values from optional response fields
+      in: query
+      required: false
+      schema:
+        type: string
+    ProgramCode:
+      name: ProgramCode
+      description: Any program code. Ref.Data.PROGRAM
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Ref.Program'
+    RetirementProgramCode:
+      description: Program code allowed for retirements. Ref.Data.RETIREMENT_PROGRAM
+      name: RetirementProgramCode
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Ref.RetirementProgramCode'
+  securitySchemes:
+    bearerToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    '401':
+      description: Not authorized error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotAuthorizedError'
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFoundError'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'

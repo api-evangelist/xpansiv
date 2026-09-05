@@ -1,0 +1,171 @@
+generated: '2026-09-04'
+method: searched
+source: >-
+  Derived from all 11 harvested OpenAPI descriptions, then upgraded from the four
+  authentication pages Xpansiv publishes and the OIDC discovery documents that were
+  fetched live.
+docs:
+- https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+- https://developer.xpansiv.com/developer-portal/xpansiv-data/authorization
+- https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+- https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+- https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+- https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+provider: Xpansiv
+headline: >-
+  Every Xpansiv REST surface authenticates with `Authorization: Bearer {token}`, but there
+  are FOUR separate credential systems behind that one header and none of their tokens is
+  accepted by another. This is the single most important integration fact about Xpansiv
+  and it is a direct consequence of the platform being assembled by acquisition (APX,
+  2022). A client integrating two Xpansiv products needs two sets of credentials from two
+  issuers.
+summary:
+  types:
+  - http (bearer)
+  - http (basic)
+  - apiKey
+  api_key_in:
+  - header
+  oauth2_declared_in_spec: false
+  note: >-
+    No description declares an oauth2 securityScheme, even though three of the four
+    credential systems ARE OAuth2 flows documented in prose. The specs model the result
+    (a bearer token) rather than the grant, so a code generator reading only the contracts
+    will not produce a working token exchange. That gap is why the prose below matters.
+credential_systems:
+- id: xpansiv-auth0
+  name: Xpansiv authorization server (Auth0)
+  serves:
+  - Xpansiv Connect API
+  - Xpansiv Data API (SSO accounts)
+  token_endpoint: https://auth.xpansiv.com/oauth/token
+  preprod_token_endpoint: https://auth.preprod.xpansiv.com/oauth/token
+  discovery: https://auth.xpansiv.com/.well-known/openid-configuration
+  discovery_status: 200
+  jwks_uri: https://auth.xpansiv.com/.well-known/jwks.json
+  grant_type: http://auth0.com/oauth/grant-type/password-realm
+  grant_note: >-
+    An Auth0 vendor extension grant, not a registered IETF grant type. A generic OAuth2
+    client library will not have it built in.
+  parameters:
+    realm: Username-Password-Authentication
+    audience: https://xpansiv/platform
+    scope: 'documented only as the placeholder SCOPE; the successful response the docs
+      show returns "scope": ""'
+    client_id: issued by Xpansiv
+    client_secret: issued by Xpansiv
+    username: issued by Xpansiv
+    password: issued by Xpansiv
+  token_lifetime: expires_in 86400 (24 hours)
+  credential_issuance: 'Request from Xpansiv — "To generate bearer token one has request
+    credentials from Xpansiv"'
+  source: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+- id: apx-jwt
+  name: APX OAuth2 authorization server
+  serves:
+  - NAR Registry Client API
+  - TIGRS Registry Client API
+  - APX Power Markets File Registry API
+  token_endpoint: https://apxjwtauthprod.apx.com/oauth/token
+  uat_token_endpoint: https://apxjwtauthuat.apx.com/oauth/token
+  discovery: none published (host returns 403 on every /.well-known/ path)
+  grant_type: password (RFC 6749 section 4.3.2)
+  client_authentication: 'Authorization: Basic {base64(clientId:clientSecret)}'
+  content_type: application/x-www-form-urlencoded
+  form_parameters: [Username, Password, grant_type]
+  returns: [access_token, token_type, grant_type, expires_in, scope]
+  scope_returned: access
+  scope_note: A single fixed value; not requestable and not subdividable. See
+    scopes/xpansiv-scopes.yml.
+  token_lifetime: 'documented as "short-lived"; expires_in returned but not documented'
+  auth_failure: 401 with status message "Bad Request - Invalid Login ID or Password"
+  credential_issuance:
+  - NAR — create an API login per the account-holder article at
+    https://nar.zendesk.com/hc/en-us/articles/25002082817175-Account-Holder-API (linked
+    from info.description of the published NAR description)
+  - TIGR — contact the TIGR administrator
+  source: https://developer.xpansiv.com/developer-portal/nar-registry/authentication and
+    https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+- id: xpansiv-data-native
+  name: Xpansiv Data native login
+  serves:
+  - Xpansiv Data API
+  login: 'GET https://api.data.xpansiv.com/auth/login with HTTP Basic (username:password)'
+  returns: '{ "token": ..., "refreshToken": ... }'
+  refresh: 'POST https://api.data.xpansiv.com/auth/refresh with {"refreshToken": ...}'
+  logout: 'POST https://api.data.xpansiv.com/auth/logout with {"refreshToken": ...}'
+  change_password: POST https://api.data.xpansiv.com/auth/changePassword
+  alternative: >-
+    An NG_API_KEY generated in the Xpansiv platform may be used instead of
+    username/password (see the Python SDK environment variables). SSO-only accounts must
+    additionally obtain an Auth0 token via https://auth.xpansiv.com/oauth/token with
+    CLIENT_ID and CLIENT_SECRET.
+  refresh_note: >-
+    The only Xpansiv family that publishes a refresh-token flow and an explicit logout.
+    Everywhere else, clients simply re-run the grant.
+  source: https://developer.xpansiv.com/developer-portal/xpansiv-data/authorization
+- id: managed-solutions-key
+  name: Xpansiv Managed Solutions account API key
+  serves:
+  - Xpansiv Managed Solutions API
+  model: long-lived bearer API key, no token endpoint
+  issuance: >-
+    Self-service from inside the account — log in to Xpansiv Managed Solutions, open the
+    API Access page (https://www.ms.xpansiv.com/app/api_access/manage), and under
+    "Xpansiv Managed Solutions Internal API" click "Generate Key".
+  header: 'Authorization: Bearer {apiKey}'
+  privilege_model: >-
+    The provider states the key "is linked to a user and an account, and has the same
+    rights as" that user. There is no scoping, no per-endpoint restriction, no read-only
+    variant and no documented rotation or expiry policy. The description does declare
+    ApiKeyCreate/Deactivate/Rotate schemas, so key management exists in the product; the
+    developer docs do not describe a rotation policy.
+  risk_note: >-
+    This is the widest-blast-radius credential in the Xpansiv catalog and the only one an
+    integrator can mint without contacting Xpansiv. Treat it as a full account credential.
+  source: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+schemes:
+- name: bearerToken
+  type: http
+  scheme: bearer
+  bearerFormat: JWT
+  sources:
+  - openapi/xpansiv-connect-openapi.yml
+  - openapi/xpansiv-managed-solutions-openapi.yml
+  - openapi/xpansiv-nar-registry-client-openapi.yml
+  - openapi/xpansiv-optimal-file-registry-openapi.yml
+  - openapi/xpansiv-optimal-reporting-openapi.yml
+  - openapi/xpansiv-optimal-resource-openapi.yml
+  - openapi/xpansiv-optimal-system-openapi.yml
+  - openapi/xpansiv-optimal-telemetry-openapi.yml
+- name: basicScheme
+  type: http
+  scheme: basic
+  sources:
+  - openapi/xpansiv-apx-power-markets-file-registry-openapi.yml
+  note: >-
+    The APX Power Markets description declares HTTP Basic as its scheme, but the
+    authentication page documents Basic only on the TOKEN request; application endpoints
+    take the resulting bearer JWT. The contract and the prose disagree; follow the prose.
+- name: JWT
+  type: apiKey
+  in: header
+  parameter: Authorization
+  sources:
+  - openapi/xpansiv-tigr-registry-client-openapi.yml
+  note: Modelled as an apiKey in the Authorization header rather than as http/bearer.
+    Functionally the same bearer JWT as the NAR description declares.
+gaps:
+- api: Transfer Position External API
+  file: openapi/xpansiv-optimal-transfer-position-openapi.yml
+  issue: >-
+    components.securitySchemes is EMPTY and no security requirement is declared, on the
+    Optimal description with the largest and most sensitive write surface (14 operations
+    including initiateRetirements, initiateAccountTransfers and initiateSubaccountTransfers).
+    The five sibling Optimal descriptions all declare the JWT bearer scheme. A reader of
+    this contract alone would conclude the API is unauthenticated. It is not — the Optimal
+    Outcomes docs state "Use API credentials to view and manage instruments."
+  impact: Code generated from this contract will omit the Authorization header entirely.
+mtls: not declared
+openid_connect_scheme: not declared in any spec (OIDC discovery is published at
+  https://auth.xpansiv.com/.well-known/openid-configuration)

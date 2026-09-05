@@ -1,0 +1,42 @@
+generated: '2026-09-04'
+method: searched
+source: >-
+  https://developer.xpansiv.com/developer-portal/xpansiv-data/errors +
+  full-text search of all 61 developer-portal pages and all 11 OpenAPI descriptions,
+  2026-09-04
+provider: Xpansiv
+limit_count: 0
+note: >-
+  Xpansiv publishes NO numeric rate limit anywhere. Every one of the 61 pages the
+  provider's own llms.txt enumerates was fetched and searched for rate-limit, throttle,
+  quota, Retry-After and 429; the only hit is the single row in the Xpansiv Data error
+  table. Rate limiting demonstrably exists — HTTP 429 is declared on 15 of the 110
+  operations across the descriptions — but its scope, window, ceiling and burst are all
+  undisclosed, and no response header carries the runtime signal. This is an honest zero:
+  the enforcement is real and the documentation of it is absent.
+limits: []
+response_headers:
+  declared: []
+  ratelimit_standard: none
+  x_ratelimit: none
+  retry_after: none
+  note: >-
+    No RateLimit-Limit / RateLimit-Remaining / RateLimit-Reset, no X-RateLimit-*, and no
+    Retry-After is declared in any response of any description or documented on any page.
+    An agent that receives a 429 has no published basis for choosing a retry interval and
+    must fall back to blind exponential backoff.
+exhaustion:
+  status: 429
+  documented_message: Too Many Requests -- You're requesting too many times! Slow down!
+  source: https://developer.xpansiv.com/developer-portal/xpansiv-data/errors
+  declared_on_operations: 15
+  source_spec: openapi/*.yml
+retry_guidance:
+  published: false
+  hazard: >-
+    Retrying is not free on this catalog. Because no operation supports an idempotency
+    key (see conventions/xpansiv-conventions.yml, idempotency.coverage: none), a blind
+    retry after a 429 or a timeout on createRetirement, createTransfers, retire,
+    initiateRetirements, deposit, withdraw or submitMeterReading risks executing the
+    write twice against real environmental commodity instruments. Confirm state first —
+    checkStatus, searchRetirements, searchTransfers, getOpenTransferBatches — then retry.

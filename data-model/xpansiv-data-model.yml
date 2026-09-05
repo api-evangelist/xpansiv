@@ -1,0 +1,245 @@
+generated: '2026-09-04'
+method: derived
+source: openapi/*.yml — 492 component schemas and their $ref graph plus id-reference
+  fields across 11 descriptions
+provider: Xpansiv
+note: >-
+  Xpansiv has no single data model; it has five, joined by a shared domain vocabulary
+  rather than by shared schemas. The same real-world concepts — an account, a ledger, a
+  holding, a retirement, a transfer — are modelled independently in each product family,
+  with different field names and different envelopes. An integrator working across two
+  Xpansiv products cannot reuse types, and that is the most useful thing this file
+  records. Schema counts: Managed Solutions 238, Connect 97, Optimal Transfer Position
+  50, Optimal Resource 44, NAR 28, Optimal Telemetry 28, TIGR 15, APX Power Markets 7,
+  Optimal File Registry 5, Optimal Reporting 5, Optimal System 1.
+core_domain_concepts:
+- concept: Account
+  meaning: The counterparty entity that holds environmental commodity instruments.
+  expressed_as:
+  - api: Xpansiv Connect
+    schema: Account
+    key: AccountIdentifier (path), registryAccountId, acxAccountIdentifier, iamOrgId
+  - api: NAR Registry
+    key: accountId, transferorId, transfereeId
+  - api: TIGR Registry
+    schema: CorporateEntities
+    key: corporateEntityId, corporateId, onBehalfOfCorporateEntityId
+  - api: Optimal
+    schema: Account
+    key: srcAcctId, srcAcctIdentifier, onBehalfOfSrcAcctId
+  - api: Managed Solutions
+    key: account_id
+  divergence: >-
+    Five different primary-key names for the same concept. Optimal and Connect both
+    support acting "on behalf of" another account; NAR and TIGR do not use the same
+    field name for it.
+- concept: Ledger
+  meaning: The book of holdings within an account, subdivided into subaccounts.
+  expressed_as:
+  - api: Xpansiv Connect
+    key: ledgerCode, ledgerIdentifier
+  - api: NAR Registry
+    path_root: /api/ledger
+    key: subaccountId
+  - api: Optimal Transfer Position
+    path_root: /api/ledger/{ledgerIdentifier}
+    key: subaccountIdentifier, toSubaccountIdentifier
+  - api: TIGR Registry
+    path_root: /api/ledger
+    key: subaccountId
+- concept: Holding
+  meaning: A quantified position in a certificate or credit type held in a subaccount.
+  expressed_as:
+  - api: NAR Registry
+    schema: Holding
+  - api: TIGR Registry
+    schema: Holding
+  - api: Optimal Transfer Position
+    schemas: [Holding, QuantifiedHolding]
+    key: holdingIdentifier, liabilityHoldingIdentifier
+  - api: Xpansiv Connect
+    key: accountHoldingsIdentifier
+- concept: Transfer
+  meaning: Movement of holdings between counterparties (inter-account) or within an
+    account (subaccount).
+  expressed_as:
+  - api: Xpansiv Connect
+    key: registryTransferIdentifier, batchIdentifier, externalIdentifier
+  - api: NAR Registry
+    schemas: [InteraccountTransferRequest, InteraccountTransferRequestDto,
+      InteraccountTransferResponse, PendingTransfer, PendingTransferActionRequest]
+    key: transferId
+  - api: Optimal Transfer Position
+    schemas: [BulkTransferRequest, InteraccountTransferRequest, BulkTransferResponse,
+      ActionTransferBatchItem, ActionTransferBatches,
+      TransferBatchRetrieveByIdentifierRequest]
+    key: transferIdentifier, batchIdentifier
+- concept: Retirement
+  meaning: Permanent cancellation of an instrument so its environmental attribute may be
+    claimed once.
+  expressed_as:
+  - api: Xpansiv Connect
+    operations: [createRetirement, searchRetirements, checkStatus, getRegistryRules]
+  - api: NAR Registry
+    key: retirementReasonCode, retirementTypeCode
+  - api: TIGR Registry
+    schemas: [RetireRequest, RetireResponse, RequestContainerOfRetireRequest,
+      ResponseContainerOfRetireResponse]
+    key: retirementTypeCode, reasonCode
+  - api: Optimal Transfer Position
+    operations: [initiateRetirements, getRetirementBatchesByIdentifier]
+  terminal: true
+  note: See conventions/xpansiv-conventions.yml reversibility — no reversal operation
+    exists for a retirement in any family.
+- concept: Program
+  meaning: The registry or standard the instrument belongs to (carbon program, REC
+    program, custodian program).
+  expressed_as:
+  - api: Xpansiv Connect
+    schemas: [Ref.Program, Ref.CarbonProgram, Ref.RecProgram, Ref.CustodianProgram]
+    key: ProgramCode, RetirementProgramCode, custodianProgramCode
+  - api: Optimal
+    key: programAssignedIdentifier, resourceProgramAssignedIdentifier,
+      programCertificationGroupCode, programQualificationIdentifier
+- concept: Resource / Facility / Generator
+  meaning: The physical asset that produces the certified attribute.
+  expressed_as:
+  - api: Optimal Resource
+    schemas: [ExtEntityAndFormResource, CookedForm, CookedFormField]
+    key: resourceIdentifier, programAssignedIdentifier
+  - api: Managed Solutions
+    key: facility_id
+  - api: Xpansiv Connect
+    operation: searchGenerators
+- concept: Meter reading / telemetry
+  meaning: Measured generation used to substantiate issuance.
+  expressed_as:
+  - api: Optimal Telemetry
+    schemas: [MeterDataSubmission, MeterDataSubmissionReading, MeterDataSubmissionStream,
+      InteractiveMeterReading, CoreReadingStructure, ReadingOutcomes]
+    key: internalUsagePointCode, reportingEntityStreamIdentifier, unitOfMeasureCode
+  - api: Managed Solutions
+    key: meter_id, meter_readings_id
+relationships:
+- from: Account
+  to: Ledger
+  type: has_many
+  via: ledgerIdentifier / ledgerCode
+  source: openapi/xpansiv-optimal-transfer-position-openapi.yml path
+    /api/ledger/{ledgerIdentifier}, openapi/xpansiv-connect-openapi.yml
+- from: Ledger
+  to: Subaccount
+  type: has_many
+  via: subaccountIdentifier / subaccountId
+  source: GET /api/ledger/{ledgerIdentifier}/subaccount (getSubaccounts),
+    GET /api/ledger/subaccount (NAR getSubaccounts)
+- from: Subaccount
+  to: Holding
+  type: has_many
+  via: holdingIdentifier
+  source: GET /api/ledger/{ledgerIdentifier}/holding (getLedgerHoldings),
+    GET /api/ledger/holding (NAR/TIGR getHoldings)
+- from: Account
+  to: Counterparty
+  type: has_many
+  via: transferorId / transfereeId / transfereeSrcAcctId
+  source: GET /api/account/counterparty (NAR getCounterparties),
+    GET /api/ledger/{ledgerIdentifier}/account (Optimal getLedgerAccounts)
+- from: Transfer
+  to: Holding
+  type: has_many
+  via: QuantifiedHolding in BulkTransferRequest
+  source: openapi/xpansiv-optimal-transfer-position-openapi.yml
+- from: TransferBatch
+  to: Transfer
+  type: has_many
+  via: batchIdentifier
+  source: POST /api/ledger/{ledgerIdentifier}/transferBatch/byIdentifier
+- from: RetirementBatch
+  to: Retirement
+  type: has_many
+  via: batchIdentifier
+  source: POST /api/ledger/{ledgerIdentifier}/retirementBatch/byIdentifier
+- from: Retirement
+  to: Program
+  type: belongs_to
+  via: RetirementProgramCode
+  source: POST /retirements/account/{AccountIdentifier}/program/{RetirementProgramCode}/action/create
+- from: Retirement
+  to: RegistryRules
+  type: belongs_to
+  via: RetirementProgramCode
+  source: GET /retirements/program/{RetirementProgramCode}/rules (getRegistryRules)
+- from: Facility
+  to: Meter
+  type: has_many
+  via: meter_id
+  source: /facilities/{facility_id}/generation/meters/{meter_id}
+- from: Meter
+  to: MeterReading
+  type: has_many
+  via: meter_readings_id
+  source: POST /facilities/{facility_id}/generation/meters/{meter_id}/readings
+- from: Facility
+  to: StateEligibility
+  type: has_many
+  via: facility_id
+  source: GET /facilities/{facility_id}/state_eligibilities
+- from: Facility
+  to: Transaction
+  type: has_many
+  via: facility_id
+  source: GET /facilities/{facility_id}/transactions
+- from: Resource
+  to: CookedForm
+  type: has_one
+  via: formCode
+  source: GET /form/core/cooked/metadata/{formCode} (getCookedFormMetadata)
+- from: Resource
+  to: Issuance
+  type: has_many
+  via: resourceIdentifier / programAssignedIdentifier
+  source: openapi/xpansiv-optimal-reporting-openapi.yml (ExtIssuancePublic,
+    ExtResourcePublic)
+- from: UsagePoint
+  to: MeterReading
+  type: has_many
+  via: internalUsagePointCode / discriminatedUsagePointIdentifier
+  source: openapi/xpansiv-optimal-telemetry-openapi.yml
+- from: FileEntry
+  to: FileType
+  type: belongs_to
+  via: fileTypeCode
+  source: GET /api/fileType (getFileTypes), POST /api/file (addFileEntry)
+- from: ScheduleFile
+  to: ValidationStatus
+  type: has_one
+  via: fileHandle
+  source: GET /fileRegistry/file/{fileHandle}/status (getStatus)
+envelopes:
+- name: OData-like row container
+  schemas: [ODataEnvelopeWithTotalCountOfCounterparty, ODataEnvelopeWithTotalCountOfHolding,
+    ODataEnvelopeWithTotalCountOfLedgerSubaccount, ODataEnvelopeWithTotalCountOfPendingTransfer,
+    ODataEnvelopeOfCorporateEntities, ODataEnvelopeOfFileReport,
+    ODataEnvelopeOfExtIssuancePublic, ODataEnvelopeOfExtResourcePublic]
+  shape: '{ "@count": int, "value": [ ... ], "totalCount": int, "countExceeded": bool }'
+  used_by: [NAR Registry, TIGRS Registry, Optimal File Registry, Optimal Reporting]
+  note: The provider's own schema description calls this "Container for OData-like rows
+    of information with count". Not OData.
+- name: Request/Response container
+  schemas: [RequestContainerOfRetireRequest, ResponseContainerOfRetireResponse,
+    RequestContainerOfSubaccountCreateRequest, ResponseContainerOfSubaccountCreateResponse]
+  used_by: [TIGRS Registry]
+- name: Error container
+  schemas: [ErrorContainer, ErrorItem, AbstractRestError, GeneralError, ValidationError,
+    ServiceException, NotAuthorizedError, NotFoundError, InternalServerError,
+    AuthTokenError]
+  note: Ten distinct error schemas across the catalog and no shared one. See
+    errors/xpansiv-problem-types.yml.
+tracing_fields:
+- field: correlationId
+  role: client-supplied opaque value echoed in responses and error messages
+  present_in: [NAR Registry, TIGRS Registry, Optimal Transfer Position, Optimal Telemetry]
+- field: submissionId
+  role: server-issued "Submission identifier for issue investigation"
+  present_in: [NAR Registry, TIGRS Registry, Optimal Transfer Position]

@@ -1,0 +1,74 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enrichment overlay for Xpansiv Connect API
+  version: 1.0.0
+extends: openapi/xpansiv-connect-openapi.yml
+x-generated: '2026-09-04'
+x-method: generated
+x-source: Derived from openapi/xpansiv-connect-openapi.yml plus conventions/xpansiv-conventions.yml. Adds
+  only API Evangelist annotations; changes no original schema, path, parameter or response.
+actions:
+- target: $.info
+  description: Record API Evangelist enrichment provenance and the cross-cutting findings that are not
+    expressible in the original contract.
+  update:
+    x-apievangelist-enrichment:
+      profile: https://github.com/api-evangelist/xpansiv
+      reviewed: '2026-09-04'
+      source_spec: https://developer.xpansiv.com/_spec/openapi/...
+      artifacts:
+        authentication: authentication/xpansiv-authentication.yml
+        conventions: conventions/xpansiv-conventions.yml
+        errors: errors/xpansiv-problem-types.yml
+        conformance: conformance/xpansiv-conformance.yml
+        data_model: data-model/xpansiv-data-model.yml
+        rate_limits: rate-limits/xpansiv-rate-limits.yml
+        lifecycle: lifecycle/xpansiv-lifecycle.yml
+    x-idempotency:
+      coverage: none
+      note: No Idempotency-Key or equivalent request header is declared on any operation in this contract.
+        Duplicate submission is not suppressed by the API; clients must deduplicate. Observed by API Evangelist
+        on 2026-09-04.
+    x-rate-limit-signal:
+      status_on_exhaustion: 429
+      headers: []
+      note: No Retry-After or RateLimit-* response header is declared or documented; retry interval is
+        not discoverable from the response.
+- target: $.paths['/exchanges/{ExchangeCode}/execution-venues/{ExecutionVenueCode}/action/settle'].post
+  description: 'Mark this write as irreversible: no cancel, void, reverse or restore operation exists
+    for it anywhere in the Xpansiv catalog.'
+  update:
+    x-reversibility:
+      reversible: false
+      reversal_operation: null
+      window: null
+      note: Terminal operation. Confirm program rules with getRegistryRules before calling, and confirm
+        outcome afterwards rather than retrying blind (no idempotency key is supported).
+- target: $.paths['/retirements/account/{AccountIdentifier}/program/{RetirementProgramCode}/action/create'].post
+  description: 'Mark this write as irreversible: no cancel, void, reverse or restore operation exists
+    for it anywhere in the Xpansiv catalog.'
+  update:
+    x-reversibility:
+      reversible: false
+      reversal_operation: null
+      window: null
+      note: Terminal operation. Confirm program rules with getRegistryRules before calling, and confirm
+        outcome afterwards rather than retrying blind (no idempotency key is supported).
+- target: $.paths['/transfers/account/{AccountIdentifier}/program/{ProgramCode}/action/cancel'].post
+  description: Mark this operation as the published reversal path for its write surface.
+  update:
+    x-reversibility:
+      reversible: true
+      role: reverses createTransfers while pending
+      window: null
+      note: Reversal path exists; Xpansiv publishes no time window for it, so the grade is `documented`,
+        not `verified`.
+- target: $.paths['/transfers/account/{AccountIdentifier}/program/{ProgramCode}/action/reject'].post
+  description: Mark this operation as the published reversal path for its write surface.
+  update:
+    x-reversibility:
+      reversible: true
+      role: recipient reversal of an inbound transfer
+      window: null
+      note: Reversal path exists; Xpansiv publishes no time window for it, so the grade is `documented`,
+        not `verified`.

@@ -1,0 +1,47 @@
+generated: '2026-09-04'
+method: searched
+source: >-
+  https://www.xpansiv.com/ (site link inventory), https://www.xpansiv.com/pricing (404),
+  https://www.xpansiv.com/contact , https://developer.xpansiv.com/developer-portal ,
+  probed 2026-09-04
+provider: Xpansiv
+plan_count: 0
+self_serve_signup: false
+public_pricing: false
+note: >-
+  Xpansiv publishes no plans, tiers, prices or usage quotas for any of its APIs. There is
+  no /pricing page (https://www.xpansiv.com/pricing returns 404) and no pricing link
+  anywhere in the site navigation, which covers commodities, solutions, trading
+  platforms, registries, data, connect, power, partners, news and careers. This is
+  expected for the market segment: Xpansiv is regulated-adjacent commodity market
+  infrastructure sold to institutional counterparties — exchange members, brokers,
+  registry account holders, utilities and corporate buyers — under negotiated
+  agreements, with API access issued as part of an existing commercial relationship. The
+  developer portal makes the gate explicit rather than hiding it: Xpansiv Connect says
+  "one has request credentials from Xpansiv", TIGR says to "reach out to the TIGR
+  administrator", and Managed Solutions keys are generated only from inside a logged-in
+  account. This is a plan_count of 0 with a stated cause, not an unchecked field.
+plans: []
+commercial_path:
+  contact: https://www.xpansiv.com/contact
+  support: https://support.xpansiv.com/
+  login: https://connect.xpansiv.com/app/login/
+  credential_issuance:
+  - api: Xpansiv Connect API
+    path: Credentials requested from Xpansiv; tokens then issued by
+      https://auth.xpansiv.com/oauth/token
+    source: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - api: Xpansiv Managed Solutions API
+    path: Self-service key generation from inside the account — log in, open the API
+      Access page, "Generate Key" under "Xpansiv Managed Solutions Internal API"
+    source: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - api: NAR Registry Client API
+    path: 'Account-holder API login created per the NAR help centre article "Creating an
+      API Login" (https://nar.zendesk.com/hc/en-us/articles/25002082817175-Account-Holder-API),
+      linked from info.description of the published description'
+  - api: TIGRS Registry Client API
+    path: Contact the TIGR administrator
+    source: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - api: Xpansiv Marketplace FIX API
+    path: FIX session credentials and session types negotiated with Xpansiv per
+      counterparty
