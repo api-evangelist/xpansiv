@@ -9,6 +9,11 @@ deployment:
   endpoint: https://developer.xpansiv.com/mcp
   auth: none
   verified: probed
+  probe_prior: (never probed)
+  probe: live
+  probe_why: live
+  checked: '2026-09-11'
+  source: claimed-backlog re-probe 2026-09-11
 transport: streamable-http (SSE response framing on tools/list)
 protocol_evidence:
   fetched: '2026-09-04'
@@ -28,20 +33,16 @@ oauth:
   - profile
   - email
   - offline_access
-  note: >-
-    RFC 9728 protected-resource metadata is published, but tools/list answered
-    anonymously with the full tool set and input schemas. Authentication appears to
-    scope the whoami tool and any account-bound content rather than gate discovery.
-note: >-
-  This is a DOCUMENTATION MCP server, not a business-operations one. It is served from
-  Xpansiv's own developer portal host and is reachable by an agent today, but its seven
-  tools read the portal's OpenAPI descriptions and search its documentation — they do
-  not call Xpansiv Connect, the registries, Xpansiv Data or the Marketplace. An agent can
-  use it to discover and understand every Xpansiv API, then must call those APIs directly
-  over REST or FIX with its own credentials. The server is provided by Redocly, the
-  platform the portal runs on; the authorization-server metadata names
-  auth.cloud.redocly.com as issuer. Xpansiv publishes no MCP server that fronts the APIs
-  themselves.
+  note: RFC 9728 protected-resource metadata is published, but tools/list answered anonymously with the
+    full tool set and input schemas. Authentication appears to scope the whoami tool and any account-bound
+    content rather than gate discovery.
+note: This is a DOCUMENTATION MCP server, not a business-operations one. It is served from Xpansiv's own
+  developer portal host and is reachable by an agent today, but its seven tools read the portal's OpenAPI
+  descriptions and search its documentation — they do not call Xpansiv Connect, the registries, Xpansiv
+  Data or the Marketplace. An agent can use it to discover and understand every Xpansiv API, then must
+  call those APIs directly over REST or FIX with its own credentials. The server is provided by Redocly,
+  the platform the portal runs on; the authorization-server metadata names auth.cloud.redocly.com as issuer.
+  Xpansiv publishes no MCP server that fronts the APIs themselves.
 tool_count: 7
 tools:
 - name: whoami
@@ -56,8 +57,8 @@ tools:
   input_schema_properties:
   - name (string, required) — API name or part of it
 - name: get-endpoint-info
-  description: Get comprehensive information about specific endpoint including parameters,
-    security, and examples
+  description: Get comprehensive information about specific endpoint including parameters, security, and
+    examples
   input_schema_properties:
   - name (string, required)
   - path (string, required)
