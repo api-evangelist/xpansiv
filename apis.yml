@@ -34,51 +34,13 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 apis:
-- aid: xpansiv:xpansiv-connect
-  name: Xpansiv Connect API
-  description: Xpansiv Connect exposes environmental commodity account, portfolio, exchange, forward deal,
-    issuance, project, reference data, report, retirement, split lot and transfer operations over REST.
-    Bearer tokens are issued by the Xpansiv authorization server at auth.xpansiv.com.
-  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
-  baseURL: https://connect.xpansiv.com/app/api/v1
-  tags:
-  - Carbon Markets
-  - Retirements
-  - Portfolio
-  properties:
-  - type: OpenAPI
-    url: openapi/xpansiv-connect-openapi.yml
-  - type: Documentation
-    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
-  - type: GettingStarted
-    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
-  - type: Overlay
-    url: overlays/xpansiv-connect-overlay.yaml
-- aid: xpansiv:xpansiv-managed-solutions
-  name: Xpansiv Managed Solutions API
-  description: Access facilities, transactions, meter readings, clean transportation, market, qualified
-    reporting entity, building type, remote data collector and utility data from an Xpansiv Managed Solutions
-    account using a bearer API key generated on the account API Access page.
-  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
-  baseURL: https://www.ms.xpansiv.com/app/api/v1
-  tags:
-  - Renewable Energy Certificates
-  - Meter Data
-  properties:
-  - type: OpenAPI
-    url: openapi/xpansiv-managed-solutions-openapi.yml
-  - type: Documentation
-    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
-  - type: Authentication
-    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
-  - type: Overlay
-    url: overlays/xpansiv-managed-solutions-overlay.yaml
 - aid: xpansiv:xpansiv-data
   name: Xpansiv Data API
-  description: Real-time, end-of-day and historical transaction-based market data for environmental and
-    energy commodities, sourced from CBL and global intermediaries including Evolution Markets. Delivered
-    as time series, data-lake file groups and NCSV downloads over a JWT-authenticated REST API, with a
-    first-party Python SDK.
+  description: >-
+    Real-time, end-of-day and historical transaction-based market data for environmental and energy commodities,
+    sourced from CBL and global intermediaries including Evolution Markets. Delivered as time series,
+    data-lake file groups and NCSV downloads over a JWT-authenticated REST API, with a first-party Python
+    SDK.
   humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-data
   baseURL: https://api.data.xpansiv.com
   tags:
@@ -93,103 +55,12 @@ apis:
     url: https://developer.xpansiv.com/developer-portal/xpansiv-data/errors
   - type: SDKs
     url: https://developer.xpansiv.com/developer-portal/xpansiv-data/sdk
-- aid: xpansiv:xpansiv-nar-registry
-  name: NAR Registry Client API
-  description: The North American Renewables Registry client API for retrieving and transacting NAR monthly
-    vintage renewable energy certificates — account, ledger, subaccount and system operations behind an
-    OAuth2 password-grant JWT.
-  humanURL: https://developer.xpansiv.com/developer-portal/nar-registry
-  baseURL: https://narenewables2.apx.com/ClientAPI
-  tags:
-  - Registries
-  - Renewable Energy Certificates
-  properties:
-  - type: OpenAPI
-    url: openapi/xpansiv-nar-registry-client-openapi.yml
-  - type: Documentation
-    url: https://developer.xpansiv.com/developer-portal/nar-registry
-  - type: Authentication
-    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
-  - type: Overlay
-    url: overlays/xpansiv-nar-registry-client-overlay.yaml
-- aid: xpansiv:xpansiv-tigr-registry
-  name: TIGRS Registry Client API
-  description: The Tradable Instrument for Global Renewables (TIGR) registry client API for retrieving
-    and retiring TIGR certificates — corporate entity, ledger, subaccount and system operations behind
-    an OAuth2 password-grant JWT.
-  humanURL: https://developer.xpansiv.com/developer-portal/tigr-registry
-  baseURL: https://tigrsregistry.apx.com/clientapi
-  tags:
-  - Registries
-  - Renewable Energy Certificates
-  properties:
-  - type: OpenAPI
-    url: openapi/xpansiv-tigr-registry-client-openapi.yml
-  - type: Documentation
-    url: https://developer.xpansiv.com/developer-portal/tigr-registry
-  - type: Authentication
-    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
-  - type: Overlay
-    url: overlays/xpansiv-tigr-registry-client-overlay.yaml
-- aid: xpansiv:xpansiv-optimal-outcomes
-  name: Xpansiv Optimal Outcomes APIs
-  description: The Optimal Outcomes suite — a system health API, a file registry, a meter-data telemetry
-    API, a reporting service, a resource API and a transfer position external API for viewing and managing
-    environmental instruments, transfer and retirement batches, ledgers and subaccounts.
-  humanURL: https://developer.xpansiv.com/developer-portal/optimal-outcomes
-  baseURL: https://optimalapi-ext.apx.com
-  tags:
-  - Registries
-  - Telemetry
-  - Reporting
-  properties:
-  - type: OpenAPI
-    url: openapi/xpansiv-optimal-system-openapi.yml
-  - type: OpenAPI
-    url: openapi/xpansiv-optimal-file-registry-openapi.yml
-  - type: OpenAPI
-    url: openapi/xpansiv-optimal-telemetry-openapi.yml
-  - type: OpenAPI
-    url: openapi/xpansiv-optimal-reporting-openapi.yml
-  - type: OpenAPI
-    url: openapi/xpansiv-optimal-resource-openapi.yml
-  - type: OpenAPI
-    url: openapi/xpansiv-optimal-transfer-position-openapi.yml
-  - type: Documentation
-    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
-  - type: Quickstart
-    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
-  - type: Overlay
-    url: overlays/xpansiv-optimal-transfer-position-overlay.yaml
-- aid: xpansiv:xpansiv-apx-power-markets
-  name: APX Power Markets File Registry API
-  description: The APX MarketSuite file registry and reporting API used to submit and retrieve ISO scheduling
-    files for CAISO, ERCOT, PJM, SPP, MISO, ISONE and NYISO, alongside the XML/XSD schedule schemas and
-    REST report endpoints.
-  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
-  baseURL: https://pm-file-api.apx.com
-  tags:
-  - Energy
-  - Power Markets
-  - Scheduling
-  properties:
-  - type: OpenAPI
-    url: openapi/xpansiv-apx-power-markets-file-registry-openapi.yml
-  - type: Documentation
-    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
-  - type: APIReference
-    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
-  - type: Authentication
-    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
-  - type: Postman
-    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
-  - type: Overlay
-    url: overlays/xpansiv-apx-power-markets-file-registry-overlay.yaml
 - aid: xpansiv:xpansiv-marketplace-fix
   name: Xpansiv Marketplace FIX API
-  description: The Xpansiv Marketplace Server API for retrieving real-time market data and executing and
-    managing orders on CBL, published as rules of engagement against the FIX 4.4 specification from the
-    FIX Trading Community, with Transaction, DropCopy and MarketData session types.
+  description: >-
+    The Xpansiv Marketplace Server API for retrieving real-time market data and executing and managing
+    orders on CBL, published as rules of engagement against the FIX 4.4 specification from the FIX Trading
+    Community, with Transaction, DropCopy and MarketData session types.
   humanURL: https://developer.xpansiv.com/developer-portal/marketplace
   baseURL: https://developer.xpansiv.com/developer-portal/marketplace/fix-api
   tags:
@@ -201,12 +72,1635 @@ apis:
     url: https://developer.xpansiv.com/developer-portal/marketplace
   - type: APIReference
     url: https://developer.xpansiv.com/developer-portal/marketplace/fix-api
+- aid: xpansiv:xpansiv-account-api
+  name: Xpansiv Account API
+  description: Account Information
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - account
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-account-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-building-types-api
+  name: Xpansiv Building types API
+  description: Building types
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Building types
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-building-types-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-clean-transportation-api
+  name: Xpansiv Clean Transportation API
+  description: Clean Transportation
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Clean Transportation
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-clean-transportation-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-corporateentity-api
+  name: Xpansiv Corporate Entity API
+  description: Corporate Entities Operations
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - corporateEntity
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-corporateentity-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-exchange-api
+  name: Xpansiv Exchange API
+  description: >-
+    The Exchange APIs allow users to take various actions, both read and write, for their interactions
+    with  execution venues, such as the CBL platform. The Search Deposits API allows the user to search
+    the current deposits placed on execution venues. The Deposit Creation API allows the user to place
+    inventory on deposit on a target execution venue.  The Deposit Withdraw API allows the user to withdraw
+    and place back into inventory deposits held on an execution venue.  The Deposit Withdraw and Create
+    Retirements API allows the user to withdraw and retire deposits held on an  execution venue.  The
+    Deposit Settlement API call would be used to settle executed trades on an execution venue by an execution  venue
+    operator.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Exchange
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-exchange-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-facilities-api
+  name: Xpansiv Facilities API
+  description: Facilities
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Facilities
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-facilities-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-facility-import-error-handling-api
+  name: Xpansiv Facility import error handling API
+  description: Facility import error handling
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Facility import error handling
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-facility-import-error-handling-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-file-type-v1-api
+  name: Xpansiv File Type V1 API
+  description: View, update or upload a file
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - file-type-v1
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-file-type-v1-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-fileregistry-api
+  name: Xpansiv /file Registry API
+  description: the File Registry REST API
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - /fileRegistry
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-fileregistry-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-forward-deals-api
+  name: Xpansiv Forward Deals API
+  description: >-
+    The Forward Deals API allows the user to search The Forward Deals associated with their Xpansiv Connect
+    account  and/or other Xpansiv Connect accounts that have granted their user that access. Forward Deal
+    information is  returned based on a Deal's last updated date. Note that this call has a number of
+    optional fields that the users  needs to include if desired in the output.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Forward Deals
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-forward-deals-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-generators-api
+  name: Xpansiv Generators API
+  description: The Generators API from Xpansiv — 1 operation(s) for generators.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Generators
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-generators-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-instruments-api
+  name: Xpansiv Instruments API
+  description: The Instruments API from Xpansiv — 1 operation(s) for instruments.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Instruments
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-instruments-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-issuances-api
+  name: Xpansiv Issuances API
+  description: >-
+    The Issuance API allows the user to pull information on any Issuances associated with their account,  or
+    permissioned account, for the various registries they are linked with. The Instrument details on the  Issuance
+    will be returned in the format of a Carbon Instrument (type CARBON) or a REC Instrument (type REC)  as
+    appropriate. Each of the types are returned with data specific to the Carbon or REC attributes.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Issuances
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-issuances-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-ledger-api
+  name: Xpansiv Ledger API
+  description: Ledger Operations
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - ledger
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-ledger-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-ledger-v1-api
+  name: Xpansiv Ledger V1 API
+  description: View an Account's current and historical instrument details
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - ledger-v1
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-ledger-v1-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-market-api
+  name: Xpansiv Market API
+  description: Market
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Market
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-market-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-meter-reading-v1-api
+  name: Xpansiv Meter Reading V1 API
+  description: >-
+    View or submit measurement data. Measurement data includes, but it is not limited to, telemetry data,
+    emission records, verification records, etc.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - meter-reading-v1
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-meter-reading-v1-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-meter-readings-api
+  name: Xpansiv Meter Readings API
+  description: Meter Readings
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Meter Readings
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-meter-readings-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-portfolio-api
+  name: Xpansiv Portfolio API
+  description: >-
+    The Portfolio API allows the user to search their credit inventory (tax lot) data on active positions  across
+    all registry accounts linked to their Xpansiv Connect account and/or other Xpansiv Connect accounts  that
+    have granted their user that access. Note that This call has a number of optional fields that the
+    user  needs to include if desired in the output.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Portfolio
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-portfolio-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-projects-api
+  name: Xpansiv Projects API
+  description: >-
+    The Project API allows the user to pull publicly available information about carbon projects registered  in
+    the registries that are integrated with Xpansiv Connect. Note - this call has a number of optional
+    fields  that the user needs to include if desired in the output.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Projects
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-projects-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-qualified-reporting-entities-api
+  name: Xpansiv Qualified reporting entities API
+  description: Qualified reporting entities
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Qualified reporting entities
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-qualified-reporting-entities-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-remote-data-collectors-api
+  name: Xpansiv Remote data collectors API
+  description: Remote data collectors
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Remote data collectors
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-remote-data-collectors-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-report-issuance-v1-api
+  name: Xpansiv Report Issuance V1 API
+  description: Issuance Reports
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - report-issuance-v1
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-report-issuance-v1-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-report-resource-v1-api
+  name: Xpansiv Report Resource V1 API
+  description: Resource Reports
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - report-resource-v1
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-report-resource-v1-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-reporting-api
+  name: Xpansiv /reporting API
+  description: the Reporting REST API
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - /reporting
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-reporting-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-reports-api
+  name: Xpansiv Reports API
+  description: >-
+    The Reports API allows the user to retrieve a comprehensive credit inventory (aka Tax Lot by Program
+    Report)  on all active positions with a single call across all registry accounts linked to their Xpansiv
+    Connect account  or other Xpansiv Connect accounts that have granted their user that access. Note
+    - this call has a number of  optional fields that the user needs to include if desired in the output.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Reports
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-reports-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-resource-v1-api
+  name: Xpansiv Resource V1 API
+  description: View, update or create a Resource.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - resource-v1
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-resource-v1-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-retirementbatch-v1-api
+  name: Xpansiv Retirementbatch V1 API
+  description: View or submit a retirement request, or redemption claim, on instrument(s).
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - retirementbatch-v1
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-retirementbatch-v1-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-retirements-api
+  name: Xpansiv Retirements API
+  description: >-
+    The Retirements APIs allow users to take various actions, both read and write, for their retirement  activity.
+    The Create Retirements API allows users of Xpansiv Connect to retire one or more positions from  their
+    linked registry accounts and/or other Xpansiv Connect accounts that have granted their API user with  that
+    access. The Get Registry Rules API call provides the user with the information required to pass the  correct
+    rule attributes specific to each registry with each retirement attempt. The Check Retirement Status  API
+    allows users to query the status of their retirements. The Search retirements API allows users search
+    their  retirement history. Note - this call has a number of optional fields that the user needs to
+    include if  desired in the output.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Retirements
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-retirements-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-split-lots-api
+  name: Xpansiv Split Lots API
+  description: >-
+    The Split Lots API allows the user to search split lot data on their Xpansiv Connect account and/or
+    other  Xpansiv Connect accounts that have granted your user that access.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Split Lots
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-split-lots-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-subaccount-v1-api
+  name: Xpansiv Subaccount V1 API
+  description: >-
+    View or create subaccounts. Use subaccounts to organize your account’s instruments. All accounts have
+    a "Default" subaccount, where all new issuances and incoming transfers will be deposited. Subaccounts
+    may also be used to delegate instrument management to an authorized third party.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - subaccount-v1
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-subaccount-v1-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-system-api
+  name: Xpansiv System API
+  description: System Information
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - system
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-system-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-system-v1-api
+  name: Xpansiv System V1 API
+  description: Check the API system health.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - system-v1
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-system-v1-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-transactions-api
+  name: Xpansiv Transactions API
+  description: Transactions
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Transactions
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-transactions-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-transferbatch-v1-api
+  name: Xpansiv Transferbatch V1 API
+  description: >-
+    Initiate a transfer request (between subaccounts or another account holder), view or act upon pending
+    transfers, as well as view historical transfer details.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - transferbatch-v1
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-transferbatch-v1-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-transfers-api
+  name: Xpansiv Transfers API
+  description: >-
+    The Transfers APIs allow users to  take various actions, both read and write, for their bilateral
+    transaction  activity. The Search Transfers API allows the user to search registry transfer data for
+    their Xpansiv  Connect account and/or other Xpansiv Connect accounts that have granted your user that
+    access. Note - this  call has a number of optional fields that the user needs to include if desired
+    in the output.  The Create Transfers API allows the user to create new bilateral transfers. The Cancel
+    Transfers API allows  the user to cancel/withdrawal any pending outgoing transfers. The Reject Transfers
+    API allows the user to  reject any pending incoming transfer. The Accept Transfers API allows the
+    user to accept any pending incoming transfer.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Transfers
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-transfers-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-usage-point-identifier-v1-api
+  name: Xpansiv Usage Point Identifier V1 API
+  description: >-
+    Retrieve usage point identifiers for resources (projects, facilities, etc.) for which measurement
+    readings may be submitted
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - usage-point-identifier-v1
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-usage-point-identifier-v1-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-utilities-api
+  name: Xpansiv Utilities API
+  description: Utilities
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  baseURL: https://connect.xpansiv.com/app/api/v1
+  tags:
+  - Utilities
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-utilities-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-account-holders-api
+  name: Xpansiv Account Holders API
+  description: The Account Holders API from Xpansiv — 1 operation(s) for account holders.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-data
+  baseURL: https://api.data.xpansiv.com
+  tags:
+  - Account Holders
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-account-holders-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-reference-data-api
+  name: Xpansiv Reference Data API
+  description: >-
+    The Reference Data API enables discovering Xpansiv Connect reference data types and values.
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-data
+  baseURL: https://api.data.xpansiv.com
+  tags:
+  - Reference Data
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-reference-data-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
+- aid: xpansiv:xpansiv-sub-account-api
+  name: Xpansiv Sub Account API
+  description: Subaccount Operations
+  humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-data
+  baseURL: https://api.data.xpansiv.com
+  tags:
+  - Sub Account
+  properties:
+  - type: OpenAPI
+    url: openapi/xpansiv-sub-account-api-openapi.yml
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect
+  - type: GettingStarted
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-managed-solutions/authorization
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/nar-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/nar-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/tigr-registry/authentication
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes
+  - type: Quickstart
+    url: https://developer.xpansiv.com/developer-portal/optimal-outcomes/quickstart
+  - type: Documentation
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api
+  - type: APIReference
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/apiendpoints
+  - type: Authentication
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/authentication
+  - type: Postman
+    url: https://developer.xpansiv.com/developer-portal/xpansiv-power/rest_api/postman
 x-enrichment:
   date: '2026-09-04'
   status: enriched
   artifacts_added: 41
   pass: local-v3
 common:
+- type: Overlay
+  url: overlays/xpansiv-managed-solutions-overlay.yaml
+- type: Overlay
+  url: overlays/xpansiv-nar-registry-client-overlay.yaml
+- type: Overlay
+  url: overlays/xpansiv-tigr-registry-client-overlay.yaml
+- type: Overlay
+  url: overlays/xpansiv-optimal-transfer-position-overlay.yaml
+- type: Overlay
+  url: overlays/xpansiv-apx-power-markets-file-registry-overlay.yaml
 - type: Website
   url: https://www.xpansiv.com/
 - type: DeveloperPortal
