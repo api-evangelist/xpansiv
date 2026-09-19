@@ -78,6 +78,8 @@ apis:
   humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
   baseURL: https://connect.xpansiv.com/app/api/v1
   tags:
+  - Account
+  tags_raw:
   - account
   properties:
   - type: OpenAPI
@@ -192,6 +194,8 @@ apis:
   humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
   baseURL: https://connect.xpansiv.com/app/api/v1
   tags:
+  - Corporate Entity
+  tags_raw:
   - corporateEntity
   properties:
   - type: OpenAPI
@@ -389,7 +393,8 @@ apis:
   description: the File Registry REST API
   humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
   baseURL: https://connect.xpansiv.com/app/api/v1
-  tags:
+  tags: []
+  tags_raw:
   - /fileRegistry
   properties:
   - type: OpenAPI
@@ -588,6 +593,8 @@ apis:
   humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
   baseURL: https://connect.xpansiv.com/app/api/v1
   tags:
+  - Ledger
+  tags_raw:
   - ledger
   properties:
   - type: OpenAPI
@@ -664,6 +671,8 @@ apis:
   humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
   baseURL: https://connect.xpansiv.com/app/api/v1
   tags:
+  - Markets
+  tags_raw:
   - Market
   properties:
   - type: OpenAPI
@@ -825,6 +834,8 @@ apis:
   humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
   baseURL: https://connect.xpansiv.com/app/api/v1
   tags:
+  - Project
+  tags_raw:
   - Projects
   properties:
   - type: OpenAPI
@@ -1015,6 +1026,8 @@ apis:
   humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
   baseURL: https://connect.xpansiv.com/app/api/v1
   tags:
+  - Reporting
+  tags_raw:
   - /reporting
   properties:
   - type: OpenAPI
@@ -1298,6 +1311,8 @@ apis:
   humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
   baseURL: https://connect.xpansiv.com/app/api/v1
   tags:
+  - System
+  tags_raw:
   - system
   properties:
   - type: OpenAPI
@@ -1336,6 +1351,8 @@ apis:
   humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
   baseURL: https://connect.xpansiv.com/app/api/v1
   tags:
+  - System V1
+  tags_raw:
   - system-v1
   properties:
   - type: OpenAPI
@@ -1374,6 +1391,8 @@ apis:
   humanURL: https://developer.xpansiv.com/developer-portal/xpansiv-connect
   baseURL: https://connect.xpansiv.com/app/api/v1
   tags:
+  - Transaction
+  tags_raw:
   - Transactions
   properties:
   - type: OpenAPI
