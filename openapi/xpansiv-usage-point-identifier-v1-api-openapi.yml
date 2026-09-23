@@ -1,0 +1,143 @@
+openapi: 3.2.0
+info:
+  title: Telemetry Usage Point Identifier V1 API
+  description: Use API credentials to view or submit meter (telemetry) data.
+  version: 1.0.0
+servers:
+- url: https://optimalapi-ext.apx.com/meter/v1
+- url: https://optimalapi-uat-ext.apx.com/meter/v1
+security:
+- JWT: []
+tags:
+- name: usage-point-identifier-v1
+  description: Retrieve usage point identifiers for resources (projects, facilities, etc.) for which measurement readings may be submitted
+paths:
+  /api/usagePointIdentifier/{readingProfileCode}:
+    get:
+      tags:
+      - usage-point-identifier-v1
+      summary: Retrieve stream identifiers for usage points of resources owned by the account
+      description: Retrieve the identifiers that may be used to identify usage points for resources (projects, facilities, etc.) owned by the account
+      operationId: getIdentifiersPage
+      parameters:
+      - name: readingProfileCode
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: Identifiers returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsagePointIdentifierResponse'
+components:
+  schemas:
+    UsagePointIdentifierResourceInputOutputStream:
+      type: object
+      properties:
+        streamTypeCode:
+          type: string
+        usagePointIdentifiers:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/InternalUsagePointCodeUsagePointIdentifier'
+            - $ref: '#/components/schemas/ReportingEntityStreamIdentifierUsagePointIdentifier'
+      description: A container for a resource's usage point identifiers for a given input/output usage point
+    UsagePointIdentifierResourceProgram:
+      type: object
+      properties:
+        programCode:
+          type: string
+        programVersion:
+          type: string
+        programAssignedIdentifier:
+          type: string
+        resourceName:
+          type: string
+        resourceTypeCode:
+          type: string
+      description: The program-specific resource information
+    UsagePointIdentifierResourceInputOutput:
+      type: object
+      properties:
+        inputOutputTypeCode:
+          type: string
+        protocols:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsagePointIdentifierProtocol'
+        usagePoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsagePointIdentifierResourceInputOutputStream'
+        isInput:
+          type: boolean
+      description: A container for a resource's usage point identifiers for a given input/output
+    UsagePointIdentifierResponse:
+      type: object
+      properties:
+        resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsagePointIdentifierResource'
+        isLastPage:
+          type: boolean
+      description: The response to a retrieval of resource usage points
+    InternalUsagePointCodeUsagePointIdentifier:
+      required:
+      - internalUsagePointCode
+      type: object
+      description: A usage point identifier that employs the internal usage point code (sometimes referred to as the stream identifier)
+      allOf:
+      - $ref: '#/components/schemas/IUsagePointIdentifier'
+      - type: object
+        properties:
+          internalUsagePointCode:
+            type: string
+    ReportingEntityStreamIdentifierUsagePointIdentifier:
+      required:
+      - reportingEntityStreamIdentifier
+      type: object
+      description: A usage point identifier that employs the reporting entity stream identifier
+      allOf:
+      - $ref: '#/components/schemas/IUsagePointIdentifier'
+      - type: object
+        properties:
+          reportingEntityStreamIdentifier:
+            type: string
+    UsagePointIdentifierResource:
+      type: object
+      properties:
+        programs:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsagePointIdentifierResourceProgram'
+        inputOutputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsagePointIdentifierResourceInputOutput'
+      description: A container for a resource's usage point identifiers and input/outputs
+    IUsagePointIdentifier:
+      type: object
+    UsagePointIdentifierProtocol:
+      type: object
+      properties:
+        protocolCode:
+          type: string
+        protocolVersion:
+          type: string
+      description: Indicates a protocol code and version related to a usage point identifier
+  securitySchemes:
+    JWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

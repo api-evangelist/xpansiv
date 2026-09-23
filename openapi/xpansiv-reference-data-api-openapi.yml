@@ -1,0 +1,84 @@
+openapi: 3.2.0
+info:
+  description: 'This is the OpenAPI spec for Xpansiv Connect API. Documentation: https://developer.xpansiv.com/developer-portal/'
+  title: Xpansiv Connect Reference Data API
+  version: 1.0.0-beta
+servers:
+- url: https://sandbox.preprod.connect.xpansiv.com/app/api/v1
+  description: SANDBOX
+- url: https://uat.preprod.connect.xpansiv.com/app/api/v1
+  description: UAT
+- url: https://connect.xpansiv.com/app/api/v1
+  description: PROD
+security:
+- bearerToken: []
+tags:
+- name: Reference Data
+  description: The Reference Data API enables discovering Xpansiv Connect reference data types and values.
+paths:
+  /reference-data:
+    get:
+      tags:
+      - Reference Data
+      operationId: getReferenceData
+      summary: Retrieve list of reference data
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          code:
+                            type: string
+                          description:
+                            type: string
+                          order:
+                            type: integer
+                            format: int64
+                          value:
+                            type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+components:
+  schemas:
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+    NotAuthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+  responses:
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
+    '401':
+      description: Not authorized error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotAuthorizedError'
+  securitySchemes:
+    bearerToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

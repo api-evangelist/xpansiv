@@ -1,0 +1,737 @@
+openapi: 3.2.0
+info:
+  title: Xpansiv Managed Solutions Facility import error handling API
+  description: 'Access data from your Xpansiv Managed Solutions account using API calls.
+
+
+    You can generate an API key for your user on Xpansiv Managed Solutions API Access page. The API key is linked to a user and an account, and has the same rights as the user on the account.
+
+
+    When calling Xpansiv Managed Solutions API use that API key to set the Bearer Token authentication header.'
+  contact:
+    email: developers@xpansiv.com
+  version: '1.10'
+servers:
+- url: https://www.ms.xpansiv.com/app/api/v1
+security:
+- BearerAuth: []
+tags:
+- name: Facility import error handling
+  description: Facility import error handling
+paths:
+  /uploads/{upload_id}/errors/{row_id}/preview/{error_type}/{field}:
+    get:
+      tags:
+      - Facility import error handling
+      summary: Preview fix for one upload row’s error (same error group context)
+      description: Like bulk preview, but scoped to a single row_id within the upload. fix_value is optional and passed to the fixer. Requires access to the upload (facilities, ABP, or DGG).
+      operationId: facilityUploadSingleRowErrorPreview
+      parameters:
+      - name: upload_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: row_id
+        in: path
+        description: Upload row identifier
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: error_type
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: field
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: fix_value
+        in: query
+        description: Optional proposed value for the fixer
+        required: false
+        schema:
+          type: string
+      - name: error_index
+        in: query
+        description: When multiple errors exist on the row for this error group, selects which error instance to preview (0-based). Invalid values return 400.
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Preview available
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 200
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/UploadSingleRowErrorPreviewSuccess'
+                  type: object
+        '400':
+          description: Invalid error_index query parameter
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 400
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/UploadErrorPreviewInvalidErrorIndexError'
+                  type: object
+        '403':
+          description: No access to this upload
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 403
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/UploadErrorPreviewForbiddenError'
+                  type: object
+        '404':
+          description: Error group or fixer not found
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 404
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/UploadErrorPreviewNotFoundError'
+                  type: object
+  /uploads/{upload_id}/errors/preview/{error_type}/{field}:
+    get:
+      tags:
+      - Facility import error handling
+      summary: Preview bulk fix for an upload error group
+      description: Returns a preview of proposed changes for all rows in the error group identified by error_type and field. Optional query parameter fix_value is passed to the fixer. Caller must have access to the upload (facilities, ABP, or DGG).
+      operationId: facilityUploadErrorPreviewBulk
+      parameters:
+      - name: upload_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: error_type
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: field
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: fix_value
+        in: query
+        description: Optional value passed to the fixer (e.g. replacement text).
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Preview succeeded
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 200
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/UploadBulkErrorPreviewSuccess'
+                  type: object
+        '403':
+          description: No permission to access this upload
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 403
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/UploadErrorPreviewForbiddenError'
+                  type: object
+        '404':
+          description: No matching error group or fixer
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 404
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/UploadErrorPreviewNotFoundError'
+                  type: object
+  /uploads/{upload_id}/errors/{row_id}/fix:
+    post:
+      tags:
+      - Facility import error handling
+      summary: Apply error fix for one upload row
+      description: Facility import error handling
+      operationId: facilityUploadApplyFixSingleRow
+      parameters:
+      - name: upload_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: row_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplyFixRequestBody'
+      responses:
+        '200':
+          description: Fix applied
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 200
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/SingleFixSuccessResponse'
+                  type: object
+        '400':
+          description: Missing fields, fix/validation failed
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ApplyFixValidationErrorResponse'
+                - $ref: '#/components/schemas/ApplyFixFieldErrorResponse'
+              examples:
+                validation_failed_all_rows:
+                  summary: Fix applied but validation failed (per-row errors)
+                  value:
+                    success: false
+                    error: Validation failed
+                    validation:
+                      '7050956':
+                        error: The facility_size 30.2222kW is different than the total panels capacity 28.615kW (DC).
+                        attempted_value: '30.2222'
+                      '7050957':
+                        error: The facility_size 30.2222kW is different than the total panels capacity 29.585kW (DC).
+                        attempted_value: '30.2222'
+                    facility_creation_attempt: []
+                missing_params:
+                  summary: Fix applied but validation failed (per-row errors)
+                  value:
+                    success: false
+                    error: No correction value provided
+                    validation: {}
+                    facility_creation_attempt: []
+                invalid_error_index:
+                  summary: error_index in body is not a valid integer
+                  value:
+                    success: false
+                    error: Invalid error_index value.
+        '403':
+          description: No access to upload
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 403
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/ForbiddenResponse'
+                  type: object
+  /uploads/{upload_id}/errors/fix:
+    post:
+      tags:
+      - Facility import error handling
+      summary: Apply error fix for all rows in the error group
+      description: Facility import error handling
+      operationId: facilityUploadApplyFixBulk
+      parameters:
+      - name: upload_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplyFixRequestBody'
+      responses:
+        '200':
+          description: Bulk fix applied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkFixSuccessResponse'
+              examples:
+                mixed_create_outcomes:
+                  summary: Validation OK; some facilities created, some errors
+                  value:
+                    success: true
+                    facility_creation_attempt:
+                      '7050928':
+                        status: success
+                        message: Facility created successfully
+                        facility_id: 184869
+                      '7050929':
+                        status: error
+                        message: A facility with this address already exists.
+                      '7050930':
+                        status: error
+                        message: A facility with this address already exists.
+                    validation: []
+                validation_fine_but_facility_can_not_be_created:
+                  summary: Validation OK; facility can not be created
+                  value:
+                    success: true
+                    facility_creation_attempt:
+                      '7050929':
+                        status: error
+                        message: A facility with this address already exists.
+                    validation: []
+                all_rows_success:
+                  summary: Every row created a facility
+                  value:
+                    success: true
+                    facility_creation_attempt:
+                      '7050928':
+                        status: success
+                        message: Facility created successfully
+                        facility_id: 184869
+                      '7050929':
+                        status: success
+                        message: Facility created successfully
+                        facility_id: 184870
+                    validation: []
+                partial_success_pending_and_validation_errors:
+                  summary: One row pending (more errors); another row failed validation
+                  value:
+                    success: true
+                    facility_creation_attempt:
+                      '7050956':
+                        status: pending
+                        message: Facility candidate has more error to resolve
+                    validation:
+                      '7050957':
+                        error: The facility_size 28.615kW is different than the total panels capacity 29.585kW (DC).
+                        attempted_value: '28.615'
+                partial_success_create_and_validation_errors:
+                  summary: One row created a facility; another row failed validation
+                  value:
+                    success: true
+                    facility_creation_attempt:
+                      '7050956':
+                        status: success
+                        message: Facility created successfully
+                        facility_id: 184869
+                    validation:
+                      '7050957':
+                        error: The facility_size 28.615kW is different than the total panels capacity 29.585kW (DC).
+                        attempted_value: '28.615'
+        '400':
+          description: Missing fields or fix/validation failed
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/ApplyFixValidationErrorResponse'
+                - $ref: '#/components/schemas/ApplyFixFieldErrorResponse'
+              examples:
+                validation_failed_all_rows:
+                  summary: Fix applied but validation failed (per-row errors)
+                  value:
+                    success: false
+                    error: Validation failed
+                    validation:
+                      '7050956':
+                        error: The facility_size 30.2222kW is different than the total panels capacity 28.615kW (DC).
+                        attempted_value: '30.2222'
+                      '7050957':
+                        error: The facility_size 30.2222kW is different than the total panels capacity 29.585kW (DC).
+                        attempted_value: '30.2222'
+                    facility_creation_attempt: []
+                missing_params:
+                  summary: Fix applied but validation failed (per-row errors)
+                  value:
+                    success: false
+                    error: No correction value provided
+                    validation: {}
+                    facility_creation_attempt: []
+        '403':
+          description: No access to upload
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 403
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/ForbiddenResponse'
+                  type: object
+components:
+  schemas:
+    BulkFixSuccessResponse:
+      required:
+      - success
+      - facility_creation_attempt
+      - validation
+      properties:
+        success:
+          type: boolean
+          enum:
+          - true
+        facility_creation_attempt:
+          type: object
+          additionalProperties: true
+        validation:
+          description: May be an empty array [] or a ValidationErrorsMap object.
+          oneOf:
+          - type: array
+            items:
+              type: object
+          - $ref: '#/components/schemas/ValidationErrorsMap'
+      type: object
+    ValidationErrorsMap:
+      description: Map of row identifier to validation error detail.
+      type: object
+      additionalProperties: true
+    PreviewChangeRow:
+      description: One proposed change row in a fix preview (`FixPreviewPayload.changes[]`).
+      required:
+      - row_index
+      - old_value
+      - new_value
+      properties:
+        row_index:
+          description: Upload row identifier (internal row id)
+          type: integer
+          example: 7050928
+        old_value:
+          description: Current value before fix (type may vary by field)
+          type:
+          - string
+          - 'null'
+        new_value:
+          description: Value after applying the proposed fix
+          type:
+          - string
+          - 'null'
+      type: object
+    SingleFixSuccessResponse:
+      required:
+      - success
+      - facility_creation_attempt
+      properties:
+        success:
+          type: boolean
+          enum:
+          - true
+        facility_creation_attempt:
+          type: object
+          additionalProperties: true
+      type: object
+    UploadBulkErrorPreviewSuccess:
+      required:
+      - success
+      - affected_row_ids
+      properties:
+        affected_row_ids:
+          $ref: '#/components/schemas/FixPreviewPayload'
+        success:
+          type: boolean
+          enum:
+          - true
+      type: object
+    ForbiddenResponse:
+      properties:
+        success:
+          type: boolean
+          enum:
+          - false
+        error:
+          type: string
+          example: You do not have permission to access this upload.
+      type: object
+    ApplyFixFieldErrorResponse:
+      properties:
+        success:
+          type: boolean
+          enum:
+          - false
+        error:
+          type: string
+          enum:
+          - The error_type field is required.
+          - The field field is required.
+          - Invalid error_index value.
+      type: object
+    UploadErrorPreviewForbiddenError:
+      description: 403 `data` payload when the caller cannot access the upload.
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/UploadErrorPreviewClientError'
+      - properties:
+          success:
+            type: boolean
+            enum:
+            - false
+          error:
+            type: string
+            example: You do not have permission to access this upload.
+        type: object
+    ApplyFixRequestBody:
+      required:
+      - error_type
+      - field
+      properties:
+        error_type:
+          type: string
+        field:
+          type: string
+        fix_value:
+          type:
+          - string
+          - 'null'
+        error_index:
+          type:
+          - integer
+          - 'null'
+      type: object
+    UploadErrorPreviewNotFoundError:
+      description: 404 `data` payload when no error group or fixer matches the request.
+      properties:
+        success:
+          type: boolean
+          enum:
+          - false
+        message:
+          type: string
+          example: Error fix or error fixer not found
+        error:
+          description: Machine-readable error code when present.
+          type:
+          - string
+          - 'null'
+          example: not_found
+      type: object
+    UploadErrorPreviewClientError:
+      description: Shared `{success, error}` shape for upload error preview client failures (400/403).
+      properties:
+        success:
+          type: boolean
+          enum:
+          - false
+        error:
+          type: string
+      type: object
+    ResponseEnvelope:
+      description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
+      required:
+      - url
+      - date
+      - code
+      - elements
+      - page
+      properties:
+        url:
+          description: Request URL including query string.
+          type: string
+          example: /app/api/v1/facilities
+        date:
+          description: Response timestamp.
+          type: string
+          example: 2024-09-17 04:26:39 EDT
+        code:
+          description: HTTP status code, mirrored in the JSON body (same as the response status).
+          type: integer
+        elements:
+          description: Number of items in `data` on HTTP 200; 0 for other status codes.
+          type: integer
+        page:
+          description: Page label (`1 of 1` when not paginated) or numeric page when listing with pagination.
+          oneOf:
+          - type: string
+            example: 1 of 1
+          - type: integer
+            example: 2
+      type: object
+    UploadErrorPreviewInvalidErrorIndexError:
+      description: 400 `data` payload when `error_index` query parameter is not a valid integer.
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/UploadErrorPreviewClientError'
+      - properties:
+          success:
+            type: boolean
+            enum:
+            - false
+          error:
+            type: string
+            example: Invalid error_index value.
+        type: object
+    ApplyFixValidationErrorResponse:
+      required:
+      - success
+      - error
+      - validation
+      - facility_creation_attempt
+      properties:
+        success:
+          type: boolean
+          enum:
+          - false
+        error:
+          type: string
+        validation:
+          $ref: '#/components/schemas/ValidationErrorsMap'
+        facility_creation_attempt:
+          type: array
+          items:
+            type: object
+      type: object
+    UploadSingleRowErrorPreviewSuccess:
+      required:
+      - success
+      - affected_row_ids
+      properties:
+        affected_row_ids:
+          $ref: '#/components/schemas/FixPreviewPayload'
+        success:
+          type: boolean
+          enum:
+          - true
+      type: object
+    FixPreviewPayload:
+      required:
+      - fixer_key
+      - field
+      - changes
+      properties:
+        changes:
+          description: One entry per affected upload row
+          type: array
+          items:
+            $ref: '#/components/schemas/PreviewChangeRow'
+        fixer_key:
+          description: Identifier of the fixer used for this preview
+          type: string
+          example: manual_correction
+        field:
+          description: Logical field name being corrected
+          type: string
+          example: street
+        scope:
+          type:
+          - string
+          - 'null'
+          example: facilities
+        field_path:
+          description: Dot-path of the field within the scope
+          type:
+          - string
+          - 'null'
+          example: facilities.street
+      type: object
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer

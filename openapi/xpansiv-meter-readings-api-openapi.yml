@@ -1,0 +1,1616 @@
+openapi: 3.2.0
+info:
+  title: Xpansiv Managed Solutions Meter Readings API
+  description: 'Access data from your Xpansiv Managed Solutions account using API calls.
+
+
+    You can generate an API key for your user on Xpansiv Managed Solutions API Access page. The API key is linked to a user and an account, and has the same rights as the user on the account.
+
+
+    When calling Xpansiv Managed Solutions API use that API key to set the Bearer Token authentication header.'
+  contact:
+    email: developers@xpansiv.com
+  version: '1.10'
+servers:
+- url: https://www.ms.xpansiv.com/app/api/v1
+security:
+- BearerAuth: []
+tags:
+- name: Meter Readings
+  description: Meter Readings
+paths:
+  /facilities/{facility_id}/generation/meters/{meter_id}/readings/eligibility:
+    get:
+      tags:
+      - Meter Readings
+      summary: Check user can submit meter reading
+      description: Check if the facility and meter are eligible for manual meter reading submissions.
+      operationId: userCanSubmitMeterReading
+      parameters:
+      - name: facility_id
+        in: path
+        description: ID of the facility to check eligibility for
+        required: true
+        schema:
+          type: integer
+      - name: meter_id
+        in: path
+        description: ID of the meter to check eligibility for
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Eligibility check completed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 200
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/MeterReadingEligibilityResult'
+                  type: object
+        '400':
+          description: Bad request - invalid facility or meter ID
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 400
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/MeterReadingEligibilityBadRequestError'
+                  type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 401
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/AuthError'
+                  type: object
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 500
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/MeterReadingEligibilityServerError'
+                  type: object
+  /facilities/{facility_id}/generation/meters/{meter_id}/readings:
+    post:
+      tags:
+      - Meter Readings
+      summary: Submit Meter Reading (Cumulative Meters Only)
+      description: 'Submit a meter reading for a facility with a **cumulative meter only**.
+
+
+        **Important**: This endpoint only accepts submissions for cumulative meters. Non-cumulative meters will be rejected with error code `CUMULATIVE_ONLY`.
+
+
+        Supports both manual and automated submissions:
+
+        - **Manual submission**: Provide `meter_reading` and `meter_reading_date_taken` (required for cumulative meters)
+
+        - **Automated submission**: Provide `processing_id` to extract reading from automated processing system
+
+
+        **Additional restrictions**:
+
+        - First-time submissions are not allowed (at least one reading must already exist)
+
+        - Meter must be verified and eligible for manual reading entry'
+      operationId: submitMeterReading
+      parameters:
+      - name: facility_id
+        in: path
+        description: The unique identifier of the facility
+        required: true
+        schema:
+          type: integer
+          example: 12345
+          minimum: 1
+      - name: meter_id
+        in: path
+        description: The unique identifier of the cumulative meter
+        required: true
+        schema:
+          type: integer
+          example: 67890
+          minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - $ref: '#/components/schemas/ManualMeterReadingRequest'
+              - $ref: '#/components/schemas/AutomatedMeterReadingRequest'
+      responses:
+        '200':
+          description: Meter reading submitted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 200
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/MeterReadingSuccessResponse'
+                  type: object
+        '400':
+          description: Bad Request - Validation failed or invalid parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 400
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/MeterReadingErrorResponse'
+                  type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 401
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/AuthError'
+                  type: object
+        '403':
+          description: Forbidden - User lacks permission to submit readings
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 403
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/MeterReadingErrorResponse'
+                  type: object
+        '404':
+          description: Not Found - Facility not found
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 404
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/MeterReadingErrorResponse'
+                  type: object
+        '410':
+          description: Gone - Facility is inactive
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 410
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/MeterReadingErrorResponse'
+                  type: object
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 500
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/MeterReadingErrorResponse'
+                  type: object
+  /facilities/{facility_id}/generation/meters/{meter_id}/image-readings:
+    post:
+      tags:
+      - Meter Readings
+      summary: Process Meter Reading Image
+      description: Accepts a meter reading photo and returns a processing ID for status tracking.
+      operationId: processMeterReadingImage
+      parameters:
+      - name: facility_id
+        in: path
+        description: ID of the facility
+        required: true
+        schema:
+          type: integer
+      - name: meter_id
+        in: path
+        description: ID of the meter
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProcessMeterReadingImageRequest'
+      responses:
+        '200':
+          description: Image accepted for processing
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 200
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/ProcessMeterReadingImageSuccess'
+                  type: object
+        '400':
+          description: Bad request - validation or file errors
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 400
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/ProcessMeterReadingImageBadRequestError'
+                  type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 401
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/AuthError'
+                  type: object
+        '429':
+          description: Too many failed photo submission attempts - manual entry required
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 429
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/ProcessMeterReadingImageMaxAttemptsError'
+                  type: object
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 500
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/ProcessMeterReadingImageServerError'
+                  type: object
+  /facilities/{facility_id}/generation/meters/{meter_id}/readings/{meter_readings_id}/verification:
+    post:
+      tags:
+      - Meter Readings
+      summary: Submit Verification for a Held Meter Reading
+      description: 'Upload a photo and a written description to justify a held meter reading (held generation).
+
+
+        This endpoint is used when a reading has been flagged as needing user action (status
+
+        `held_high`, `held_low`, `held_less_than_previous`, or `srectrade_disapproved`). A
+
+        successful submission changes the reading status to `pending_review`.
+
+
+        **Validation rules**:
+
+        - `facility_id`, `meter_id`, and `meter_readings_id` must be positive integers
+
+        - The authenticated user''s account must have access to the facility
+
+        - The facility must be active (not closed/lost)
+
+        - The `meter_id` must be the primary meter of the facility
+
+        - The reading must exist, belong to the meter, and have a status that requires user action
+
+        - An image file must be provided (`image` field, `multipart/form-data`)
+
+        - Accepted image types: `png`, `gif`, `jpg`, `jpeg` (extension and MIME type are both validated)
+
+        - A non-empty `description` is required (max 512 characters)'
+      operationId: submitReadingVerification
+      parameters:
+      - name: facility_id
+        in: path
+        description: The unique identifier of the facility
+        required: true
+        schema:
+          type: integer
+          example: 12345
+          minimum: 1
+      - name: meter_id
+        in: path
+        description: The unique identifier of the primary meter of the facility
+        required: true
+        schema:
+          type: integer
+          example: 67890
+          minimum: 1
+      - name: meter_readings_id
+        in: path
+        description: The unique identifier of the held meter reading to verify
+        required: true
+        schema:
+          type: integer
+          example: 98765
+          minimum: 1
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              required:
+              - image
+              - description
+              properties:
+                image:
+                  description: 'Photo justifying the meter reading. Accepted types: png, gif, jpg, jpeg.'
+                  type: string
+                  format: binary
+                description:
+                  description: Written justification for the held reading (1–512 characters).
+                  type: string
+                  example: Meter was temporarily obstructed by construction equipment.
+                  maxLength: 512
+                  minLength: 1
+              type: object
+      responses:
+        '201':
+          description: Verification submitted — reading moved to `pending_review`
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 201
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/SubmitReadingVerificationSuccess'
+                  type: object
+        '400':
+          description: '`NO_IMAGE` — the `image` field is absent from the request.'
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 400
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/ApiResponseDTO'
+                  type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 401
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/AuthError'
+                  type: object
+        '403':
+          description: 'Forbidden. Possible `error` codes:
+
+            - `permission_denied` — user lacks the `REPORT_PRODUCTION` ACL permission
+
+            - `FACILITY_ACCESS_DENIED` — user''s account cannot access this facility
+
+            - `INACTIVE_FACILITY` — the facility has been closed/lost'
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 403
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/ApiResponseDTO'
+                  type: object
+        '404':
+          description: 'Not Found. Possible `error` codes:
+
+            - `FACILITY_NOT_FOUND` — no facility exists for the given `facility_id`
+
+            - `READING_NOT_FOUND` — reading does not exist or does not belong to the given meter'
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 404
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/ApiResponseDTO'
+                  type: object
+        '409':
+          description: 'Conflict — `READING_NOT_ELIGIBLE`. The reading exists but its current status does not
+
+            require user action (e.g. it is already approved, pending review, or fully processed).'
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 409
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/ApiResponseDTO'
+                  type: object
+        '422':
+          description: 'Unprocessable Entity — request is well-formed but data validation failed. Possible `error` codes:
+
+            - `invalid_parameters` — one or more path IDs are not valid positive integers
+
+            - `METER_ID_MISMATCH` — `meter_id` is not the primary meter of the facility
+
+            - `INVALID_IMAGE_TYPE` — image extension not in the allowed list (png, gif, jpg, jpeg)
+
+            - `INVALID_IMAGE` — file MIME type does not match the declared extension
+
+            - `INVALID_DESCRIPTION` — description is missing, empty, or exceeds 512 characters'
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 422
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/ApiResponseDTO'
+                  type: object
+        '500':
+          description: 'Internal Server Error. Possible `error` codes:
+
+            - `IMAGE_UPLOAD_FAILED` — the document storage service returned an error
+
+            - `DOCUMENT_REFERENCE_MISSING` — the upload succeeded but returned no document reference
+
+            - `UPDATE_FAILED` — the database update of the reading record failed'
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 500
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/ApiResponseDTO'
+                  type: object
+  /facilities/{facility_id}/generation/meters/{meter_id}/image-readings/{processing_id}:
+    get:
+      tags:
+      - Meter Readings
+      summary: Get Meter Reading Image Processing Status
+      description: 'Poll for OCR completion and report failures. Returns the status of a submitted meter reading image OCR processing.
+
+
+        The `processing_id` is returned by the POST endpoint when uploading an image.'
+      operationId: getMeterReadingImageProcessingStatus
+      parameters:
+      - name: facility_id
+        in: path
+        description: The unique identifier of the facility
+        required: true
+        schema:
+          type: integer
+          example: 158830
+          minimum: 1
+      - name: meter_id
+        in: path
+        description: The unique identifier of the meter
+        required: true
+        schema:
+          type: integer
+          example: 140561
+          minimum: 1
+      - name: processing_id
+        in: path
+        description: The processing ID returned from the image upload (POST) request
+        required: true
+        schema:
+          type: integer
+          example: 12345
+          minimum: 1
+      responses:
+        '200':
+          description: OCR processing status and extracted data
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 200
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/MeterReadingImageProcessingStatus'
+                  type: object
+        '400':
+          description: Bad Request - Invalid facility_id or access denied
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 400
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/MeterReadingImageProcessingStatusBadRequestError'
+                  type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 401
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/AuthError'
+                  type: object
+        '404':
+          description: Not Found - Invalid processing id
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 404
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/MeterReadingImageProcessingStatusNotFoundError'
+                  type: object
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 500
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/MeterReadingImageProcessingStatusServerError'
+                  type: object
+  /facilities/{facility_id}/generation/meters/{meter_id}/readings/{reading_id}:
+    patch:
+      tags:
+      - Meter Readings
+      summary: Update an Existing Meter Reading
+      description: 'Partially update an existing meter reading for a facility.
+
+
+        Updates are **always manual** — there is no automated/OCR path for this endpoint.
+
+        The request body accepts the same fields as the manual submission: `meter_reading`
+
+        and (for cumulative meters) `meter_reading_date_taken`.
+
+
+        **Validation and business rules applied by the service layer**:
+
+        - The user must have the `REPORT_PRODUCTION` ACL permission
+
+        - `facility_id`, `meter_id`, and `reading_id` must be valid positive integers
+
+        - The request body must be valid JSON
+
+        - The reading must exist and belong to the specified meter (`READING_NOT_FOUND` / `READING_METER_MISMATCH`)
+
+        - The reading must still be within the edit window (`OUTSIDE_EDIT_WINDOW`)
+
+        - Field-level validation (e.g. required `meter_reading`, valid date format) is enforced
+
+        and reported via the `errors` map in the response body'
+      operationId: updateMeterReading
+      parameters:
+      - name: facility_id
+        in: path
+        description: The unique identifier of the facility
+        required: true
+        schema:
+          type: integer
+          example: 12345
+          minimum: 1
+      - name: meter_id
+        in: path
+        description: The unique identifier of the meter
+        required: true
+        schema:
+          type: integer
+          example: 67890
+          minimum: 1
+      - name: reading_id
+        in: path
+        description: The unique identifier of the meter reading to update
+        required: true
+        schema:
+          type: integer
+          example: 54321
+          minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ManualMeterReadingRequest'
+      responses:
+        '200':
+          description: Meter reading updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 200
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/MeterReadingSuccessResponse'
+                  type: object
+        '400':
+          description: 'Bad Request. Possible `error` codes:
+
+            - `invalid_parameters` (from controller) — one or more path IDs are not valid positive integers
+
+            - `invalid_json` (from controller) — request body is not valid JSON
+
+            - `submission_failed` (from service) — field-level validation failed; see `errors` map
+
+            - `OUTSIDE_EDIT_WINDOW` — the reading has already been processed by the registry and can no longer be edited
+
+            - `READING_NOT_FOUND` — reading does not exist
+
+            - `READING_METER_MISMATCH` — reading does not belong to the given meter
+
+            - `VALIDATION_ERROR` — general validation failure with field-level details in `errors`'
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 400
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/MeterReadingErrorResponse'
+                  type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 401
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/AuthError'
+                  type: object
+        '403':
+          description: 'Forbidden. Possible `error` codes:
+
+            - `permission_denied` — user lacks the `REPORT_PRODUCTION` ACL permission'
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 403
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/MeterReadingErrorResponse'
+                  type: object
+        '500':
+          description: Internal Server Error — unexpected exception during update
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 500
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/MeterReadingErrorResponse'
+                  type: object
+components:
+  schemas:
+    AutomatedMeterReadingRequest:
+      description: Automated meter reading submission body for `submitMeterReading` (OCR processing_id).
+      required:
+      - processing_id
+      properties:
+        processing_id:
+          description: ID from the image-readings OCR process containing automated meter reading data
+          type: integer
+          example: 42
+          minimum: 1
+      type: object
+    MeterReadingErrorResponse:
+      description: 'Error response payload (inside the data envelope).
+
+
+        The `error` and `errors` fields are optional and may not be present in all error responses.'
+      required:
+      - success
+      - message
+      properties:
+        success:
+          description: Indicates if the submission was successful (always false for errors)
+          type: boolean
+          example: false
+        error:
+          description: Error code identifying the specific error type (optional)
+          type: string
+          example: VALIDATION_ERROR
+          enum:
+          - MULTIPLE_FACILITIES
+          - NO_FACILITY
+          - FIRST_TIME_SUBMISSION
+          - CUMULATIVE_ONLY
+          - AUTO_REPORTING
+          - METER_NOT_VERIFIED
+          - NEPOOL_REGISTRY
+          - WREGIS_REGISTRY
+          - NOT_ELIGIBLE
+          - NO_METER
+          - UNAUTHORIZED
+          - INACTIVE_FACILITY
+          - METER_ID_MISMATCH
+          - VALIDATION_ERROR
+          - OUTSIDE_EDIT_WINDOW
+          - READING_NOT_FOUND
+          - READING_METER_MISMATCH
+        message:
+          description: Human-readable error message (always present)
+          type: string
+          example: Reading falls outside of the accepted date range.
+        errors:
+          description: Field-specific validation errors (optional)
+          type: object
+          example:
+            meter_reading: Reading is required
+            meter_reading_date_taken: Reading date is required for cumulative meters
+          additionalProperties:
+            type: string
+      type: object
+    ProcessMeterReadingImageServerError:
+      description: '`POST .../image-readings` server failures after the image is accepted.'
+      required:
+      - success
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/MeterReadingOperationError'
+      - properties:
+          error:
+            description: Error code indicating the type of server failure
+            type: string
+            example: image_upload_failed
+            enum:
+            - image_upload_failed
+            - document_reference_missing
+            - unexpected_error
+          message:
+            description: Human-readable error message
+            type: string
+            example: Image upload failed
+        type: object
+    MeterReadingEligibilityBadRequestError:
+      description: '`GET .../readings/eligibility` when facility or meter path IDs are invalid (manual contract).'
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+    ProcessMeterReadingImageSuccess:
+      description: Image accepted for OCR processing.
+      required:
+      - success
+      - message
+      - processing_id
+      - remaining_attempts
+      properties:
+        success:
+          description: Indicates if the request was successful
+          type: boolean
+          example: true
+        message:
+          description: Human-readable success message
+          type: string
+          example: Meter readings processing started
+        processing_id:
+          description: Unique identifier for tracking the image processing status
+          type: integer
+          example: 16
+        remaining_attempts:
+          description: Number of remaining photo submission attempts before manual entry is required
+          type: integer
+          example: 4
+          maximum: 5
+          minimum: 0
+      type: object
+    MeterReadingImageProcessingStatus:
+      description: OCR processing status and extracted data
+      required:
+      - success
+      - status
+      - requires_manual_entry
+      - remaining_attempts
+      - extracted_data
+      properties:
+        extracted_data:
+          $ref: '#/components/schemas/MeterReadingImageExtractedData'
+        success:
+          description: Whether the request was successful
+          type: boolean
+          example: true
+        status:
+          description: Current OCR processing status
+          type: string
+          example: processing
+          enum:
+          - pending
+          - processing
+          - successful
+          - failed
+        requires_manual_entry:
+          description: Whether manual entry is required (true when status is failed and no remaining attempts)
+          type: boolean
+          example: false
+        remaining_attempts:
+          description: Number of remaining photo submission attempts before manual entry is required
+          type: integer
+          example: 5
+          maximum: 5
+          minimum: 0
+      type: object
+    ApiResponseDTO:
+      description: API response data
+      properties:
+        success:
+          type: boolean
+          example: true
+        error:
+          type: string
+          example: error message
+        message:
+          type: string
+          example: message
+        data:
+          type: object
+          example:
+            key: value
+        errors:
+          type: array
+          items:
+            type: string
+          example:
+          - error message
+        field_errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiFieldError'
+          example:
+          - field: email
+            message: error message
+      type: object
+    MeterReadingSubmissionPeriod:
+      required:
+      - start
+      - end
+      properties:
+        start:
+          description: Start date of the submission period
+          type: string
+          format: date
+          example: '2025-11-01'
+        end:
+          description: End date of the submission period
+          type: string
+          format: date
+          example: '2025-11-02'
+      type: object
+    Error:
+      description: 'Generic error payload when no more specific error schema applies.
+
+
+        Implements JsonSerializable so it can be passed directly to API_Controller::response().
+
+        Implements Countable returning 0 so the response size guard in API_Controller treats it
+
+        as an empty collection (error responses never trigger the size limit).'
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Error description
+      type: object
+    MeterReadingOperationError:
+      description: 'Shared `{success, error, message}` shape for meter-reading image/status API errors.
+
+
+        Endpoint-specific schemas extend this class and set a distinct `schema` name for OpenAPI.'
+      required:
+      - success
+      - error
+      - message
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: error
+        message:
+          description: Human-readable error message
+          type: string
+          example: An error occurred
+      type: object
+    ResponseEnvelope:
+      description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
+      required:
+      - url
+      - date
+      - code
+      - elements
+      - page
+      properties:
+        url:
+          description: Request URL including query string.
+          type: string
+          example: /app/api/v1/facilities
+        date:
+          description: Response timestamp.
+          type: string
+          example: 2024-09-17 04:26:39 EDT
+        code:
+          description: HTTP status code, mirrored in the JSON body (same as the response status).
+          type: integer
+        elements:
+          description: Number of items in `data` on HTTP 200; 0 for other status codes.
+          type: integer
+        page:
+          description: Page label (`1 of 1` when not paginated) or numeric page when listing with pagination.
+          oneOf:
+          - type: string
+            example: 1 of 1
+          - type: integer
+            example: 2
+      type: object
+    MeterReadingImageProcessingStatusBadRequestError:
+      description: '`GET .../image-readings/{processing_id}` when facility access or path validation fails (manual documents as 400).'
+      required:
+      - success
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/MeterReadingOperationError'
+    AuthError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 401 when API authentication is missing or invalid.
+            type: string
+            example: connection_failed
+          message:
+            type: string
+            example: Authentication error
+        type: object
+    MeterReadingSuccessResponse:
+      description: Success response payload (inside the data envelope)
+      required:
+      - success
+      - meter_readings_id
+      - meter_reading_status
+      properties:
+        success:
+          description: Indicates if the submission was successful
+          type: boolean
+          example: true
+        meter_readings_id:
+          description: The unique identifier of the created/updated meter reading
+          type: integer
+          example: 54321
+        meter_reading_status:
+          description: The status of the submitted meter reading
+          type: string
+          example: approved
+          enum:
+          - approved
+          - held_high
+          - held_low
+          - held_less_than_previous
+          - pending_review
+          - disapproved
+          - setup_incomplete
+          - date_outside_expected
+          - wrong_held_gen_id
+          - missing_previous_verified
+          - extrapolation_off
+          - invalid_meter_style
+          - already_processed
+          - unknown
+        message:
+          description: Success message (optional)
+          type: string
+          example: Meter reading submitted successfully
+      type: object
+    ManualMeterReadingRequest:
+      description: Manual meter reading submission body for `submitMeterReading`.
+      required:
+      - meter_reading
+      - meter_reading_date_taken
+      properties:
+        meter_reading:
+          description: The meter reading value provided by the user
+          type: number
+          example: 98765
+          minimum: 0
+        meter_reading_date_taken:
+          description: Date when the meter reading was taken (YYYY-MM-DD). Required for cumulative meters.
+          type: string
+          format: date
+          example: '2025-01-15'
+      type: object
+    MeterReadingEligibilityResult:
+      description: Whether the facility/meter can submit manual readings at this time
+      required:
+      - can_submit
+      - code
+      - message
+      properties:
+        submission_window:
+          $ref: '#/components/schemas/MeterReadingSubmissionWindow'
+        last_submission:
+          $ref: '#/components/schemas/MeterReadingLastSubmission'
+        can_submit:
+          description: Whether the facility/meter can submit manual readings at this time
+          type: boolean
+          example: true
+        code:
+          description: Status code when `can_submit` is false (null when eligible)
+          type:
+          - string
+          - 'null'
+          enum:
+          - MULTIPLE_FACILITIES
+          - NO_FACILITY
+          - FIRST_TIME_SUBMISSION
+          - CUMULATIVE_ONLY
+          - AUTO_REPORTING
+          - METER_NOT_VERIFIED
+          - NEPOOL_REGISTRY
+          - WREGIS_REGISTRY
+          - NOT_ELIGIBLE
+          - NO_METER
+          - OUTSIDE_SUBMISSION_WINDOW
+        message:
+          description: Human-readable message explaining submission status
+          type:
+          - string
+          - 'null'
+      type: object
+    ProcessMeterReadingImageRequest:
+      description: Multipart body for `POST /facilities/{facility_id}/generation/meters/{meter_id}/image-readings`.
+      required:
+      - image
+      properties:
+        image:
+          description: Meter reading photo
+          type: string
+          format: binary
+        auto_submit_reading:
+          description: Whether to automatically submit the reading after processing
+          type: boolean
+          default: false
+        meter_reading_date_taken:
+          description: Date when the meter reading was taken (required for cumulative meters)
+          type: string
+          format: date
+          example: '2025-12-02'
+      type: object
+    SubmitReadingVerificationSuccess:
+      description: Verification submission accepted — reading moved to `pending_review`.
+      required:
+      - meter_readings_id
+      - meter_readings_status
+      - message
+      properties:
+        meter_readings_id:
+          description: ID of the meter reading that was verified.
+          type: integer
+          example: 98765
+        meter_readings_status:
+          description: New status of the reading after verification. Always `pending_review`.
+          type: string
+          example: pending_review
+          enum:
+          - pending_review
+        message:
+          description: Human-readable confirmation message.
+          type: string
+          example: Verification submitted successfully
+      type: object
+    MeterReadingImageExtractedData:
+      description: OCR extracted data from the meter reading image
+      required:
+      - meter_brand
+      - meter_model_number
+      - meter_reading
+      - raw_reading
+      - is_valid
+      - error_message
+      properties:
+        meter_brand:
+          description: Extracted meter brand name
+          type: string
+          example: ''
+        meter_model_number:
+          description: Extracted meter model number
+          type: string
+          example: ''
+        meter_reading:
+          description: Extracted meter reading value
+          type: string
+          example: ''
+        raw_reading:
+          description: Raw OCR text before processing
+          type: string
+          example: ''
+        is_valid:
+          description: Whether the extracted reading is considered valid
+          type: boolean
+          example: false
+        error_message:
+          description: Error message if extraction failed or validation failed
+          type: string
+          example: ''
+      type: object
+    ProcessMeterReadingImageMaxAttemptsError:
+      description: '`POST .../image-readings` when the photo OCR retry limit is reached (HTTP 429).'
+      required:
+      - success
+      - error
+      - message
+      - requires_manual_entry
+      - remaining_attempts
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          description: Error code indicating the retry limit has been reached
+          type: string
+          example: max_photo_attempts_reached
+          enum:
+          - max_photo_attempts_reached
+        message:
+          description: Human-readable error message
+          type: string
+          example: Maximum photo submission attempts reached. Please use manual entry.
+        requires_manual_entry:
+          description: Always true when retry limit is reached
+          type: boolean
+          example: true
+        remaining_attempts:
+          description: Always 0 when retry limit is reached
+          type: integer
+          example: 0
+          minimum: 0
+      type: object
+    MeterReadingEligibilityServerError:
+      description: '`GET .../readings/eligibility` when an unexpected error occurs (manual contract).'
+      required:
+      - can_submit
+      - code
+      - message
+      properties:
+        can_submit:
+          type: boolean
+          example: false
+        code:
+          type: string
+          example: UNKNOWN
+        message:
+          type: string
+          example: Error occurred while checking meter reading eligibility. Please try again later.
+      type: object
+    ProcessMeterReadingImageBadRequestError:
+      description: '`POST .../image-readings` client errors (missing/invalid image per manual spec).'
+      required:
+      - success
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/MeterReadingOperationError'
+      - properties:
+          error:
+            description: Error code indicating the type of validation failure
+            type: string
+            example: no_image
+            enum:
+            - no_image
+            - invalid_image
+          message:
+            description: Human-readable error message
+            type: string
+            example: No image uploaded
+        type: object
+    ApiFieldError:
+      description: API field error
+      properties:
+        field:
+          type: string
+          example: field_name
+        message:
+          type: string
+          example: error_message
+      type: object
+    MeterReadingSubmissionWindow:
+      properties:
+        current_period:
+          $ref: '#/components/schemas/MeterReadingSubmissionPeriod'
+        next_period:
+          $ref: '#/components/schemas/MeterReadingSubmissionPeriod'
+      type: object
+    MeterReadingLastSubmission:
+      required:
+      - meter_readings_id
+      - generation_period
+      - value
+      properties:
+        meter_readings_id:
+          description: ID of the last meter reading submission
+          type: integer
+          example: 4728475
+        generation_period:
+          description: Period for which the last meter reading was submitted
+          type: string
+          example: 2025/09
+        user_reading_taken:
+          description: Date on which the user has taken the reading
+          type:
+          - string
+          - 'null'
+          format: date
+          example: '2025-10-12'
+        value:
+          description: Value of the last meter reading
+          type: number
+          example: 3701
+      type: object
+    MeterReadingImageProcessingStatusServerError:
+      description: '`GET .../image-readings/{processing_id}` internal server error (manual contract).'
+      required:
+      - success
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/MeterReadingOperationError'
+    MeterReadingImageProcessingStatusNotFoundError:
+      description: '`GET .../image-readings/{processing_id}` when the processing record is missing or not owned by the facility.'
+      required:
+      - success
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/MeterReadingOperationError'
+      - properties:
+          error:
+            type: string
+            example: invalid_processing_id
+            enum:
+            - invalid_processing_id
+        type: object
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer

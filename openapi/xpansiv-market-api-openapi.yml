@@ -1,0 +1,226 @@
+openapi: 3.2.0
+info:
+  title: Xpansiv Managed Solutions Market API
+  description: 'Access data from your Xpansiv Managed Solutions account using API calls.
+
+
+    You can generate an API key for your user on Xpansiv Managed Solutions API Access page. The API key is linked to a user and an account, and has the same rights as the user on the account.
+
+
+    When calling Xpansiv Managed Solutions API use that API key to set the Bearer Token authentication header.'
+  contact:
+    email: developers@xpansiv.com
+  version: '1.10'
+servers:
+- url: https://www.ms.xpansiv.com/app/api/v1
+security:
+- BearerAuth: []
+tags:
+- name: Market
+  description: Market
+paths:
+  /market_pricing:
+    get:
+      tags:
+      - Market
+      summary: Market Pricing
+      description: Get market pricing. The data available depends on the Insight subscription and is the same than the one available on Insight page on www.ms.xpansiv.com.
+      operationId: searchMarket
+      parameters:
+      - name: state
+        in: query
+        description: 'Search market pricing by state
+
+          Example: PA
+
+          '
+        required: false
+        schema:
+          type: string
+      - name: product
+        in: query
+        description: 'Search market pricing by product
+
+          Example: PA2018
+
+          '
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: type
+        in: query
+        description: "Search market pricing by type bid or offer\n  - bid\n  - offer\n"
+        required: false
+        schema:
+          type: string
+      - name: start_date
+        in: query
+        description: 'Search market pricing after that date
+
+          Example: 2017-10-01
+
+          '
+        required: false
+        schema:
+          type: string
+      - name: end_date
+        in: query
+        description: 'Search market pricing before that date
+
+          Example: 2017-12-01
+
+          '
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Indicate which page will be returned if the result is paginated
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: List of market pricing available for the user and matching search criteria
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 200
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/MarketPricingListResponse'
+                  type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 401
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/AuthError'
+                  type: object
+components:
+  schemas:
+    AuthError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 401 when API authentication is missing or invalid.
+            type: string
+            example: connection_failed
+          message:
+            type: string
+            example: Authentication error
+        type: object
+    MarketPricingListResponse:
+      description: Market pricing rows returned in the API envelope `data` field.
+      type: array
+      items:
+        $ref: '#/components/schemas/MarketPricingItem'
+    ResponseEnvelope:
+      description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
+      required:
+      - url
+      - date
+      - code
+      - elements
+      - page
+      properties:
+        url:
+          description: Request URL including query string.
+          type: string
+          example: /app/api/v1/facilities
+        date:
+          description: Response timestamp.
+          type: string
+          example: 2024-09-17 04:26:39 EDT
+        code:
+          description: HTTP status code, mirrored in the JSON body (same as the response status).
+          type: integer
+        elements:
+          description: Number of items in `data` on HTTP 200; 0 for other status codes.
+          type: integer
+        page:
+          description: Page label (`1 of 1` when not paginated) or numeric page when listing with pagination.
+          oneOf:
+          - type: string
+            example: 1 of 1
+          - type: integer
+            example: 2
+      type: object
+    Error:
+      description: 'Generic error payload when no more specific error schema applies.
+
+
+        Implements JsonSerializable so it can be passed directly to API_Controller::response().
+
+        Implements Countable returning 0 so the response size guard in API_Controller treats it
+
+        as an empty collection (error responses never trigger the size limit).'
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Error description
+      type: object
+    MarketPricingItem:
+      description: One market pricing row in the API envelope `data` array for `searchMarket`.
+      required:
+      - product
+      - date
+      properties:
+        product:
+          type: string
+          example: PA2018
+        date:
+          type: string
+          example: '2017-10-20'
+        bid_price:
+          type:
+          - number
+          - 'null'
+          format: float
+          example: 5.5
+        offer_price:
+          type:
+          - number
+          - 'null'
+          format: float
+          example: 6.5
+      type: object
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer

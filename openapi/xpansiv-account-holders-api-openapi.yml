@@ -1,0 +1,180 @@
+openapi: 3.2.0
+info:
+  description: 'This is the OpenAPI spec for Xpansiv Connect API. Documentation: https://developer.xpansiv.com/developer-portal/'
+  title: Xpansiv Connect Account Holders API
+  version: 1.0.0-beta
+servers:
+- url: https://sandbox.preprod.connect.xpansiv.com/app/api/v1
+  description: SANDBOX
+- url: https://uat.preprod.connect.xpansiv.com/app/api/v1
+  description: UAT
+- url: https://connect.xpansiv.com/app/api/v1
+  description: PROD
+security:
+- bearerToken: []
+tags:
+- name: Account Holders
+paths:
+  /account-holders/action/search:
+    post:
+      operationId: searchAccountHolders
+      tags:
+      - Account Holders
+      parameters:
+      - $ref: '#/components/parameters/PageNumber'
+      - $ref: '#/components/parameters/PageSize'
+      summary: Account Holders search
+      requestBody:
+        description: Account Holders search endpoint
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                registryAccountId:
+                  type: string
+                  description: ID of the account on the registry.
+                registryAccountName:
+                  type: string
+                program:
+                  $ref: '#/components/schemas/Ref.Program'
+                accountType:
+                  type: string
+                  description: Account type description.
+                active:
+                  type: boolean
+                  description: True/False.
+                generatorAccount:
+                  type: boolean
+                  description: True/False.
+      responses:
+        '200':
+          description: Account Holders search successfully executed
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Page'
+                - type: object
+                  properties:
+                    content:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AccountHolder'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                    - INVALID_REQUEST
+                    - INVALID_PROGRAM
+                    - INVALID_PAGE_SIZE
+                    - INVALID_PAGE_NUMBER
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+components:
+  schemas:
+    AccountHolder:
+      type: object
+      required:
+      - registryAccountId
+      - registryAccountName
+      - program
+      - active
+      properties:
+        registryAccountId:
+          type: string
+          description: ID of the account on the registry.
+        registryAccountName:
+          type: string
+          description: Name of the account on the registry.
+        program:
+          $ref: '#/components/schemas/Ref.Program'
+        accountType:
+          type: string
+          description: Account type description.
+        managerName:
+          type: string
+          description: Name of the manager.
+        active:
+          type: boolean
+          description: True/False.
+        generatorAccount:
+          type: boolean
+          description: True/False.
+    NotAuthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+    Ref.Program:
+      type: string
+      description: Ref.Data.PROGRAM
+    Page:
+      type: object
+      required:
+      - page
+      - size
+      - totalPages
+      - totalElements
+      properties:
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+  responses:
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
+    '401':
+      description: Not authorized error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotAuthorizedError'
+  parameters:
+    PageSize:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    PageNumber:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+  securitySchemes:
+    bearerToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

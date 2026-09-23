@@ -1,0 +1,620 @@
+openapi: 3.2.0
+info:
+  title: Xpansiv Managed Solutions Transactions API
+  description: 'Access data from your Xpansiv Managed Solutions account using API calls.
+
+
+    You can generate an API key for your user on Xpansiv Managed Solutions API Access page. The API key is linked to a user and an account, and has the same rights as the user on the account.
+
+
+    When calling Xpansiv Managed Solutions API use that API key to set the Bearer Token authentication header.'
+  contact:
+    email: developers@xpansiv.com
+  version: '1.10'
+servers:
+- url: https://www.ms.xpansiv.com/app/api/v1
+security:
+- BearerAuth: []
+tags:
+- name: Transactions
+  description: Transactions
+paths:
+  /facilities/{facility_id}/transactions:
+    get:
+      tags:
+      - Transactions
+      summary: Get Transaction Summary/History
+      description: Returns transaction summary/history for a facility.
+      operationId: getTransactionsHistory
+      parameters:
+      - name: facility_id
+        in: path
+        description: ID of the facility to retrieve transactions for
+        required: true
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        description: Number of transactions to display per page. Maximum 1000.
+        required: false
+        schema:
+          type: integer
+          default: 50
+          maximum: 1000
+          minimum: 1
+      - name: page
+        in: query
+        description: The current page number
+        required: false
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      responses:
+        '200':
+          description: Transaction summary/history retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/PaginatedResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 200
+                  type: object
+                - $ref: '#/components/schemas/FacilityTransactionsPaginatedResponse'
+        '400':
+          description: Bad request - invalid facility ID format
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 400
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/TransactionsInvalidFacilityIdError'
+                  type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 401
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/AuthError'
+                  type: object
+        '403':
+          description: Access denied or facility closed/lost
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 403
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/TransactionsForbiddenError'
+                  type: object
+        '404':
+          description: Facility not found
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 404
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/TransactionsNotFoundError'
+                  type: object
+  /facilities/{facility_id}/generation/history:
+    get:
+      tags:
+      - Transactions
+      summary: Get Production History
+      description: Returns production history for a facility.
+      operationId: getProductionHistory
+      parameters:
+      - name: facility_id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Production history retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/PaginatedResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 200
+                  type: object
+                - $ref: '#/components/schemas/ProductionHistoryPaginatedResponse'
+        '400':
+          description: Bad request — generation history could not be loaded
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 400
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/ProductionHistoryBadRequestError'
+                  type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 401
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/AuthError'
+                  type: object
+        '404':
+          description: Facility not found
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 404
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/FacilityGetError'
+                  type: object
+components:
+  schemas:
+    TransactionsNotFoundError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: '`GET .../transactions` when the facility is missing or transaction data cannot be loaded.'
+            type: string
+            example: error
+            enum:
+            - error
+            - facility_not_found
+          message:
+            type: string
+            example: Facility not found
+        type: object
+    TransactionsForbiddenError:
+      description: '`GET .../transactions` when access is denied or the facility is closed/lost (manual 403).'
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+    ProductionHistoryPaginatedResponse:
+      properties:
+        data:
+          $ref: '#/components/schemas/ProductionHistoryData'
+      type: object
+    AuthError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 401 when API authentication is missing or invalid.
+            type: string
+            example: connection_failed
+          message:
+            type: string
+            example: Authentication error
+        type: object
+    TransactionItem:
+      description: Single transaction row in `TransactionReportData.transactions`.
+      required:
+      - date
+      - net_sales
+      - status
+      - quantity
+      - product
+      properties:
+        date:
+          description: Transaction date in YYYY-MM-DD format
+          type: string
+          example: '2025-07-24'
+        net_sales:
+          description: Net sales amount for the transaction
+          type: number
+          format: float
+          example: 123.45
+        status:
+          description: Payment status of the transaction
+          type: string
+          example: Not yet initiated
+        quantity:
+          description: Quantity of RECs/SRECs sold
+          type: number
+          format: float
+          example: 5
+        generation:
+          description: Month of generation for the transaction in YYYY/MM format
+          type:
+          - string
+          - 'null'
+          example: 2025/05
+        product:
+          description: Product name/type
+          type: string
+          example: VA2025-SREC
+      type: object
+    FacilityGetError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: GET `/facilities/{facility_id}` when the facility is missing or not visible to the account.
+            type: string
+            example: error
+          message:
+            type: string
+            example: Wrong facility_id parameter
+        type: object
+    FacilityTransactionsPaginatedResponse:
+      properties:
+        data:
+          $ref: '#/components/schemas/TransactionReportData'
+      type: object
+    ProductionHistoryBadRequestError:
+      description: '`GET .../generation/history` when generation data cannot be loaded (runtime returns 400).'
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+    ProductionHistoryItem:
+      description: Single production history row in `ProductionHistoryData.history`.
+      required:
+      - meter_readings_id
+      - generation_period
+      properties:
+        meter_readings_id:
+          description: Unique identifier for the meter reading
+          type: integer
+          example: 4742721
+        generation_period:
+          description: Generation period in YYYY/MM format
+          type: string
+          example: 2025/10
+        reading_date:
+          description: Date when the reading was taken; omitted when unknown
+          type:
+          - string
+          - 'null'
+          format: date
+        reading_status:
+          description: Status of the reading
+          type:
+          - string
+          - 'null'
+          enum:
+          - srectrade_approved
+          - high
+          - low
+          - reading_less_than_previous
+          - pending_review
+          - srectrade_disapproved
+          - setup_incomplete
+          - date_outside_expected
+          - wrong_held_gen_id
+          - missing_previous_verified
+          - extrapolation_off
+          - invalid_meter_style
+          - already_processed
+        production:
+          description: Production value for the period
+          type:
+          - number
+          - 'null'
+          format: float
+          example: 547
+        reading_value:
+          description: The actual meter reading value
+          type:
+          - number
+          - 'null'
+          format: float
+          example: 73332
+        info:
+          description: Additional information about the reading
+          type:
+          - string
+          - 'null'
+          example: Reading is waiting to be verified by your tracking registry.
+        photo_url:
+          description: URL of the photo submission for this reading
+          type:
+          - string
+          - 'null'
+        photo_description:
+          description: Description of the photo submission for this reading
+          type:
+          - string
+          - 'null'
+          example: First time reading
+      type: object
+    Pagination:
+      properties:
+        total:
+          description: Total number of items
+          type: integer
+          example: 100
+        per_page:
+          description: Items per page
+          type: integer
+          example: 20
+        current_page:
+          description: Current page number
+          type: integer
+          example: 1
+        last_page:
+          description: Last page number
+          type: integer
+          example: 5
+      type: object
+    TransactionReportData:
+      description: Transaction report payload in the API envelope `data` field for `getTransactionsHistory`.
+      required:
+      - total_earned
+      - available_recs
+      - transactions
+      properties:
+        total_earned:
+          description: Total amount earned from all transactions
+          type: number
+          format: float
+          example: 369.65
+        last_payment_date:
+          description: Date of the most recent payment
+          type:
+          - string
+          - 'null'
+          format: date
+          example: '2025-07-24'
+        available_recs:
+          description: Number of available RECs/SRECs
+          type: integer
+          example: 3
+        transactions:
+          description: List of transactions for the current page
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionItem'
+      type: object
+    TransactionsInvalidFacilityIdError:
+      description: '`GET .../transactions` when `facility_id` is not numeric (manual contract).'
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+    Error:
+      description: 'Generic error payload when no more specific error schema applies.
+
+
+        Implements JsonSerializable so it can be passed directly to API_Controller::response().
+
+        Implements Countable returning 0 so the response size guard in API_Controller treats it
+
+        as an empty collection (error responses never trigger the size limit).'
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Error description
+      type: object
+    PaginatedResponseEnvelope:
+      description: Standard API response envelope for paginated endpoints.
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/ResponseEnvelope'
+      - required:
+        - pagination
+        properties:
+          pagination:
+            $ref: '#/components/schemas/Pagination'
+        type: object
+    ProductionHistoryData:
+      description: Production history payload in the API envelope `data` field for `getProductionHistory`.
+      required:
+      - meter_id
+      - meter_reading_style
+      - current_reading_value
+      - current_reading_status
+      - current_reading_period
+      - last_approved_photo_url
+      - last_approved_photo_description
+      - last_approved_photo_date
+      - history
+      properties:
+        meter_id:
+          description: ID of the meter
+          type: integer
+          example: 73059
+        meter_reading_style:
+          description: Style of meter reading (cumulative, actual, etc.)
+          type: string
+          example: cumulative
+        current_reading_value:
+          description: Current meter reading value
+          type: integer
+          example: 73332
+        current_reading_status:
+          description: Status of the current reading
+          type:
+          - string
+          - 'null'
+          example: srectrade_approved
+          enum:
+          - srectrade_approved
+          - high
+          - low
+          - reading_less_than_previous
+          - pending_review
+          - srectrade_disapproved
+          - setup_incomplete
+          - date_outside_expected
+          - wrong_held_gen_id
+          - missing_previous_verified
+          - extrapolation_off
+          - invalid_meter_style
+          - already_processed
+        current_reading_period:
+          description: Period of the current reading in YYYY-MM-DD format
+          type:
+          - string
+          - 'null'
+          example: '2025-10-01'
+        last_approved_photo_url:
+          description: URL of the last approved photo submission
+          type:
+          - string
+          - 'null'
+        last_approved_photo_description:
+          description: Description of the last approved photo submission
+          type:
+          - string
+          - 'null'
+          example: First time reading
+        last_approved_photo_date:
+          description: Date of the last approved photo submission in YYYY-MM-DD format
+          type:
+          - string
+          - 'null'
+          format: date
+          example: '2025-02-01'
+        history:
+          description: Array of production history records
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductionHistoryItem'
+      type: object
+    ResponseEnvelope:
+      description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
+      required:
+      - url
+      - date
+      - code
+      - elements
+      - page
+      properties:
+        url:
+          description: Request URL including query string.
+          type: string
+          example: /app/api/v1/facilities
+        date:
+          description: Response timestamp.
+          type: string
+          example: 2024-09-17 04:26:39 EDT
+        code:
+          description: HTTP status code, mirrored in the JSON body (same as the response status).
+          type: integer
+        elements:
+          description: Number of items in `data` on HTTP 200; 0 for other status codes.
+          type: integer
+        page:
+          description: Page label (`1 of 1` when not paginated) or numeric page when listing with pagination.
+          oneOf:
+          - type: string
+            example: 1 of 1
+          - type: integer
+            example: 2
+      type: object
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer

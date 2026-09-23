@@ -1,0 +1,193 @@
+openapi: 3.2.0
+info:
+  version: 1.0.0
+  title: TIGRS Registry Client Corporate Entity API
+  description: This API is used for retrieving and retiring TIGR certificates. APIs require an OAuth Authentication token. To create API credentials, please reach out to the TIGR administrator.
+  contact:
+    email: tigrs@apx.com
+servers:
+- url: //tigrsregistry.apx.com:443/clientapi
+tags:
+- name: corporateEntity
+  description: Corporate Entities Operations
+paths:
+  /api/corporateEntity:
+    get:
+      tags:
+      - corporateEntity
+      summary: Corporate Entities
+      operationId: getCorporateEntities
+      parameters:
+      - name: accountIds
+        in: query
+        description: 'Account ids: if specified, limits results to the items related to the accounts whose ids match the provided set; otherwise, all results related to any authorized account will be returned'
+        required: false
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: $filter
+        in: query
+        description: OData-like filter expression
+        required: false
+        schema:
+          type: string
+      - name: $count
+        in: query
+        description: Whether to include the count of records with the result
+        required: false
+        schema:
+          type: boolean
+      - name: $orderby
+        in: query
+        description: Comma-separated list of columns for sorting
+        required: false
+        schema:
+          type: string
+      - name: $skip
+        in: query
+        description: Number of records to skip
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: $top
+        in: query
+        description: Maximum number of records to return
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ODataEnvelopeOfCorporateEntities'
+        '400':
+          description: Invalid parameter(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '403':
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '429':
+          description: Server too busy or acceptable use policy violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '500':
+          description: An unexpected error has occurred
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+      security:
+      - JWT: []
+components:
+  schemas:
+    ErrorItem:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          description: The error code
+        correlationId:
+          type: string
+          description: The correlation identifier from the input
+        field:
+          type: string
+          description: The field in error, if applicable
+        message:
+          type: string
+          description: The error message
+        parameter:
+          type: string
+          description: The parameter in error, if applicable
+        path:
+          type: string
+          description: The path to the field specifically in error, if applicable
+      title: ErrorItem
+      description: Describes a specific error
+    ODataEnvelopeOfCorporateEntities:
+      type: object
+      properties:
+        '@count':
+          type: integer
+          format: int32
+          description: The total number of results (only present if requested)
+        value:
+          type: array
+          description: Rows of information
+          items:
+            $ref: '#/components/schemas/CorporateEntities'
+      title: ODataEnvelopeOfCorporateEntities
+      description: Container for OData-like rows of information
+    ErrorContainer:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: List of errors
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+        submissionId:
+          type: string
+          description: Submission identifier for issue investigation
+      title: ErrorContainer
+      description: Container for errors
+    CorporateEntities:
+      type: object
+      required:
+      - accountId
+      - corporateEntityId
+      - corporateEntityName
+      - corporateId
+      - corporateIdType
+      properties:
+        accountId:
+          type: integer
+          format: int32
+          description: The account identifier
+          example: '123'
+        corporateEntityId:
+          type: integer
+          format: int32
+          description: The corporate entity id
+          example: '55'
+        corporateEntityName:
+          type: string
+          description: The corporate entity name
+          example: Acme Corp.
+        corporateId:
+          type: string
+          description: The corporate id
+          example: 1234-55
+        corporateIdType:
+          type: string
+          description: The corporate id type
+          example: DUNS
+      title: CorporateEntities
+      description: Corporate entities information
+  securitySchemes:
+    JWT:
+      type: apiKey
+      name: Authorization
+      in: header

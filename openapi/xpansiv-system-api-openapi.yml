@@ -1,0 +1,168 @@
+openapi: 3.2.0
+info:
+  title: Xpansiv System API
+  version: 1.0.0
+  description: 'Operations tagged system across 2 of this provider''s published API definitions: nar-registry-client-v1_nar.client.v1.openapi.yaml, tigr-registry-client-v1_tigr.client.v1.openapi.yaml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://narenewables2.apx.com/ClientAPI
+  description: Generated server url
+- url: //tigrsregistry.apx.com:443/clientapi
+tags:
+- name: System
+  description: System Information
+paths:
+  /api/system/ping:
+    get:
+      tags:
+      - System
+      summary: Ping System
+      description: For connectivity testing. Checks for server health and ensures a valid auth token is being properly provided.
+      operationId: ping
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pong'
+        '400':
+          description: Invalid parameter(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '403':
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '429':
+          description: Server too busy or acceptable use policy violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '500':
+          description: An unexpected error has occurred
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+      security:
+      - JWT: []
+    servers:
+    - url: https://narenewables2.apx.com/ClientAPI
+      description: Generated server url
+components:
+  schemas:
+    ErrorItem:
+      required:
+      - message
+      type: object
+      properties:
+        parameter:
+          type: string
+          description: The parameter in error, if applicable
+        correlationId:
+          type: string
+          description: The correlation identifier from the input
+        path:
+          type: string
+          description: The path to the field specifically in error, if applicable
+        field:
+          type: string
+        code:
+          type: string
+          description: The field in error, if applicable
+        message:
+          type: string
+          description: The error code
+      description: Describes a specific error
+    ErrorContainer:
+      type: object
+      properties:
+        submissionId:
+          type: string
+          description: Submission identifier for issue investigation
+        errors:
+          type: array
+          description: List of errors
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+      description: Container for errors
+    Pong:
+      required:
+      - pong
+      type: object
+      properties:
+        pong:
+          type: string
+          format: date-time
+          example: '2024-10-22T19:26:52.641Z'
+      description: Response indicating server is online and auth token is valid
+    ErrorItem_2:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          description: The error code
+        correlationId:
+          type: string
+          description: The correlation identifier from the input
+        field:
+          type: string
+          description: The field in error, if applicable
+        message:
+          type: string
+          description: The error message
+        parameter:
+          type: string
+          description: The parameter in error, if applicable
+        path:
+          type: string
+          description: The path to the field specifically in error, if applicable
+      title: ErrorItem
+      description: Describes a specific error
+    ErrorContainer_2:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: List of errors
+          items:
+            $ref: '#/components/schemas/ErrorItem_2'
+        submissionId:
+          type: string
+          description: Submission identifier for issue investigation
+      title: ErrorContainer
+      description: Container for errors
+    Pong_2:
+      type: object
+      required:
+      - pong
+      properties:
+        pong:
+          type: string
+          format: date-time
+          description: The current time on the server
+          example: '2024-10-31T17:58:38.066Z'
+      title: Pong
+      description: Response indicating server health
+  securitySchemes:
+    JWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- nar-registry-client-v1_nar.client.v1.openapi.yaml
+- tigr-registry-client-v1_tigr.client.v1.openapi.yaml

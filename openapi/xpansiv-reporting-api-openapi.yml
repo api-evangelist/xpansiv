@@ -1,0 +1,291 @@
+openapi: 3.2.0
+info:
+  title: File Registry /reporting API
+  version: 1.1.49
+  description: the Reporting REST API
+servers:
+- url: https://pm-file-api.apx.com
+  description: Generated server url
+tags:
+- name: Reporting
+  description: the Reporting REST API
+paths:
+  /reporting/getReport:
+    put:
+      tags:
+      - Reporting
+      summary: Run a MarketSuite Report and receive the results in the specified format
+      operationId: getReport
+      parameters:
+      - name: reportPath
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: reportFormat
+        in: query
+        required: true
+        schema:
+          type: string
+          enum:
+          - HTML_4_0
+          - CSV
+          - PSV
+          - EXCEL
+          - PDF
+          - XML
+          - IMAGE
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReportRequestParameters'
+        required: true
+      responses:
+        '200':
+          description: A report file
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: byte
+        '400':
+          description: Invalid input parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '401':
+          description: The user does not have authorization to perform this operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+        '503':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceException'
+components:
+  schemas:
+    ServiceException:
+      type: object
+      properties:
+        cause:
+          type: object
+          properties:
+            stackTrace:
+              type: array
+              items:
+                type: object
+                properties:
+                  methodName:
+                    type: string
+                  fileName:
+                    type: string
+                  lineNumber:
+                    type: integer
+                    format: int32
+                  className:
+                    type: string
+                  nativeMethod:
+                    type: boolean
+            message:
+              type: string
+            localizedMessage:
+              type: string
+            suppressed:
+              type: array
+              items:
+                type: object
+                properties:
+                  stackTrace:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        methodName:
+                          type: string
+                        fileName:
+                          type: string
+                        lineNumber:
+                          type: integer
+                          format: int32
+                        className:
+                          type: string
+                        nativeMethod:
+                          type: boolean
+                  message:
+                    type: string
+                  localizedMessage:
+                    type: string
+        stackTrace:
+          type: array
+          items:
+            type: object
+            properties:
+              methodName:
+                type: string
+              fileName:
+                type: string
+              lineNumber:
+                type: integer
+                format: int32
+              className:
+                type: string
+              nativeMethod:
+                type: boolean
+        innerExceptions:
+          type: object
+          properties:
+            cause:
+              type: object
+              properties:
+                stackTrace:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      methodName:
+                        type: string
+                      fileName:
+                        type: string
+                      lineNumber:
+                        type: integer
+                        format: int32
+                      className:
+                        type: string
+                      nativeMethod:
+                        type: boolean
+                message:
+                  type: string
+                localizedMessage:
+                  type: string
+                suppressed:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      stackTrace:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            methodName:
+                              type: string
+                            fileName:
+                              type: string
+                            lineNumber:
+                              type: integer
+                              format: int32
+                            className:
+                              type: string
+                            nativeMethod:
+                              type: boolean
+                      message:
+                        type: string
+                      localizedMessage:
+                        type: string
+            stackTrace:
+              type: array
+              items:
+                type: object
+                properties:
+                  methodName:
+                    type: string
+                  fileName:
+                    type: string
+                  lineNumber:
+                    type: integer
+                    format: int32
+                  className:
+                    type: string
+                  nativeMethod:
+                    type: boolean
+            message:
+              type: string
+            localizedMessage:
+              type: string
+            suppressed:
+              type: array
+              items:
+                type: object
+                properties:
+                  stackTrace:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        methodName:
+                          type: string
+                        fileName:
+                          type: string
+                        lineNumber:
+                          type: integer
+                          format: int32
+                        className:
+                          type: string
+                        nativeMethod:
+                          type: boolean
+                  message:
+                    type: string
+                  localizedMessage:
+                    type: string
+        method:
+          type: string
+        message:
+          type: string
+        localizedMessage:
+          type: string
+        suppressed:
+          type: array
+          items:
+            type: object
+            properties:
+              stackTrace:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    methodName:
+                      type: string
+                    fileName:
+                      type: string
+                    lineNumber:
+                      type: integer
+                      format: int32
+                    className:
+                      type: string
+                    nativeMethod:
+                      type: boolean
+              message:
+                type: string
+              localizedMessage:
+                type: string
+    ReportRequestParameters:
+      required:
+      - key
+      - value
+      type: object
+      properties:
+        key:
+          type: string
+          description: Name of the specific report parameter
+        value:
+          type: string
+          description: Value for the specific report parameter
+  securitySchemes:
+    basicScheme:
+      type: http
+      scheme: basic

@@ -1,0 +1,401 @@
+openapi: 3.2.0
+info:
+  title: Xpansiv Subaccount API
+  version: 1.0.0
+  description: 'Operations tagged subaccount across 2 of this provider''s published API definitions: nar-registry-client-v1_nar.client.v1.openapi.yaml, tigr-registry-client-v1_tigr.client.v1.openapi.yaml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://narenewables2.apx.com/ClientAPI
+  description: Generated server url
+- url: //tigrsregistry.apx.com:443/clientapi
+tags:
+- name: Sub Account
+  description: Subaccount Operations
+paths:
+  /api/ledger/subaccount:
+    get:
+      tags:
+      - Sub Account
+      summary: SubAccounts
+      description: Retrieve a list of subaccounts.
+      operationId: getSubaccounts
+      parameters:
+      - name: accountIds
+        in: query
+        description: 'Account ids: if specified, limits results to the items related to the accounts whose ids match the provided set; otherwise, all results related to any authorized account will be returned'
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: subaccountType
+        in: query
+        description: Subaccount type code
+        required: false
+        schema:
+          type: string
+          enum:
+          - ACT
+          - RET
+      - name: $filter
+        in: query
+        description: OData-like filter expression
+        required: false
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: Comma-separated list of columns for sorting
+        required: false
+        schema:
+          type: string
+      - name: $skip
+        in: query
+        description: Number of records to skip
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: $top
+        in: query
+        description: Maximum number of records to return
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: $apply
+        in: query
+        description: OData-like apply expression with groupby and aggregate only
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ODataEnvelopeWithTotalCountOfLedgerSubaccount'
+        '400':
+          description: Invalid parameter(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '403':
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '429':
+          description: Server too busy or acceptable use policy violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '500':
+          description: An unexpected error has occurred
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+      security:
+      - JWT: []
+    servers:
+    - url: https://narenewables2.apx.com/ClientAPI
+      description: Generated server url
+  /api/subaccount/{subaccountType}:
+    post:
+      tags:
+      - Sub Account
+      summary: Subaccounts
+      operationId: createSubaccountsUsingPOST
+      parameters:
+      - name: subaccountType
+        in: path
+        description: Subaccount type
+        required: true
+        schema:
+          type: string
+          enum:
+          - ACT
+          - RET
+      - name: onBehalfOfAccountId
+        in: query
+        description: 'Account id for which the request is being made: defaults to the primary account id of the requester unless specified'
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestContainerOfSubaccountCreateRequest'
+        description: Subaccount create requests
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContainerOfSubaccountCreateResponse'
+        '400':
+          description: Invalid parameter(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer_2'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer_2'
+        '403':
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer_2'
+        '413':
+          description: Request payload is too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer_2'
+        '429':
+          description: Server too busy or acceptable use policy violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer_2'
+        '500':
+          description: An unexpected error has occurred
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer_2'
+      security:
+      - JWT: []
+    servers:
+    - url: //tigrsregistry.apx.com:443/clientapi
+components:
+  schemas:
+    LedgerSubaccount:
+      required:
+      - accountId
+      - open
+      - subaccountId
+      - subaccountName
+      - subaccountType
+      type: object
+      properties:
+        accountId:
+          type: integer
+          description: The account identifier
+          format: int32
+          example: 55
+        subaccountId:
+          type: string
+          description: The subaccount identifier
+          example: '321'
+        subaccountType:
+          type: string
+          description: The subaccount type
+          enum:
+          - ACT
+          - RET
+          - KSG
+          example: ACT
+        subaccountName:
+          type: string
+          description: The subaccount name
+          example: Active Hydro Certificates
+        open:
+          type: boolean
+          description: Whether the subaccount is open
+      description: Subaccount information
+    ErrorContainer:
+      type: object
+      properties:
+        submissionId:
+          type: string
+          description: Submission identifier for issue investigation
+        errors:
+          type: array
+          description: List of errors
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+      description: Container for errors
+    ErrorItem:
+      required:
+      - message
+      type: object
+      properties:
+        parameter:
+          type: string
+          description: The parameter in error, if applicable
+        correlationId:
+          type: string
+          description: The correlation identifier from the input
+        path:
+          type: string
+          description: The path to the field specifically in error, if applicable
+        field:
+          type: string
+        code:
+          type: string
+          description: The field in error, if applicable
+        message:
+          type: string
+          description: The error code
+      description: Describes a specific error
+    ODataEnvelopeWithTotalCountOfLedgerSubaccount:
+      required:
+      - countExceeded
+      - value
+      type: object
+      properties:
+        '@count':
+          type: integer
+          format: int32
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/LedgerSubaccount'
+        totalCount:
+          type: integer
+          format: int32
+        countExceeded:
+          type: boolean
+      description: Container for OData-like rows of information with count
+    RequestContainerOfSubaccountCreateRequest:
+      type: object
+      properties:
+        requests:
+          type: array
+          description: List of requests
+          items:
+            $ref: '#/components/schemas/SubaccountCreateRequest'
+      title: RequestContainerOfSubaccountCreateRequest
+      description: Container for requests
+    ResponseContainerOfSubaccountCreateResponse:
+      type: object
+      required:
+      - submissionId
+      properties:
+        responses:
+          type: array
+          description: List of responses
+          items:
+            $ref: '#/components/schemas/SubaccountCreateResponse'
+        submissionId:
+          type: string
+          description: Submission identifier for issue investigation
+      title: ResponseContainerOfSubaccountCreateResponse
+      description: Container for responses
+    SubaccountCreateRequest:
+      type: object
+      required:
+      - name
+      properties:
+        additionalDetails:
+          type: string
+          description: The subaccount additional details
+          example: Acme Retirements
+        alias:
+          type: string
+          description: The subaccount alias
+          example: Acme Retirements
+        correlationId:
+          type: string
+          description: 'Correlation identifier: an opaque value that will be returned in the responses and error messages to correlate the response or error with the corresponding request'
+          example: '1'
+        name:
+          type: string
+          description: The subaccount name
+          example: Acme Retirements
+      title: SubaccountCreateRequest
+      description: Request to create a subaccount
+    ErrorContainer_2:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: List of errors
+          items:
+            $ref: '#/components/schemas/ErrorItem_2'
+        submissionId:
+          type: string
+          description: Submission identifier for issue investigation
+      title: ErrorContainer
+      description: Container for errors
+    SubaccountCreateResponse:
+      type: object
+      required:
+      - name
+      - subaccountId
+      properties:
+        additionalDetails:
+          type: string
+          description: The subaccount additional details
+          example: Acme Retirements
+        alias:
+          type: string
+          description: The subaccount alias
+          example: Acme Retirements
+        correlationId:
+          type: string
+          description: 'Correlation identifier: an opaque value that will be returned in the responses and error messages to correlate the response or error with the corresponding request'
+          example: '1'
+        name:
+          type: string
+          description: The subaccount name
+          example: Acme Retirements
+        subaccountId:
+          type: string
+          description: The subaccount identifier
+          example: '99'
+      title: SubaccountCreateResponse
+      description: Response to a subaccount creation request
+    ErrorItem_2:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          description: The error code
+        correlationId:
+          type: string
+          description: The correlation identifier from the input
+        field:
+          type: string
+          description: The field in error, if applicable
+        message:
+          type: string
+          description: The error message
+        parameter:
+          type: string
+          description: The parameter in error, if applicable
+        path:
+          type: string
+          description: The path to the field specifically in error, if applicable
+      title: ErrorItem
+      description: Describes a specific error
+  securitySchemes:
+    JWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- nar-registry-client-v1_nar.client.v1.openapi.yaml
+- tigr-registry-client-v1_tigr.client.v1.openapi.yaml

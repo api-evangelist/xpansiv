@@ -1,0 +1,522 @@
+openapi: 3.2.0
+info:
+  title: Xpansiv Managed Solutions Clean Transportation API
+  description: 'Access data from your Xpansiv Managed Solutions account using API calls.
+
+
+    You can generate an API key for your user on Xpansiv Managed Solutions API Access page. The API key is linked to a user and an account, and has the same rights as the user on the account.
+
+
+    When calling Xpansiv Managed Solutions API use that API key to set the Bearer Token authentication header.'
+  contact:
+    email: developers@xpansiv.com
+  version: '1.10'
+servers:
+- url: https://www.ms.xpansiv.com/app/api/v1
+security:
+- BearerAuth: []
+tags:
+- name: Clean Transportation
+  description: Clean Transportation
+paths:
+  /ct/company_entities:
+    get:
+      tags:
+      - Clean Transportation
+      summary: Company Entities
+      description: Retrieve list of company entities.
+      operationId: getCompanyEntities
+      responses:
+        '200':
+          description: List of company entities
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 200
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/CompanyEntityList'
+                  type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 401
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/AuthError'
+                  type: object
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 500
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/ServerError'
+                  type: object
+  /ct/assets:
+    post:
+      tags:
+      - Clean Transportation
+      summary: Create asset
+      description: Create new Asset.
+      operationId: createAsset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/postAssetCreate'
+      responses:
+        '201':
+          description: Asset created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 201
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/CreateAssetSuccess'
+                  type: object
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 400
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/CreateAssetFieldErrors'
+                  type: object
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 401
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/AuthError'
+                  type: object
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 500
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/ServerError'
+                  type: object
+components:
+  schemas:
+    CompanyEntityAddress:
+      description: Address nested on a company entity returned by `getCompanyEntities`.
+      properties:
+        address_id:
+          type: integer
+          example: 18353
+        address_street:
+          type: string
+          example: 1234 Shattuck Avenue
+        address_city:
+          type: string
+          example: Berkeley
+        address_zip:
+          type: string
+          example: '94704'
+        address_state:
+          type: string
+          example: CA
+        address_country:
+          type: string
+          example: US
+      type: object
+    AuthError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 401 when API authentication is missing or invalid.
+            type: string
+            example: connection_failed
+          message:
+            type: string
+            example: Authentication error
+        type: object
+    CompanyEntityContact:
+      description: Contact nested on a company entity returned by `getCompanyEntities`.
+      properties:
+        contact_id:
+          type: string
+          example: '12345'
+        contact_name:
+          type: string
+          example: John Doe
+        contact_email:
+          type: string
+          example: test.address@example.com
+        contact_phone:
+          type: string
+          example: '123456789'
+        contact_date_created:
+          type: string
+          example: '2024-10-26 13:30:24'
+      type: object
+    CompanyEntityList:
+      description: Company entity rows in the API envelope `data` field.
+      type: array
+      items:
+        $ref: '#/components/schemas/CompanyEntityItem'
+    CreateAssetFieldErrors:
+      description: Field-level validation messages in envelope `data` for `POST /ct/assets`.
+      properties:
+        asset_fse_id:
+          type: string
+          example: The asset_fse_id FSE12345EE6 already exists.
+        reporting_method_id:
+          type: string
+          example: The reporting_method_id field is required.
+        address_latitude:
+          type: string
+          example: The address_latitude value is not valid within United States limits. It should be within the range of 7.2 and 83.7.
+        asset_serial_number:
+          type: string
+          example: The asset_serial_number field is required.
+        entity_id:
+          type: string
+        asset_name:
+          type: string
+        address_street:
+          type: string
+        address_city:
+          type: string
+        address_zip:
+          type: string
+        address_state:
+          type: string
+        address_country:
+          type: string
+        address_longitude:
+          type: string
+        class_type_id:
+          type: string
+        charging_type_id:
+          type: string
+        manufacturer_name:
+          type: string
+        asset_registration_upload_id:
+          type: string
+        asset_start_date:
+          type: string
+        asset_end_date:
+          type: string
+        electricity_source_id:
+          type: string
+      type: object
+    CompanyEntityItem:
+      properties:
+        address:
+          $ref: '#/components/schemas/CompanyEntityAddress'
+        contact:
+          $ref: '#/components/schemas/CompanyEntityContact'
+        entity_id:
+          type: string
+          example: '172'
+        entity_name:
+          type: string
+          example: Example entity name
+        entity_fein:
+          type: string
+          example: '123456789'
+        entity_agreement:
+          type: string
+          example: 6363fac17cfaf0_1234567.pdf
+      type: object
+    ServerError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 500 when an unexpected server or infrastructure failure occurs.
+            type: string
+            example: internal_error
+          message:
+            type: string
+            example: Error description
+        type: object
+    postAssetCreate:
+      description: Request body for `POST /ct/assets` (`createAsset`).
+      required:
+      - entity_id
+      - asset_name
+      - address_street
+      - address_city
+      - address_zip
+      - address_state
+      - address_country
+      - address_latitude
+      - address_longitude
+      - class_type_id
+      - asset_serial_number
+      - charging_type_id
+      - manufacturer_name
+      - asset_fse_id
+      - asset_registration_upload_id
+      - reporting_method_id
+      - asset_start_date
+      - asset_end_date
+      - electricity_source_id
+      properties:
+        entity_id:
+          description: Unique identifier for the entity
+          type: string
+          example: '150'
+        asset_name:
+          description: Name of the asset; can include dynamic placeholders
+          type: string
+          example: Test asset
+        address_street:
+          description: Street address of the asset
+          type: string
+          example: 40270 GLENALDER PLACE
+        address_city:
+          description: City where the asset is located
+          type: string
+          example: Squamish
+        address_zip:
+          description: ZIP or postal code
+          type: string
+          example: '12345'
+        address_state:
+          description: State or province
+          type: string
+          example: CA
+        address_country:
+          description: Country code (ISO format)
+          type: string
+          example: US
+        address_latitude:
+          description: Latitude coordinate; can include dynamic placeholders
+          type: string
+          example: '55.391234'
+        address_longitude:
+          description: Longitude coordinate; can include dynamic placeholders
+          type: string
+          example: '-92.75123'
+        class_type_id:
+          description: List of class type IDs associated with the asset
+          type: array
+          items:
+            type: integer
+          example:
+          - 3
+        asset_serial_number:
+          description: Serial number for the asset; can include dynamic placeholders
+          type: string
+          example: '2025410189123'
+        charging_type_id:
+          description: Identifier for the charging type
+          type: integer
+          example: 3
+        manufacturer_name:
+          description: Name of the manufacturer
+          type: string
+          example: ABCD company
+        asset_fse_id:
+          description: FSE ID
+          type: string
+          example: FSE413000EE2
+        asset_registration_upload_id:
+          description: Unique registration upload ID; can include placeholders
+          type: string
+          example: RUZ-781234
+        reporting_method_id:
+          description: ID of the reporting method
+          type: string
+          example: '2'
+        asset_start_date:
+          description: Asset start date in YYYY-MM-DD format
+          type: string
+          format: date
+          example: '2021-07-01'
+        asset_end_date:
+          description: Asset end date in YYYY-MM-DD format
+          type: string
+          format: date
+          example: '2026-11-02'
+        electricity_source_id:
+          description: ID representing the source of electricity
+          type: integer
+          example: 3
+        asset_status_id:
+          description: Status ID of the asset
+          type: string
+          example: '4'
+        asset_fse_code:
+          description: Code representing the FSE
+          type: string
+          example: Test FSE code
+        asset_method_of_kwh:
+          description: Method used to measure kWh
+          type: string
+          example: akhdkajh
+        asset_charging_data_source:
+          description: Source of charging data
+          type: string
+          example: Test
+        asset_lcfs_lff_id:
+          description: LCFS (Low Carbon Fuel Standard) LFF ID
+          type: string
+          example: '1'
+        asset_lcfs_facility_name:
+          description: Name of the LCFS facility
+          type: string
+          example: test
+        asset_rp_name:
+          description: Reporting party or responsible person/entity name
+          type: string
+          example: test
+      type: object
+    Error:
+      description: 'Generic error payload when no more specific error schema applies.
+
+
+        Implements JsonSerializable so it can be passed directly to API_Controller::response().
+
+        Implements Countable returning 0 so the response size guard in API_Controller treats it
+
+        as an empty collection (error responses never trigger the size limit).'
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Error description
+      type: object
+    CreateAssetSuccess:
+      description: Success payload in the API envelope `data` field for `createAsset` (`POST /ct/assets`).
+      required:
+      - status
+      properties:
+        status:
+          type: string
+          example: asset created
+      type: object
+    ResponseEnvelope:
+      description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
+      required:
+      - url
+      - date
+      - code
+      - elements
+      - page
+      properties:
+        url:
+          description: Request URL including query string.
+          type: string
+          example: /app/api/v1/facilities
+        date:
+          description: Response timestamp.
+          type: string
+          example: 2024-09-17 04:26:39 EDT
+        code:
+          description: HTTP status code, mirrored in the JSON body (same as the response status).
+          type: integer
+        elements:
+          description: Number of items in `data` on HTTP 200; 0 for other status codes.
+          type: integer
+        page:
+          description: Page label (`1 of 1` when not paginated) or numeric page when listing with pagination.
+          oneOf:
+          - type: string
+            example: 1 of 1
+          - type: integer
+            example: 2
+      type: object
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer

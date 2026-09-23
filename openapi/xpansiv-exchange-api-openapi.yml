@@ -1,0 +1,1481 @@
+openapi: 3.2.0
+info:
+  description: 'This is the OpenAPI spec for Xpansiv Connect API. Documentation: https://developer.xpansiv.com/developer-portal/'
+  title: Xpansiv Connect Exchange API
+  version: 1.0.0-beta
+servers:
+- url: https://sandbox.preprod.connect.xpansiv.com/app/api/v1
+  description: SANDBOX
+- url: https://uat.preprod.connect.xpansiv.com/app/api/v1
+  description: UAT
+- url: https://connect.xpansiv.com/app/api/v1
+  description: PROD
+security:
+- bearerToken: []
+tags:
+- name: Exchange
+  description: The Exchange APIs allow users to take various actions, both read and write, for their interactions with execution venues, such as the CBL platform.
+paths:
+  /exchanges/{ExchangeCode}/accounts/{AccountIdentifier}/action/search-deposits:
+    parameters:
+    - $ref: '#/components/parameters/ExchangeCode'
+    - $ref: '#/components/parameters/AccountIdentifier'
+    post:
+      summary: Search deposits
+      description: Get list of deposits for an exchange
+      tags:
+      - Exchange
+      operationId: searchDeposits
+      responses:
+        '200':
+          description: List of deposits
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - depositIdentifier
+                  - executionVenue
+                  - taxLot
+                  - instrument
+                  - quantity
+                  - availableQuantity
+                  - settledQuantity
+                  - status
+                  properties:
+                    depositIdentifier:
+                      type: string
+                      description: Unique identifier.
+                    executionVenue:
+                      type: object
+                      required:
+                      - code
+                      - name
+                      properties:
+                        code:
+                          $ref: '#/components/schemas/Ref.ExecutionVenue'
+                        name:
+                          type: string
+                          description: Target execution venue code name.
+                    depositMarket:
+                      type: object
+                      required:
+                      - market
+                      - marketModelInstrument
+                      properties:
+                        market:
+                          type: object
+                          required:
+                          - name
+                          - apiCode
+                          properties:
+                            name:
+                              type: string
+                              description: Name of the target market on the execution venue.
+                            apiCode:
+                              type: string
+                              description: AIP code sent to the execution venue.
+                        marketModelInstrument:
+                          type: object
+                          required:
+                          - description
+                          - price
+                          properties:
+                            description:
+                              type: string
+                              description: Description of the Market Model Instrument for the deposit.
+                            price:
+                              type: object
+                              required:
+                              - amount
+                              properties:
+                                amount:
+                                  type: number
+                                  format: double
+                                  description: Price, if applicable, for the deposit.
+                    taxLot:
+                      type: object
+                      required:
+                      - name
+                      properties:
+                        name:
+                          type: string
+                          description: The name of the TaxLot associated with the deposit.
+                    instrument:
+                      type: object
+                      required:
+                      - ein
+                      - description
+                      - program
+                      - vintage
+                      - resource
+                      properties:
+                        ein:
+                          type: string
+                          description: The EIN code for the deposit.
+                        description:
+                          type: string
+                          description: The Xpansiv Connect description for the EIN on the deposit.
+                        type:
+                          $ref: '#/components/schemas/Ref.InstrumentType'
+                        program:
+                          $ref: '#/components/schemas/Ref.Program'
+                        vintage:
+                          $ref: '#/components/schemas/Vintage'
+                        resource:
+                          type: object
+                          required:
+                          - name
+                          properties:
+                            name:
+                              type: string
+                              description: The registry name of the item on deposit.
+                            registryAssignedId:
+                              type: string
+                              description: The registry assigned id for the item on deposit.
+                    quantity:
+                      type: integer
+                      format: int64
+                      description: The original quantity of the deposit.
+                    availableQuantity:
+                      type: integer
+                      format: int64
+                      description: The remaining quantity of the deposit.
+                    settledQuantity:
+                      type: integer
+                      format: int64
+                      description: The quantity of the deposit settled as a result of trading activity.
+                    status:
+                      $ref: '#/components/schemas/Ref.DepositStatus'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                    - INVALID_EXCHANGE
+                    - INVALID_ACCOUNT
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+  /exchanges/{ExchangeCode}/execution-venues/{ExecutionVenueCode}/accounts/{AccountIdentifier}/action/deposit:
+    parameters:
+    - $ref: '#/components/parameters/ExchangeCode'
+    - $ref: '#/components/parameters/ExecutionVenueCode'
+    - $ref: '#/components/parameters/AccountIdentifier'
+    post:
+      summary: Deposits creation
+      tags:
+      - Exchange
+      operationId: deposit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - market
+              - deposits
+              properties:
+                market:
+                  type: string
+                deposits:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required:
+                    - taxLotId
+                    - quantity
+                    properties:
+                      taxLotId:
+                        type: integer
+                        format: int64
+                        description: TaxLot id of the inventory selected for the deposit to the execution venue.
+                      quantity:
+                        type: integer
+                        format: int64
+                        minimum: 1
+                        description: Quantity to be deposited.
+                      priority:
+                        type: integer
+                        format: int64
+                        description: Priority for the deposit to be used in the trade settlement process.
+      responses:
+        '200':
+          description: Deposits created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - depositIdentifier
+                  properties:
+                    depositIdentifier:
+                      type: string
+                      description: The depositIdentifier of create deposit.
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - code
+                - message
+                properties:
+                  code:
+                    type: string
+                    enum:
+                    - INVALID_REQUEST
+                    - INVALID_EXCHANGE
+                    - INVALID_ACCOUNT
+                    - INVALID_EXECUTION_VENUE
+                    - INVALID_DEPOSITS
+                    - INVALID_MARKET
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          enum:
+                          - NOT_ENOUGH_QUANTITY
+                          - DUPLICATE_TAX_LOT
+                          - TAX_LOT_NOT_FOUND
+                        message:
+                          type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+  /exchanges/{ExchangeCode}/accounts/{AccountIdentifier}/action/withdraw:
+    parameters:
+    - $ref: '#/components/parameters/ExchangeCode'
+    - $ref: '#/components/parameters/AccountIdentifier'
+    post:
+      summary: Deposits withdraw
+      tags:
+      - Exchange
+      operationId: withdraw
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - withdrawals
+              properties:
+                withdrawals:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required:
+                    - depositIdentifier
+                    - quantity
+                    properties:
+                      depositIdentifier:
+                        type: string
+                        description: The depositIdentifier of the deposit to withdraw.
+                      quantity:
+                        type: integer
+                        format: int64
+                        description: Quantity of the amount on deposit to be withdrawn.
+                        minimum: 1
+      responses:
+        '200':
+          description: Deposits withdrawn
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - depositIdentifier
+                  - status
+                  properties:
+                    depositIdentifier:
+                      type: string
+                      description: The depositIdentifier with which the withdraw request was made.
+                    status:
+                      $ref: '#/components/schemas/Ref.WithdrawStatus'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - code
+                - message
+                properties:
+                  code:
+                    type: string
+                    enum:
+                    - INVALID_REQUEST
+                    - DEPOSIT_NOT_FOUND
+                    - INVALID_EXCHANGE
+                    - INVALID_WITHDRAWALS
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          enum:
+                          - NOT_ENOUGH_QUANTITY
+                        message:
+                          type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+  /exchanges/{ExchangeCode}/account/{AccountIdentifier}/program/{RetirementProgramCode}/action/withdraw-and-retire:
+    post:
+      tags:
+      - Exchange
+      operationId: withdrawAndRetire
+      parameters:
+      - $ref: '#/components/parameters/ExchangeCode'
+      - $ref: '#/components/parameters/AccountIdentifier'
+      - $ref: '#/components/parameters/RetirementProgramCode'
+      summary: Withdraw credits and create retirements
+      description: Allows the combination of withdrawal of credits and creation of retirements in bulk
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - dryRun
+              - retirements
+              properties:
+                dryRun:
+                  description: If true it will only do the validation of the request but not to create the retirements
+                  type: boolean
+                retirements:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - ein
+                    - quantity
+                    properties:
+                      ein:
+                        type: string
+                      quantity:
+                        type: integer
+                        format: int64
+                      externalIdentifier:
+                        type: string
+                attributes:
+                  type: object
+                  additionalProperties: true
+        required: true
+      responses:
+        '200':
+          description: Retirements
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - retirements
+                - batchIdentifier
+                properties:
+                  retirements:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Retirement'
+                  batchIdentifier:
+                    type: string
+                    description: EMA retirement batch identifier
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                    - INVALID_PROGRAM
+                    - INVALID_REQUEST
+                    - EMPTY_REQUEST
+                    - INVALID_ATTRIBUTES
+                    - INVALID_RETIREMENTS
+                    - INVALID_EXCHANGE
+                    - INVALID_ACCOUNT
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                        message:
+                          type: string
+                  attributeErrors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          enum:
+                          - INVALID_TYPE
+                          - INVALID_VALUE
+                          - UNEXPECTED_FIELD
+                          - UNAVAILABLE_FIELD
+                          - REQUIRED_FIELD
+                          - INVALID_SUB_ACCOUNT
+                          - INVALID_BENEFICIAL_OWNER_NAME
+                        message:
+                          type: string
+                        field:
+                          type: string
+                        value:
+                          type: string
+                  retirementErrors:
+                    type: array
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          code:
+                            type: string
+                            enum:
+                            - INVALID_VALUE
+                            - QUARANTINED_POSITION
+                            - INSUFFICIENT_QUANTITY
+                            - INVALID_EIN
+                            - DUPLICATE_EIN
+                            - INVALID_TAX_LOT_ALLOCATION_STRATEGY
+                            - INVALID_TAX_LOT_ALLOCATION
+                            - UNEXPECTED_QUANTITY_PER_TAX_LOT
+                            - ZERO_QUANTITY_TAX_LOTS
+                            - DUPLICATE_TAX_LOTS
+                            - ZERO_QUANTITY
+                            - INVALID_QUANTITY_SUM
+                            - EIN_CURRENTLY_LOCKED
+                          message:
+                            type: string
+                          field:
+                            type: string
+                          value:
+                            type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /exchanges/{ExchangeCode}/account/{AccountIdentifier}/program/{ProgramCode}/action/withdraw-and-export:
+    post:
+      tags:
+      - Exchange
+      operationId: withdrawAndExport
+      parameters:
+      - $ref: '#/components/parameters/ExchangeCode'
+      - $ref: '#/components/parameters/AccountIdentifier'
+      - $ref: '#/components/parameters/ProgramCode'
+      summary: Withdraw credits and create exports
+      description: Allows the combination of withdrawal of credits and creation of export in bulk
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - exports
+              properties:
+                dryRun:
+                  description: If true it will only do the validation of the request but not withdraw nor export
+                  type: boolean
+                exports:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - ein
+                    - quantity
+                    properties:
+                      ein:
+                        type: string
+                      quantity:
+                        type: integer
+                        format: int64
+                      externalIdentifier:
+                        type: string
+        required: true
+      responses:
+        '200':
+          description: Successful withdraw and export
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - batchIdentifier
+                - exports
+                properties:
+                  batchIdentifier:
+                    type: string
+                    description: EMA export batch identifier
+                  exports:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                      - transferIdentifier
+                      properties:
+                        transferIdentifier:
+                          type: string
+                        externalIdentifier:
+                          type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - code
+                - message
+                properties:
+                  code:
+                    type: string
+                    enum:
+                    - INVALID_PROGRAM
+                    - INVALID_REQUEST
+                    - EMPTY_REQUEST
+                    - INVALID_EXPORTS
+                    - INVALID_ACCOUNT
+                    - INVALID_EXCHANGE
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          enum:
+                          - INVALID_VALUE
+                          - QUARANTINED_POSITION
+                          - INSUFFICIENT_QUANTITY
+                          - INVALID_EIN
+                          - DUPLICATE_EIN
+                          - ZERO_QUANTITY
+                          - EIN_CURRENTLY_LOCKED
+                          - INVALID_ACCOUNT
+                          - INVALID_QUANTITY
+                        message:
+                          type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+  /exchanges/{ExchangeCode}/execution-venues/{ExecutionVenueCode}/action/settle:
+    parameters:
+    - $ref: '#/components/parameters/ExchangeCode'
+    - $ref: '#/components/parameters/ExecutionVenueCode'
+    post:
+      summary: Deposits settlement
+      tags:
+      - Exchange
+      operationId: settle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - tradeIdentifier
+              - sellerIdentifier
+              - buyerIdentifier
+              - productCode
+              - quantity
+              - price
+              - currency
+              properties:
+                tradeIdentifier:
+                  type: string
+                  minLength: 1
+                sellerIdentifier:
+                  type: string
+                  minLength: 8
+                  example: 098B0A25
+                buyerIdentifier:
+                  type: string
+                  minLength: 8
+                  example: 098B0A25
+                productCode:
+                  type: string
+                  minLength: 3
+                quantity:
+                  type: integer
+                  format: int64
+                  example: 100
+                  exclusiveMinimum: 0
+                price:
+                  type: number
+                  format: double
+                  minimum: 0
+                  example: 3.12
+                currency:
+                  $ref: '#/components/schemas/Ref.Currency'
+      responses:
+        '201':
+          description: Settlement created
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                    - INVALID_REQUEST
+                    - DUPLICATED_REQUEST
+                    - INVALID_EXCHANGE
+                    - INVALID_EXECUTION_VENUE
+                    - ACCOUNT_NOT_FOUND
+                    - NOT_ENOUGH_QUANTITY
+                    - DEPOSIT_NOT_FOUND
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '404':
+          $ref: '#/components/responses/404'
+        '500':
+          $ref: '#/components/responses/500'
+components:
+  schemas:
+    RecInstrument:
+      allOf:
+      - $ref: '#/components/schemas/BaseInstrument'
+      - type: object
+        required:
+        - generator
+        properties:
+          fuelType:
+            $ref: '#/components/schemas/FuelType'
+          stateEligibilities:
+            type: array
+            description: Optional property. Use `include` param.
+            items:
+              type: object
+              description: Object to hold full state eligibility information - type of eligibility and name
+              properties:
+                name:
+                  type: string
+                  description: Name of the state eligibility.
+                type:
+                  $ref: '#/components/schemas/Ref.StateEligibilityType'
+          voluntaryEligibilities:
+            type: array
+            description: Optional property. Use `include` param.
+            items:
+              $ref: '#/components/schemas/VoluntaryEligibility'
+          generator:
+            $ref: '#/components/schemas/Generator'
+    Ref.RetirementProgramCode:
+      type: string
+      description: Retirement program code. Ref.Data.RETIREMENT_PROGRAM
+    Instrument:
+      oneOf:
+      - $ref: '#/components/schemas/CarbonInstrument'
+      - $ref: '#/components/schemas/RecInstrument'
+      - $ref: '#/components/schemas/ResourceInstrument'
+    Ref.Currency:
+      description: Ref.Data.CURRENCY
+      type: string
+      minLength: 3
+      example: USD
+    Ref.WithdrawStatus:
+      type: string
+      description: Status of the deposit withdrawal request. Ref.Data.WITHDRAW_STATUS
+    Ref.Certification:
+      type: string
+      description: Certification code. Ref.Data.CARBON_CERTIFICATION
+    Ref.ProjectStatus:
+      type: string
+      description: Ref.Data.PROJECT_STATUS
+    Ref.CreditType:
+      type: string
+      description: The type of the credit. Ref.Data.CARBON_CREDIT_TYPE
+    Generator:
+      allOf:
+      - $ref: '#/components/schemas/Resource'
+      - type: object
+        properties:
+          program:
+            $ref: '#/components/schemas/Ref.RecProgram'
+          registryAssignedId:
+            type: string
+            description: The registry assigned identifier for the generator.
+          status:
+            $ref: '#/components/schemas/Ref.GeneratorStatus'
+          siteCode:
+            type: string
+            description: The Site Code of the generator if provided by the registry.
+          unitName:
+            type: string
+            description: The Unit Name of the generator in the registry.
+          controlArea:
+            type: string
+            description: The Control Area that the generator is located in.
+          parentCompanyName:
+            type: string
+            description: The Parent Company Name of the generator if provided by the registry.
+          powerCompanyName:
+            type: string
+            description: The Power Company Name of the generator if provided by the registry.
+          powerCompanyCode:
+            type: string
+            description: The Power Company Code of the generator if provided by the registry.
+          ownerName:
+            type: string
+            description: The Owner Name of the generator if provided by the registry
+          ownershipType:
+            type: string
+            description: The Ownership Type of the generator if provided by the registry.
+          countyName:
+            type: string
+            description: The County Name locatio of the generator if provided by the registry.
+          stateProvince:
+            $ref: '#/components/schemas/Ref.StateProvince'
+          country:
+            $ref: '#/components/schemas/Ref.Country'
+          contactInfo:
+            type: string
+            description: Contact Information for the generator if provided by the registry.
+          registryAcctHolderName:
+            type: string
+            description: The Registry Account Holder name of the generator if provided by the registry.
+          commencedDt:
+            type: string
+            format: date-time
+            description: The Commenced Operation Date of the generator if provided by the registry.
+          nameplateCapacity:
+            type: number
+            format: double
+            description: The Nameplate Capacity of the generator if provided by the registry.
+          facNoncompetitiveCertData:
+            type: string
+          fuelTypes:
+            type: array
+            description: Additional information about a generator if it is multi-fuel. Optional property. Use `include` param.
+            items:
+              title: Fuel Type Eligibility aggregation
+              type: object
+              required:
+              - fuelType
+              properties:
+                fuelType:
+                  $ref: '#/components/schemas/FuelType'
+                stateEligibilities:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/StateEligibility'
+                voluntaryEligibilities:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/VoluntaryEligibility'
+    ResourceProject:
+      allOf:
+      - $ref: '#/components/schemas/Resource'
+      - type: object
+        required:
+        - programs
+        properties:
+          programs:
+            type: array
+            items:
+              type: object
+              title: ResourceProjectProgram
+              required:
+              - program
+              - registryAssignedId
+              properties:
+                program:
+                  $ref: '#/components/schemas/Ref.ResourceProgram'
+                programName:
+                  type: string
+                registryAssignedId:
+                  type: string
+          status:
+            $ref: '#/components/schemas/Ref.ResourceProjectStatus'
+          country:
+            $ref: '#/components/schemas/Ref.Country'
+          accountName:
+            type: string
+          classification1:
+            type: string
+          classification2:
+            type: string
+          classification3:
+            type: string
+          childResourceProject:
+            $ref: '#/components/schemas/ChildResourceProject'
+          inOutTypes:
+            type: array
+            items:
+              type: object
+              required:
+              - inType
+              - outType
+              properties:
+                inType:
+                  $ref: '#/components/schemas/Ref.ResourceInType'
+                outType:
+                  $ref: '#/components/schemas/Ref.ResourceOutType'
+          typeName:
+            type: string
+    Ref.ProjectType:
+      type: string
+      description: The project type. Ref.Data.CARBON_PROJECT_TYPE
+    Ref.ResourceProgram:
+      type: string
+      description: Ref.Data.RESOURCE_PROGRAM
+    Ref.StateProvince:
+      type: string
+      description: Ref.Data.STATE_PROVINCE
+    Ref.ResourceInType:
+      type: string
+      description: Ref.Data.RESOURCE_INPUT_TYPE
+    FuelType:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The fuel type associated with the underlying asset.
+        type:
+          $ref: '#/components/schemas/Ref.FuelType'
+        fuelSource:
+          type: string
+          description: The registry fuel source associated with the fuel type (registry-dependent).
+    BaseInstrument:
+      type: object
+      required:
+      - type
+      - ein
+      - program
+      - vintage
+      - creditType
+      properties:
+        type:
+          $ref: '#/components/schemas/Ref.InstrumentType'
+        id:
+          type: integer
+          format: int64
+          description: Unique Xpansiv Connect identifier.
+        ein:
+          type: string
+          description: 'Environment Instrument Number. Unique identifier associated with an issuance of credits from a given project,  vintage, technology/fuel type and associated certification(s)/eligibility(s). An EIN is associated with a  position and a position will never be associated with more than 1 EIN.
+
+            '
+        description:
+          type: string
+          description: 'The Xpansiv Connect description associated with the instrument providing information regarding location,  vintage, fuel type and certifications.
+
+            '
+        program:
+          $ref: '#/components/schemas/Ref.Program'
+        vintage:
+          $ref: '#/components/schemas/Vintage'
+        markets:
+          type: array
+          description: Optional property. Use `include` param.
+          items:
+            $ref: '#/components/schemas/InstrumentMarket'
+        creditType:
+          type: string
+          description: The type of the credit.
+      discriminator:
+        propertyName: type
+        mapping:
+          CARBON: '#/components/schemas/CarbonInstrument'
+          REC: '#/components/schemas/RecInstrument'
+          RESOURCE_PROJECT: '#/components/schemas/ResourceInstrument'
+    NotFoundError:
+      type: object
+      properties:
+        message:
+          type: string
+    Ref.BaselineMethodology:
+      type: string
+      description: Ref.Data.BASELINE_METHODOLOGY
+    NotAuthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+    ChildResourceProject:
+      allOf:
+      - $ref: '#/components/schemas/Resource'
+      - type: object
+        properties:
+          accountName:
+            type: string
+          inOutTypes:
+            type: array
+            items:
+              type: object
+              required:
+              - inType
+              - outType
+              properties:
+                inType:
+                  $ref: '#/components/schemas/Ref.ResourceInType'
+                outType:
+                  $ref: '#/components/schemas/Ref.ResourceOutType'
+          programs:
+            type: array
+            items:
+              type: object
+              title: ChildResourceProjectProgram
+              required:
+              - program
+              - registryAssignedId
+              properties:
+                program:
+                  $ref: '#/components/schemas/Ref.ResourceProgram'
+                programName:
+                  type: string
+                registryAssignedId:
+                  type: string
+    Ref.RecProgram:
+      type: string
+      description: Ref.Data.REC_PROGRAM
+    TaxLot:
+      type: object
+      description: A Tax Lot represents the incoming activity that resulted in the creation or increase of a position against an EIN. The types of activities represented by Tax Lots are; imported positions (at account linking); incoming settled bilateral transfers; or credit issuance. Tax Lot is associated with a Position, where 1 or more Tax Lots make up the available quantity for a single Position
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: The unique identifier for the tax lot
+        name:
+          type: string
+          description: The name of the tax lot, normally made up of tax lot type and established date
+        establishedDate:
+          type: string
+          format: date-time
+          description: The timestamp for when the tax lot was established, meaning when the transaction that created the tax lot was accepted in XC
+        establishQuantity:
+          type: integer
+          format: int64
+          description: The original quantity of credits that created the tax lot. Optional property. Use `include` param.
+        pricePaid:
+          $ref: '#/components/schemas/Price'
+        availableQuantity:
+          type: integer
+          format: int64
+          description: The quantity available of the tax lot for transfer or retirement
+        encumberedQuantity:
+          type: integer
+          format: int64
+          description: The quantity encumbered of the tax lot on an execution venue integrated with XC
+        unsettledQuantity:
+          type: integer
+          format: int64
+          description: The quantity unsettled of the tax lot. This can represent a quantity that is in a bilateral transaction, buy or sell, that is pending and not yet settled in the registry.
+        estimatedMarketPrice:
+          type: number
+          description: The estimated price associated with the highest value market this tax lot has a certification with  where prices have been uploaded from the CBL Exchange. Optional property. Use `include` param.
+        estimatedMarketValue:
+          type: number
+          description: Using the Estimated Market Price, this represents the estimated market value of the tax lot based on the tax lot position quantity. Optional property. Use `include` param.
+        estimatedGainLoss:
+          type: number
+          description: Utilizing both Price Paid and Estimated Market Price against tax lot quantity to determine if there was a financial gain or loss for this tax lot. Optional property. Use `include` param.
+        previousCounterparty:
+          type: string
+          description: The registry name of the counterparty that transferred the credits of this tax lot to the XC client. Optional property. Use `include` param.
+        externalTradeId:
+          type: string
+          description: An external trade/transaction identifier as provided by the XC client for this position. Optional property. Use `include` param.
+        dealId:
+          type: string
+          description: A deal Identifier as provided by the XC client for this position if associated with a forward deal delivery. Optional property. Use `include` param.
+    InstrumentMarket:
+      properties:
+        market:
+          $ref: '#/components/schemas/Market'
+        marketModelInstrument:
+          $ref: '#/components/schemas/MarketModelInstrument'
+    Ref.InstrumentType:
+      type: string
+      description: REC or CARBON. Ref.Data.INSTRUMENT_TYPE
+    Ref.GeneratorStatus:
+      type: string
+      description: The status of the generator in the registry. Ref.Data.GENERATOR_STATUS
+    Ref.DepositStatus:
+      type: string
+      description: The current status of the deposit in relation to the execution venue. Ref.Data.DEPOSIT_STATUS
+    CarbonInstrument:
+      allOf:
+      - $ref: '#/components/schemas/BaseInstrument'
+      - type: object
+        required:
+        - project
+        properties:
+          serialNumber:
+            type: string
+          issuanceCertifications:
+            type: array
+            description: Optional property. Use `include` param.
+            items:
+              $ref: '#/components/schemas/IssuanceCertification'
+          projectCertifications:
+            type: array
+            description: Optional property. Use `include` param.
+            items:
+              $ref: '#/components/schemas/ProjectCertification'
+          reportingPeriodStart:
+            type: string
+            format: date-time
+            description: Reporting period start date.
+          reportingPeriodEnd:
+            type: string
+            format: date-time
+            description: Reporting period end date.
+          project:
+            $ref: '#/components/schemas/Project'
+    Vintage:
+      type: object
+      required:
+      - year
+      properties:
+        year:
+          type: integer
+          format: int32
+          description: Vintage year.
+        month:
+          type: integer
+          format: int32
+          description: Vintage month.
+    MarketModelInstrument:
+      properties:
+        ein:
+          type: string
+          description: 'Environment Instrument Number. Unique identifier associated with an issuance of credits from a given project,  vintage, technology/fuel type and associated certification(s)/eligibility(s).  An EIN is associated with a position and a position will never be associated with more than 1 EIN.
+
+            '
+        description:
+          type: string
+          description: Description.
+        price:
+          $ref: '#/components/schemas/MarketModelInstrumentPrice'
+    ResourceInstrument:
+      allOf:
+      - $ref: '#/components/schemas/BaseInstrument'
+      - type: object
+        required:
+        - resourceProject
+        properties:
+          serialNumber:
+            type: string
+          inType:
+            $ref: '#/components/schemas/Ref.ResourceInType'
+          outType:
+            $ref: '#/components/schemas/Ref.ResourceOutType'
+          resourceProject:
+            $ref: '#/components/schemas/ResourceProject'
+    Ref.ExecutionVenue:
+      type: string
+      description: Ref.Data.EXECUTION_VENUE
+    Ref.ResourceProjectStatus:
+      type: string
+      description: Ref.Data.RESOURCE_PROJECT_STATUS
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+    Ref.Country:
+      type: string
+      description: Ref.Data.COUNTRY
+    Ref.ProjectRegistryStatus:
+      type: string
+      description: The registry status of the project. Ref.Data.PROJECT_REGISTRY_STATUS
+    StateEligibility:
+      type: object
+      description: Object to hold full state eligibility information - type of eligibility, extendable with other information
+      properties:
+        name:
+          type: string
+          description: Name of the state eligibility.
+        type:
+          $ref: '#/components/schemas/Ref.StateEligibilityType'
+        stateIdentifier:
+          type: string
+          description: This is the identifier of the eligibility from the registry
+    Ref.CarbonProgram:
+      type: string
+      description: Ref.Data.CARBON_PROGRAM
+    Price:
+      type: object
+      required:
+      - currency
+      - amount
+      properties:
+        currency:
+          $ref: '#/components/schemas/Ref.Currency'
+        amount:
+          type: number
+          description: The numeric value of the price
+          minimum: 0
+    Ref.VoluntaryEligibilityType:
+      type: string
+      description: The type of the voluntary eligibility. Ref.Data.REC_VOLUNTARY_ELIGIBILITY
+    Ref.RetirementStatus:
+      type: string
+      description: Status of the retirement. Ref.Data.RETIREMENT_STATUS
+    Location:
+      title: Resource location
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+          description: Latitude.
+        longitude:
+          type: number
+          format: double
+          description: Longitude.
+    Project:
+      allOf:
+      - $ref: '#/components/schemas/Resource'
+      - type: object
+        required:
+        - programs
+        properties:
+          programs:
+            type: array
+            items:
+              type: object
+              title: ProjectProgram
+              required:
+              - program
+              - registryAssignedId
+              - status
+              - creditType
+              - projectType
+              properties:
+                program:
+                  $ref: '#/components/schemas/Ref.CarbonProgram'
+                programName:
+                  type: string
+                  description: Registry name.
+                registryAssignedId:
+                  type: string
+                  description: ID assigned by the registry.
+                registryAccountHolderName:
+                  type: string
+                  description: Name of the registry account holder.
+                status:
+                  $ref: '#/components/schemas/Ref.ProjectRegistryStatus'
+                creditType:
+                  $ref: '#/components/schemas/Ref.CreditType'
+                projectType:
+                  $ref: '#/components/schemas/Ref.ProjectType'
+                baselineMethodologies:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Ref.BaselineMethodology'
+                creditingPeriodBegin:
+                  type: string
+                  format: date-time
+                  description: Begin date for credit reporting.
+                creditingPeriodEnd:
+                  type: string
+                  format: date-time
+                  description: End date for credit reporting.
+          description:
+            type: string
+            description: The full description from the registry.
+          status:
+            $ref: '#/components/schemas/Ref.ProjectStatus'
+          country:
+            $ref: '#/components/schemas/Ref.Country'
+          stateProvince:
+            type: string
+            description: State or Province
+          city:
+            type: string
+            description: City.
+          location:
+            $ref: '#/components/schemas/Location'
+          annualAverageOffsetQty:
+            type: integer
+            format: int64
+            description: Annual average offset quantity.
+          projectCertifications:
+            type: array
+            description: Optional property. Use `include` param.
+            items:
+              $ref: '#/components/schemas/ProjectCertification'
+          issuanceCertifications:
+            type: array
+            description: Optional property. Use `include` param.
+            items:
+              $ref: '#/components/schemas/IssuanceCertification'
+    Market:
+      properties:
+        name:
+          type: string
+          description: Name of the market.
+        apiCode:
+          type: string
+          description: API code for market execution venue.
+        applicableExecutionVenues:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ref.ExecutionVenue'
+        applicablePrograms:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ref.Program'
+    Retirement:
+      type: object
+      required:
+      - instrument
+      - lastUpdatedDate
+      - createdDate
+      - quantity
+      - status
+      - batchIdentifier
+      - identifier
+      properties:
+        instrument:
+          $ref: '#/components/schemas/Instrument'
+        lastUpdatedDate:
+          type: string
+          format: date-time
+          description: Last updated date.
+        createdDate:
+          type: string
+          format: date-time
+          description: Creation date.
+        quantity:
+          type: integer
+          description: Retirement quantity.
+        status:
+          $ref: '#/components/schemas/Ref.RetirementStatus'
+        batchIdentifier:
+          type: string
+          description: XPC Retirement batch identifier
+        identifier:
+          type: string
+          description: XPC Retirement identifier
+        externalIdentifier:
+          type: string
+          description: Retirement identifier provided by API client when creating the retirement
+        registryTransferIdentifier:
+          type: string
+          description: Retirement identifier generated by the program
+        registryPositionId:
+          type: string
+          description: Id of the retired registry credits
+        attributes:
+          type: object
+          additionalProperties: true
+        transferTaxLots:
+          description: Optional property. Use `include` param.
+          type: array
+          items:
+            type: object
+            required:
+            - taxLot
+            properties:
+              taxLot:
+                $ref: '#/components/schemas/TaxLot'
+              quantity:
+                type: integer
+                format: int64
+    Ref.FuelType:
+      type: string
+      description: Ref.Data.REC_FUEL_TYPE
+    VoluntaryEligibility:
+      type: object
+      description: Object to hold full voluntary eligibility information - type of eligibility, effective date, expiration, extendable with other information
+      properties:
+        name:
+          type: string
+          description: The name of the registry voluntary eligibility.
+        type:
+          $ref: '#/components/schemas/Ref.VoluntaryEligibilityType'
+        effectiveDate:
+          type: string
+          format: date-time
+          description: The effective date of the eligibility.
+        expirationDate:
+          type: string
+          format: date-time
+          description: the expiration date of the eligibility.
+    Ref.StateEligibilityType:
+      type: string
+      description: The type of the state eligibility. Ref.Data.REC_STATE_ELIGIBILITY
+    IssuanceCertification:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/Ref.Certification'
+        vintageYears:
+          type: array
+          description: Vintage years.
+          items:
+            type: integer
+            format: int32
+    Ref.Program:
+      type: string
+      description: Ref.Data.PROGRAM
+    Ref.ResourceOutType:
+      type: string
+      description: Ref.Data.RESOURCE_OUTPUT_TYPE
+    MarketModelInstrumentPrice:
+      properties:
+        amount:
+          type: number
+          format: double
+          description: Amount.
+        currency:
+          $ref: '#/components/schemas/Ref.Currency'
+        lastUpdatedDate:
+          type: string
+          format: date-time
+          description: Last updated date-time.
+    Resource:
+      type: object
+      required:
+      - name
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: The unique XC db identifier for the project or generator.
+        upn:
+          type: string
+          description: 'Universal Project Identifier. The unique identifier assigned by Xpansiv Connect to every resource across all registries that  have integrated with the Xpansiv Connect platform.
+
+            '
+        name:
+          type: string
+          description: The registry assigned name of the project or generator.
+    ProjectCertification:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/Ref.Certification'
+        projectCertificationDateRanges:
+          type: array
+          items:
+            type: object
+            properties:
+              certificationStart:
+                type: string
+                format: date-time
+                description: The project certification start date.
+              certificationEnd:
+                type: string
+                format: date-time
+                description: The project certification end date.
+  parameters:
+    RetirementProgramCode:
+      description: Program code allowed for retirements. Ref.Data.RETIREMENT_PROGRAM
+      name: RetirementProgramCode
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Ref.RetirementProgramCode'
+    ExecutionVenueCode:
+      name: ExecutionVenueCode
+      description: Ref.Data.EXECUTION_VENUE
+      in: path
+      required: true
+      schema:
+        type: string
+    AccountIdentifier:
+      description: Account identifier
+      name: AccountIdentifier
+      example: 098B0A25
+      in: path
+      required: true
+      schema:
+        type: string
+    ProgramCode:
+      name: ProgramCode
+      description: Any program code. Ref.Data.PROGRAM
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Ref.Program'
+    ExchangeCode:
+      name: ExchangeCode
+      description: Exchange code
+      in: path
+      required: true
+      schema:
+        type: string
+        example: CBL , RVCMC
+  responses:
+    '401':
+      description: Not authorized error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotAuthorizedError'
+    '404':
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotFoundError'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
+  securitySchemes:
+    bearerToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

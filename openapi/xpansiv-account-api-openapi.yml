@@ -1,0 +1,599 @@
+openapi: 3.2.0
+info:
+  title: Xpansiv Account API
+  version: '1.0'
+  description: 'Operations tagged account across 2 of this provider''s published API definitions: nar-registry-client-v1_nar.client.v1.openapi.yaml, xpansiv-connect-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://narenewables2.apx.com/ClientAPI
+  description: Generated server url
+- url: https://sandbox.preprod.connect.xpansiv.com/app/api/v1
+  description: SANDBOX
+- url: https://uat.preprod.connect.xpansiv.com/app/api/v1
+  description: UAT
+- url: https://connect.xpansiv.com/app/api/v1
+  description: PROD
+tags:
+- name: Account
+  description: Account Information
+paths:
+  /api/account/counterparty:
+    get:
+      tags:
+      - Account
+      summary: Counterparties
+      description: A request to retrieve a list of accounts in the registry that are valid for certificate transfers. This should be all NAR accounts that can buy or sell certificates (this will not include MA Biomass accounts).
+      operationId: getCounterparties
+      parameters:
+      - name: counterpartyAccountIds
+        in: query
+        description: 'Counterparty account ids: if specified, limits the results to the counterparty accounts whose ids match the provided set'
+        required: false
+        schema:
+          type: array
+          items:
+            type: integer
+            format: int32
+      - name: $filter
+        in: query
+        description: OData-like filter expression
+        required: false
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: Comma-separated list of columns for sorting
+        required: false
+        schema:
+          type: string
+      - name: $skip
+        in: query
+        description: Number of records to skip
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: $top
+        in: query
+        description: Maximum number of records to return
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: $apply
+        in: query
+        description: OData-like apply expression with groupby and aggregate only
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ODataEnvelopeWithTotalCountOfCounterparty'
+        '400':
+          description: Invalid parameter(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '403':
+          description: Permission denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '429':
+          description: Server too busy or acceptable use policy violation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '500':
+          description: An unexpected error has occurred
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+      security:
+      - JWT: []
+    servers:
+    - url: https://narenewables2.apx.com/ClientAPI
+      description: Generated server url
+  /account/{AccountIdentifier}/program/{ProgramCode}/subaccounts:
+    get:
+      tags:
+      - Account
+      operationId: getSubAccountsByProgram
+      summary: Get sub-accounts
+      description: Get sub-accounts for a given account and program
+      parameters:
+      - $ref: '#/components/parameters/AccountIdentifier'
+      - $ref: '#/components/parameters/ProgramCode'
+      responses:
+        '200':
+          description: List of sub-accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - code
+                  - name
+                  - subAccountType
+                  - active
+                  - public
+                  properties:
+                    code:
+                      type: string
+                      description: Unique identifier.
+                    name:
+                      type: string
+                      description: Name of the Sub-Account in the registry.
+                    subAccountType:
+                      $ref: '#/components/schemas/Ref.SubAccountType'
+                    active:
+                      type: boolean
+                      description: True/False.
+                    public:
+                      type: boolean
+                      description: True/False.
+                    complianceStatus:
+                      $ref: '#/components/schemas/Ref.ComplianceStatus'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                    - INVALID_PROGRAM
+                  message:
+                    type: string
+                  field:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+      - bearerToken: []
+    servers:
+    - url: https://sandbox.preprod.connect.xpansiv.com/app/api/v1
+      description: SANDBOX
+    - url: https://uat.preprod.connect.xpansiv.com/app/api/v1
+      description: UAT
+    - url: https://connect.xpansiv.com/app/api/v1
+      description: PROD
+  /account/{AccountIdentifier}:
+    get:
+      summary: Search for account
+      tags:
+      - Account
+      operationId: accountSearch
+      parameters:
+      - $ref: '#/components/parameters/AccountIdentifier'
+      - $ref: '#/components/parameters/Include'
+      responses:
+        '200':
+          description: Account found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                    - INVALID_REQUEST
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+      security:
+      - bearerToken: []
+    servers:
+    - url: https://sandbox.preprod.connect.xpansiv.com/app/api/v1
+      description: SANDBOX
+    - url: https://uat.preprod.connect.xpansiv.com/app/api/v1
+      description: UAT
+    - url: https://connect.xpansiv.com/app/api/v1
+      description: PROD
+components:
+  schemas:
+    ErrorItem:
+      required:
+      - message
+      type: object
+      properties:
+        parameter:
+          type: string
+          description: The parameter in error, if applicable
+        correlationId:
+          type: string
+          description: The correlation identifier from the input
+        path:
+          type: string
+          description: The path to the field specifically in error, if applicable
+        field:
+          type: string
+        code:
+          type: string
+          description: The field in error, if applicable
+        message:
+          type: string
+          description: The error code
+      description: Describes a specific error
+    ErrorContainer:
+      type: object
+      properties:
+        submissionId:
+          type: string
+          description: Submission identifier for issue investigation
+        errors:
+          type: array
+          description: List of errors
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+      description: Container for errors
+    Counterparty:
+      required:
+      - accountId
+      - accountType
+      - name
+      type: object
+      properties:
+        accountId:
+          type: integer
+          description: The account identifier
+          format: int32
+          example: '55'
+        name:
+          type: string
+          description: The account name
+          example: Acme Corp.
+        accountType:
+          type: string
+          description: The account type
+          example: General Account
+        website:
+          type: string
+          description: The account website
+          example: acmecorp.com
+        isTransferor:
+          type: boolean
+          description: Indicates whether the account is eligible to sell certificates.
+        isTransferee:
+          type: boolean
+          description: Indicates whether the account is eligible to buy certificates.
+      description: Counterparty information
+    ODataEnvelopeWithTotalCountOfCounterparty:
+      required:
+      - countExceeded
+      - value
+      type: object
+      properties:
+        '@count':
+          type: integer
+          format: int32
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Counterparty'
+        totalCount:
+          type: integer
+          format: int32
+        countExceeded:
+          type: boolean
+      description: Container for OData-like rows of information with count
+    Ref.RegistryLinkStatus:
+      type: string
+      description: Ref.Data.REGISTRY_LINK_STATUS
+    CustodianAccountServiceAttributes:
+      title: CustodianAccountServiceAttributes
+      type: object
+      description: 'Attributes for account service with `type` CUSTODIAN_SERVICE.
+
+        '
+      required:
+      - custodianProgramCode
+      - manualReplicaMode
+      - externalTransferAutoApproval
+      properties:
+        custodianProgramCode:
+          $ref: '#/components/schemas/Ref.CustodianProgram'
+        manualReplicaMode:
+          type: boolean
+          description: if set true - manual replica mode will be enabled
+        ledgerCode:
+          type: string
+        ledgerIdentifier:
+          type: string
+        accountHoldingsIdentifier:
+          type: string
+          description: account identifier on custodian program
+        accountHoldingsName:
+          type: string
+          description: account name on custodian program
+        replicaTargetSubaccountIdentifier:
+          type: string
+          description: default subaccount identifier to propagate replicas to
+        externalTransferAutoApproval:
+          type: boolean
+        retirementOperationsNotificationEmails:
+          type: array
+          description: Optional addresses that receive a copy of retirement notifications, merged with user-supplied email.
+          items:
+            type: string
+    AccountService:
+      type: object
+      description: 'Canonical account service response (`id`, `status`, `type`, optional `attributes`). Used on `Account.services` and on standalone service-account endpoints. Polymorphism is on `attributes`, selected implicitly by `type`. If the service has no typed attributes (any `type` other than ACX, SUBACCOUNT_SERVICE, or CUSTODIAN_SERVICE), do not display `attributes` — omit the field, or return it as an empty object.
+
+        '
+      required:
+      - id
+      - status
+      - type
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          type: string
+          description: Ref.Data.SERVICE_ACCOUNT_STATUS
+          example: APPROVED
+          readOnly: true
+        type:
+          type: string
+          example: ACX
+          description: Ref.Data.SERVICE_TYPE
+        attributes:
+          $ref: '#/components/schemas/AccountServiceAttributes'
+    SubaccountAccountServiceAttributes:
+      title: SubaccountAccountServiceAttributes
+      type: object
+      description: 'Attributes for account service with `type` SUBACCOUNT_SERVICE.
+
+        '
+      required:
+      - custodianEmaAccountIdentifier
+      - autoDeposit
+      properties:
+        custodianEmaAccountIdentifier:
+          type: string
+          description: The EMA account identifier of the custodian account
+        autoDeposit:
+          type: boolean
+          description: If set true - auto deposit mode will be enabled
+        retirementSubaccountCodes:
+          type: object
+          description: Mapping of a program code to a list of retirement subaccounts. Program codes are taken from ReferenceData.Program
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          example:
+            ACR:
+            - '12345'
+            CAR: []
+            VCS:
+            - '43134'
+            - '32141'
+        linkedRegistryAccountIds:
+          type: object
+          description: Mapping of a program code to a registry account id. Program codes are taken from ReferenceData.Program
+          additionalProperties:
+            type: string
+            description: Registry account id
+          example:
+            ACR: 098765
+            CAR: null
+            VCS: '567890'
+    NotAuthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+    Ref.SubAccountType:
+      type: string
+      description: Type of registry sub-account. Ref.Data.SUBACCOUNT_REGISTRY_TYPE
+    Ref.OrganizationLegalStructure:
+      type: string
+      example: PRIVATELY_OWNED_CORP
+      description: Ref.Data.ORGANIZATION_LEGAL_STRUCTURE
+    Ref.ComplianceStatus:
+      type: string
+      description: Flag for whether sub-account is for compliance retirement activity. Ref.Data.COMPLIANCE_STATUS
+    Organization:
+      type: object
+      required:
+      - legalName
+      - structure
+      - type
+      properties:
+        iamOrgId:
+          type: string
+        legalName:
+          type: string
+          example: RVCMC Sub Default
+        structure:
+          $ref: '#/components/schemas/Ref.OrganizationLegalStructure'
+        type:
+          $ref: '#/components/schemas/Ref.OrganizationType'
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+    Ref.CustodianProgram:
+      type: string
+      description: Ref.Data.CUSTODIAN_PROGRAM
+    AcxAccountServiceAttributes:
+      title: AcxAccountServiceAttributes
+      type: object
+      description: 'Attributes for account service with `type` ACX.
+
+        '
+      required:
+      - acxAccountIdentifier
+      properties:
+        acxAccountIdentifier:
+          type: string
+    AccountRegistryLink:
+      type: object
+      required:
+      - id
+      - program
+      - registryAccountId
+      - status
+      properties:
+        id:
+          type: integer
+          format: int64
+        program:
+          $ref: '#/components/schemas/Ref.Program'
+        registryAccountId:
+          type: string
+        status:
+          $ref: '#/components/schemas/Ref.RegistryLinkStatus'
+        lastSyncDate:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: 'Incremental sync watermark (RFC 3339 date-time), equivalent to the server''s sync time identifier used for incremental sync. Omitted or null when the registry link has never been synced.
+
+            '
+    Ref.Program:
+      type: string
+      description: Ref.Data.PROGRAM
+    Ref.OrganizationType:
+      type: string
+      example: BROKER
+      description: Ref.Data.ORGANIZATION_TYPE
+    AccountServiceAttributes:
+      title: AccountServiceAttributes
+      description: 'Shape is determined by the parent service `type` (Ref.ServiceType), using mapping: ACX → AcxAccountServiceAttributes; SUBACCOUNT_SERVICE → SubaccountAccountServiceAttributes; CUSTODIAN_SERVICE → CustodianAccountServiceAttributes. If there are no service attributes (all other service types), do not display this object — omit `attributes`, or return `attributes` as an empty object.
+
+        '
+      oneOf:
+      - $ref: '#/components/schemas/AcxAccountServiceAttributes'
+      - $ref: '#/components/schemas/SubaccountAccountServiceAttributes'
+      - $ref: '#/components/schemas/CustodianAccountServiceAttributes'
+    Ref.AccountStatus:
+      type: string
+      example: APPROVED
+      description: Ref.Data.ACCOUNT_STATUS
+    Account:
+      type: object
+      required:
+      - id
+      - identifier
+      - noOfUsers
+      - status
+      - maxUsers
+      - childAccounts
+      - registryLinks
+      - organization
+      - services
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        identifier:
+          type: string
+          readOnly: true
+          example: 0980A123
+        noOfUsers:
+          type: integer
+          format: int64
+        status:
+          $ref: '#/components/schemas/Ref.AccountStatus'
+        maxUsers:
+          type: number
+        childAccounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Account'
+        registryLinks:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountRegistryLink'
+        organization:
+          $ref: '#/components/schemas/Organization'
+        services:
+          type: array
+          description: 'Service accounts for this EMA account. Each item is an `AccountService`
+
+            '
+          items:
+            $ref: '#/components/schemas/AccountService'
+  responses:
+    '401':
+      description: Not authorized error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotAuthorizedError'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
+  parameters:
+    AccountIdentifier:
+      description: Account identifier
+      name: AccountIdentifier
+      example: 098B0A25
+      in: path
+      required: true
+      schema:
+        type: string
+    ProgramCode:
+      name: ProgramCode
+      description: Any program code. Ref.Data.PROGRAM
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Ref.Program'
+    Include:
+      name: include
+      description: Comma-separated values from optional response fields
+      in: query
+      required: false
+      schema:
+        type: string
+  securitySchemes:
+    JWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    bearerToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- nar-registry-client-v1_nar.client.v1.openapi.yaml
+- xpansiv-connect-openapi.yml

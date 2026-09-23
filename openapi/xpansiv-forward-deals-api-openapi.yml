@@ -1,0 +1,495 @@
+openapi: 3.2.0
+info:
+  description: 'This is the OpenAPI spec for Xpansiv Connect API. Documentation: https://developer.xpansiv.com/developer-portal/'
+  title: Xpansiv Connect Forward Deals API
+  version: 1.0.0-beta
+servers:
+- url: https://sandbox.preprod.connect.xpansiv.com/app/api/v1
+  description: SANDBOX
+- url: https://uat.preprod.connect.xpansiv.com/app/api/v1
+  description: UAT
+- url: https://connect.xpansiv.com/app/api/v1
+  description: PROD
+security:
+- bearerToken: []
+tags:
+- name: Forward Deals
+  description: The Forward Deals API allows the user to search The Forward Deals associated with their Xpansiv Connect account and/or other Xpansiv Connect accounts that have granted their user that access. Forward Deal information is returned based on a Deal's last updated date. Note that this call has a number of optional fields that the users needs to include if desired in the output.
+paths:
+  /forward-deals/account/{AccountIdentifier}/action/search:
+    post:
+      tags:
+      - Forward Deals
+      operationId: searchForwardDeals
+      summary: Search forward deals
+      parameters:
+      - $ref: '#/components/parameters/AccountIdentifier'
+      - $ref: '#/components/parameters/PageNumber'
+      - $ref: '#/components/parameters/PageSize'
+      - $ref: '#/components/parameters/Include'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                programs:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Ref.Program'
+                lastUpdatedDateFrom:
+                  type: string
+                  format: date-time
+                lastUpdatedDateTo:
+                  type: string
+                  format: date-time
+                counterpartyName:
+                  type: string
+                  description: If this search parameter is passed as ““  then deals with no counterparty identifier specified will be returned.
+                dealName:
+                  type: string
+      responses:
+        '200':
+          description: List of forward deals
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Page'
+                - type: object
+                  properties:
+                    content:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: Name of the forward deal.
+                          memo:
+                            type: string
+                            description: Memo if provided by the XC user.
+                          executionDate:
+                            type: string
+                            format: date-time
+                            description: Execution date.
+                          externalDealId:
+                            type: string
+                            description: Optional external ID.
+                          type:
+                            $ref: '#/components/schemas/Ref.ForwardDealType'
+                          status:
+                            $ref: '#/components/schemas/Ref.ForwardDealStatus'
+                          transactionSideType:
+                            $ref: '#/components/schemas/Ref.TransactionSideType'
+                          program:
+                            $ref: '#/components/schemas/Ref.Program'
+                          vintageType:
+                            $ref: '#/components/schemas/Ref.VintageType'
+                          createdBy:
+                            type: string
+                            description: Created by id.
+                          trader:
+                            type: string
+                            description: Trader name associated with the deal.
+                          privateCounterpartyDetails:
+                            type: object
+                            properties:
+                              contactName:
+                                type: string
+                                description: Optional contact name.
+                              name:
+                                type: string
+                                description: Optional counterparty name.
+                              tradeDate:
+                                type: string
+                                format: date-time
+                                description: Optional trade date.
+                              contractNumber:
+                                type: string
+                                description: Optional contract number.
+                          unitOfMeasure:
+                            $ref: '#/components/schemas/Ref.UnitOfMeasure'
+                          counterpartyName:
+                            type: string
+                            description: Name of the counterparty in the registry for this deal.
+                          brokerDetails:
+                            type: object
+                            properties:
+                              identifier:
+                                type: string
+                                description: Broker id.
+                              name:
+                                type: string
+                                description: Broker name.
+                              fee:
+                                allOf:
+                                - $ref: '#/components/schemas/Price'
+                                description: Broker fee.
+                          lastUpdatedDate:
+                            type: string
+                            format: date-time
+                            description: Last updated date.
+                          forwardPortfolio:
+                            type: object
+                            properties:
+                              identifier:
+                                type: string
+                              name:
+                                type: string
+                          confirmDetails:
+                            type: object
+                            properties:
+                              comments:
+                                type: string
+                                description: Comments associated with the confirm action if provided by the XC client.
+                              brokerInWriting:
+                                type: boolean
+                                description: Flag for if confirm was agreed with broker in writing.
+                              receivedDate:
+                                type: string
+                                format: date-time
+                                description: Date the confirm was received.
+                              executionDate:
+                                type: string
+                                format: date-time
+                                description: Date of deal execution related to this confirm action.
+                          statusEvents:
+                            type: array
+                            items:
+                              type: object
+                              allOf:
+                              - $ref: '#/components/schemas/ForwardStatusEvent'
+                              properties:
+                                type:
+                                  $ref: '#/components/schemas/Ref.ForwardDealStatus'
+                            description: Optional property. Use `include` param.
+                          forwardTransactions:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                identifier:
+                                  type: string
+                                  description: Unique identifier.
+                                deliveryDate:
+                                  type: string
+                                  format: date-time
+                                  description: Schedule delivery date.
+                                quantity:
+                                  type: integer
+                                  format: int64
+                                  description: Scheduled delivery quantity.
+                                quantityType:
+                                  $ref: '#/components/schemas/Ref.ForwardTransactionQuantityType'
+                                status:
+                                  $ref: '#/components/schemas/Ref.ForwardTransactionStatus'
+                                deliveryScheduleType:
+                                  $ref: '#/components/schemas/Ref.ForwardDeliveryScheduleType'
+                                contractedDetails:
+                                  $ref: '#/components/schemas/ForwardContract'
+                                deliveredDetails:
+                                  $ref: '#/components/schemas/ForwardContract'
+                                netOpenVolume:
+                                  type: integer
+                                  format: int64
+                                  description: Remaining open volume.
+                                createdDate:
+                                  type: string
+                                  format: date-time
+                                  description: Delivery created date.
+                                lastUpdatedDate:
+                                  type: string
+                                  format: date-time
+                                  description: Delivery last updated date.
+                                forwardInstrument:
+                                  type: object
+                                  properties:
+                                    type:
+                                      type: string
+                                    deliveryDateRange:
+                                      $ref: '#/components/schemas/ForwardDateRange'
+                                  discriminator:
+                                    propertyName: type
+                                    mapping:
+                                      BUNDLE: '#/components/schemas/ForwardInstrumentAttributeBundle'
+                                      MMI: '#/components/schemas/ForwardInstrumentMarketModelInstrument'
+                                  oneOf:
+                                  - $ref: '#/components/schemas/ForwardInstrumentAttributeBundle'
+                                  - $ref: '#/components/schemas/ForwardInstrumentMarketModelInstrument'
+                                deliveryNotes:
+                                  type: string
+                                statusEvents:
+                                  type: array
+                                  items:
+                                    type: object
+                                    allOf:
+                                    - $ref: '#/components/schemas/ForwardStatusEvent'
+                                    properties:
+                                      type:
+                                        $ref: '#/components/schemas/Ref.ForwardTransactionStatus'
+                                  description: Optional property. Use `include` param. Status event types.
+                                linkedTransfers:
+                                  type: array
+                                  items:
+                                    type: string
+                                  description: 'Optional property. Use `include` param. Each value represents a transaction ID for the linked  transfer.
+
+                                    '
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                    - INVALID_REQUEST
+                    - INVALID_PROGRAM
+                    - INVALID_DATE_RANGE
+                    - INVALID_PAGE_SIZE
+                    - INVALID_PAGE_NUMBER
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+components:
+  parameters:
+    PageSize:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    AccountIdentifier:
+      description: Account identifier
+      name: AccountIdentifier
+      example: 098B0A25
+      in: path
+      required: true
+      schema:
+        type: string
+    PageNumber:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    Include:
+      name: include
+      description: Comma-separated values from optional response fields
+      in: query
+      required: false
+      schema:
+        type: string
+  schemas:
+    Ref.Currency:
+      description: Ref.Data.CURRENCY
+      type: string
+      minLength: 3
+      example: USD
+    Ref.ForwardDeliveryScheduleType:
+      type: string
+      description: Delivery schedule type. Ref.Data.FORWARD_DEAL_DELIVERY_SCHEDULE_TYPE
+    Ref.ForwardTransactionQuantityType:
+      type: string
+      description: Quantity type. Ref.Data.FORWARD_DEAL_QUANTITY_TYPE
+    Ref.TransactionSideType:
+      type: string
+      description: Buy or Sell. Ref.Data.FORWARD_DEAL_TRANSACTION_TYPE
+    Page:
+      type: object
+      required:
+      - page
+      - size
+      - totalPages
+      - totalElements
+      properties:
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+    ForwardStatusEvent:
+      type: object
+      properties:
+        action:
+          type: string
+          description: Action for the statusEvent.
+        notes:
+          type: string
+          description: Notes for the statusEvent.
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp for the statusEvent.
+        user:
+          type: string
+          description: User for the statusEvent.
+    NotAuthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+    ForwardInstrumentMarketModelInstrument:
+      type: object
+      properties:
+        type:
+          type: string
+          default: MMI
+        marketModelInstrument:
+          type: object
+          properties:
+            dateRange:
+              $ref: '#/components/schemas/ForwardDateRange'
+            market:
+              $ref: '#/components/schemas/ForwardMarket'
+    ForwardContract:
+      type: object
+      properties:
+        volume:
+          type: integer
+          format: int64
+          description: Delivered volume.
+        unitPrice:
+          allOf:
+          - $ref: '#/components/schemas/Price'
+          description: Delivered price.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/Price'
+          description: Delivered value.
+    Ref.ForwardDealType:
+      type: string
+      default: PHYSICAL
+      description: Type of deal as either Market or Project Specific. Ref.Data.FORWARD_DEAL_TYPE
+    Ref.VintageType:
+      type: string
+      description: Ref.Data.FORWARD_DEAL_VINTAGE_TYPE
+    ForwardInstrumentAttributeBundle:
+      type: object
+      properties:
+        type:
+          type: string
+          default: BUNDLE
+        attributeBundle:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Bundle name.
+            dateRange:
+              $ref: '#/components/schemas/ForwardDateRange'
+            market:
+              $ref: '#/components/schemas/ForwardMarket'
+            projects:
+              type: array
+              items:
+                type: object
+                properties:
+                  upn:
+                    type: string
+                    description: 'Universal Project Identifier. The unique identifier assigned to every resource across all registries that  have integrated with Xpansiv Connect.
+
+                      '
+                  fuelType:
+                    $ref: '#/components/schemas/ForwardFuelType'
+    ForwardDateRange:
+      type: object
+      properties:
+        startMonth:
+          type: integer
+          format: int32
+          description: Month of delivery start.
+        startYear:
+          type: integer
+          format: int32
+          description: Year of delivery start.
+        endMonth:
+          type: integer
+          format: int32
+          description: Month of delivery end.
+        endYear:
+          type: integer
+          format: int32
+          description: Year of delivery end.
+    ForwardFuelType:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/Ref.FuelType'
+        registryCode:
+          type: string
+          description: Registry fuel type code.
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+    Ref.UnitOfMeasure:
+      type: string
+      description: Unit of measure. Ref.Data.UNIT_OF_MEASURE
+    Price:
+      type: object
+      required:
+      - currency
+      - amount
+      properties:
+        currency:
+          $ref: '#/components/schemas/Ref.Currency'
+        amount:
+          type: number
+          description: The numeric value of the price
+          minimum: 0
+    Ref.ForwardTransactionStatus:
+      type: string
+      description: Delivery status. Ref.Data.FORWARD_DEAL_TRANSACTION_STATUS
+    Ref.FuelType:
+      type: string
+      description: Ref.Data.REC_FUEL_TYPE
+    Ref.ForwardDealStatus:
+      type: string
+      description: Ref.Data.FORWARD_DEAL_STATUS
+    Ref.Program:
+      type: string
+      description: Ref.Data.PROGRAM
+    ForwardMarket:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Instrument code.
+        name:
+          type: string
+          description: Instrument name.
+  responses:
+    '401':
+      description: Not authorized error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotAuthorizedError'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
+  securitySchemes:
+    bearerToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

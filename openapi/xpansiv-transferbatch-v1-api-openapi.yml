@@ -1,0 +1,919 @@
+openapi: 3.2.0
+info:
+  title: Transfer Position External Transferbatch V1 API
+  description: Use API credentials to view and manage instruments.
+  version: 1.0.0
+servers:
+- url: https://optimalapi-ext.apx.com/transfer/v1
+- url: https://optimalapi-uat-ext.apx.com/transfer/v1
+tags:
+- name: transferbatch-v1
+  description: Initiate a transfer request (between subaccounts or another account holder), view or act upon pending transfers, as well as view historical transfer details.
+paths:
+  /api/ledger/{ledgerIdentifier}/transfer:
+    post:
+      tags:
+      - transferbatch-v1
+      summary: Initiate counterparty transfer
+      description: Initiate transfer will propose the transaction to the counterparty, after which the counterparty will be prompted to act on the proposal.
+      operationId: initiateAccountTransfers
+      parameters:
+      - name: ledgerIdentifier
+        in: path
+        description: Ledger identifier, can be found using /api/ledger endpoint
+        required: true
+        schema:
+          type: string
+          format: uuid
+        example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      requestBody:
+        description: Bulk Transfer Request payload
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkTransferRequest'
+        required: true
+      responses:
+        '200':
+          description: success
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BulkTransferResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/GeneralError'
+                - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger/{ledgerIdentifier}/transferBatch/open/action:
+    post:
+      tags:
+      - transferbatch-v1
+      summary: Act on a proposed transfer
+      description: Actions include accept, reject or withdrawal of a proposed transfer, using the transfer batch identifier.
+      operationId: acknowledgeTransferBatches
+      parameters:
+      - name: ledgerIdentifier
+        in: path
+        description: Ledger identifier, can be found using /api/ledger endpoint
+        required: true
+        schema:
+          type: string
+          format: uuid
+        example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      requestBody:
+        description: Populated ActionTransferBatches payload
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActionTransferBatches'
+        required: true
+      responses:
+        '200':
+          description: success
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/GeneralError'
+                - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger/{ledgerIdentifier}/transferBatch/byIdentifier:
+    post:
+      tags:
+      - transferbatch-v1
+      summary: Retrieve transfer request details
+      description: View the details behind a transfer request, using the transfer batch identifier.
+      operationId: getTransferBatchesByIdentifier
+      parameters:
+      - name: ledgerIdentifier
+        in: path
+        description: Ledger identifier, can be found using /api/ledger endpoint
+        required: true
+        schema:
+          type: string
+          format: uuid
+        example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      requestBody:
+        description: Populated TransferBatchRetrieveByIdentifierRequest
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferBatchRetrieveByIdentifierRequest'
+        required: true
+      responses:
+        '200':
+          description: success
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TransferBatchRetrieveByIdentifierResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/GeneralError'
+                - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger/{ledgerIdentifier}/transfer/subaccount:
+    post:
+      tags:
+      - transferbatch-v1
+      summary: Transfer holdings between subaccounts
+      description: Transfers holdings between active subaccounts, within the same account.
+      operationId: initiateSubaccountTransfers
+      parameters:
+      - name: ledgerIdentifier
+        in: path
+        description: Ledger identifier, can be found using /api/ledger endpoint
+        required: true
+        schema:
+          type: string
+          format: uuid
+        example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      requestBody:
+        description: Bulk Subaccount Transfer request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkSubaccountTransferRequest'
+        required: true
+      responses:
+        '200':
+          description: success
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BulkSubaccountTransferResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/GeneralError'
+                - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger/{ledgerIdentifier}/transferBatch/open:
+    get:
+      tags:
+      - transferbatch-v1
+      summary: Retrieve pending transfer requests
+      description: Retrieve list of currently pending transfers.
+      operationId: getOpenTransferBatches
+      parameters:
+      - name: ledgerIdentifier
+        in: path
+        description: Ledger identifier, can be found using /api/ledger endpoint
+        required: true
+        schema:
+          type: string
+          format: uuid
+        example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      - name: direction
+        in: query
+        description: Specify whether you want only "in"bound or "out"bound pending transfers. If omitted, both types will be returned.
+        required: false
+        schema:
+          type: string
+          enum:
+          - in
+          - out
+        example: direction="in"
+      - name: includeHoldings
+        in: query
+        description: Include transfer related holdings details
+        required: false
+        schema:
+          type: boolean
+        example: ?includeHoldings=true
+      - name: onBehalfOfSrcAcctId
+        in: query
+        description: If permitted, allows the caller to retrieve open transfer batches on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
+        required: false
+        schema:
+          type: string
+      - name: $skip
+        in: query
+        description: Number of records to skip
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: $top
+        in: query
+        description: Maximum number of records to return
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: $filter
+        in: query
+        description: OData-like filter expression
+        required: false
+        schema:
+          type: string
+      - name: $apply
+        in: query
+        description: OData-like apply expression with groupby and aggregate only
+        required: false
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: Comma-separated list of columns for sorting
+        required: false
+        schema:
+          type: string
+      - name: $count
+        in: query
+        description: Whether to include the count of records with the result
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: transfer batches retrieved
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OpenTransferBatchResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/GeneralError'
+                - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+components:
+  schemas:
+    BulkSubaccountTransferRequest:
+      type: object
+      properties:
+        onBehalfOfSrcAcctId:
+          type: string
+          description: If permitted, allows the caller to initiate subaccount transfers on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
+        requests:
+          type: array
+          description: Collection of Subaccount transfer requests
+          items:
+            $ref: '#/components/schemas/SubaccountTransferRequest'
+      description: Sub-account bulk transfer request
+    ProtocolVersion:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Protocol code
+          example: AMS-I.D.
+        version:
+          type: string
+          description: Version of Protocol
+          example: 1.0.0
+        effectiveAt:
+          type: string
+          description: Start date of the Protocol Version
+          format: date-time
+        expiresAt:
+          type: string
+          description: End date of the Protocol Version
+          format: date-time
+        issuing:
+          type: boolean
+          description: Issuing/Adorning flag
+    BulkTransferResponse:
+      type: object
+      properties:
+        responses:
+          type: array
+          description: Bulk Transfer Response
+          items:
+            $ref: '#/components/schemas/InteraccountTransferResponse'
+      description: Bulk Transfer Response
+    ErrorContainer:
+      type: object
+      properties:
+        submissionId:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+    ActionTransferBatches:
+      type: object
+      properties:
+        onBehalfOfSrcAcctId:
+          type: string
+          description: If permitted, allows the caller to perform actions on open transfer batches on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
+        action:
+          type: string
+          description: Specifies code of action to take; same action for all transfer batches included in "items".
+          example: WITHDRAW
+          enum:
+          - CONFIRM
+          - WITHDRAW
+          - REJECT
+        items:
+          type: array
+          description: List of transfer batch identifiers
+          items:
+            $ref: '#/components/schemas/ActionTransferBatchItem'
+    GeneralError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
+    ReferenceDatum:
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: The reference data's value.
+        name:
+          type: string
+          description: The reference data's name
+      description: A reference datum data object
+    QuantifiedHolding:
+      type: object
+      properties:
+        holdingIdentifier:
+          type: string
+          description: Holding Identifier, as returned by the holdings API
+          example: '476099'
+        quantity:
+          type: number
+          description: Quantity of holding to be used in this operation
+          example: 3
+      description: Quantified Holding
+    ActionTransferBatchItem:
+      type: object
+      properties:
+        batchIdentifier:
+          type: string
+          description: The system identifier for a specific transfer batch
+          example: 7644439A-A56B-45E5-AFE6-94E149CF014E
+    OpenTransferBatchResponse:
+      type: object
+      properties:
+        inbound:
+          type: array
+          description: Inbound transfer batches that are visible-to-the-caller; as the transfer recipient, the API user can usually accept or reject.
+          items:
+            $ref: '#/components/schemas/TransferBatch'
+        outbound:
+          type: array
+          description: Outbound transfer batches that are visible-to-the-caller; as the transfer initiator, the API user can usually withdraw.
+          items:
+            $ref: '#/components/schemas/TransferBatch'
+      description: Includes visible-to-the-caller transfer batches – both incoming and outgoing. If includeHoldings = true, it has the holding collection associated with each of those transfer batches is populated with the holding details
+    BulkSubaccountTransferResponse:
+      type: object
+      properties:
+        responses:
+          type: array
+          description: Bulk Subaccount Transfer response
+          items:
+            $ref: '#/components/schemas/SubaccountTransferResponse'
+    SubaccountTransferResponse:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: Matches the correlationId provided in the subaccount transfer request.
+        transferBatchIdentifier:
+          type: string
+          description: Transfer batch identifier for the Subaccount Transfer Batch associated with subaccount transfer
+      description: Sub-account bulk transfer response
+    ErrorItem:
+      type: object
+      properties:
+        parameter:
+          type: string
+        correlationId:
+          type: string
+        path:
+          type: string
+        field:
+          type: string
+        code:
+          type: string
+        message:
+          type: string
+    Holding:
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: The holding's system-assigned identifier.
+        resourceProgramAssignedIdentifier:
+          type: string
+          description: The associated resource's program assigned identifier.
+          example: GHG1021
+        holdingStatus:
+          $ref: '#/components/schemas/ReferenceDatum'
+        programPeriodBeginInclusive:
+          type: string
+          description: Start of program period (vintage) associated to the holding record's issuance.
+          format: date-time
+          example: '2022-01-01T00:00:00-05:00'
+        programPeriodEndExclusive:
+          type: string
+          description: End of program period (vintage) associated to the holding record's issuance.
+          format: date-time
+          example: '2023-01-01T00:00:00-05:00'
+        timeOfProductionBeginInclusive:
+          type: string
+          description: Start of production period associated to the holding's issuance
+          format: date-time
+          example: '2022-01-01T00:00:00-05:00'
+        timeOfProductionEndExclusive:
+          type: string
+          description: End of production period associated to the holding's issuance
+          format: date-time
+          example: '2023-01-01T00:00:00-05:00'
+        serialNumber:
+          type: string
+          description: The holding record's serial number.
+          example: APXOPCAR-GOC-GHG1021-US-2022--46-5701-6700
+        quantity:
+          type: number
+          description: The quantity of the holding record.
+          example: 1000
+        programVersions:
+          type: array
+          description: Associated programs and their versions.
+          items:
+            $ref: '#/components/schemas/ProgramVersion'
+        protocolVersions:
+          type: array
+          description: Associated protocols and their versions.
+          items:
+            $ref: '#/components/schemas/ProtocolVersion'
+        resourceInputTypeCodes:
+          type: array
+          description: A list of resource input types associated with the holding record's issuance.
+          items:
+            type: string
+        resourceOutputTypeCodes:
+          type: array
+          description: A list of resource output types associated with the holding record's issuance.
+          example: CARBON_REDUCTION
+          items:
+            type: string
+        subaccountIdentifier:
+          type: string
+          description: The  system-assigned identifier for the subaccount.
+          example: 5FF7ABAA-095D-11EF-B304-AA080FC10FFA
+        subaccountName:
+          type: string
+          description: Subaccount name, as inputted by subaccount owner.
+          example: My Linked Holdings
+        subaccountNumber:
+          type: string
+          description: Subaccount Id displayed on the Optimal Outcomes platform's UI.
+          example: '10033'
+        programCertificationGroupCode:
+          type: string
+          description: The issuing program certification group of the holding record.
+          example: NONAFOLU_GHG_MEASUREMENT_PROGRAM
+        upn:
+          type: string
+          description: Xpansiv Connect Universal Project Number (UPN) for Resource associated to the holding's issuance, if assigned.
+          example: 0999F5B4
+        ein:
+          type: string
+          description: Xpansiv Connect Environmental Instrument Number (EIN), if assigned.
+          example: 1246AFA3E2
+        einDescription:
+          type: string
+          description: Xpansiv Connect Environmental Instrument Number (EIN) details, if assigned
+          example: VCU-20120101-20121231-EDEM-3267-ZMB
+        shadowedLedgerName:
+          type: string
+          description: If shadowing = true, the external ledger's name.
+          example: Verra
+        managingExternalPlatformName:
+          type: string
+          description: If the holding is held in an external subaccount, the name of the managing external platform associated with the external subaccount.
+          example: Xpansiv Connect
+        holdingGroupIdentifier:
+          type: string
+          description: Identifier for grouped holdings in transfer operations, if applicable.
+        certificateType:
+          $ref: '#/components/schemas/ReferenceDatum'
+    TransferBatchRetrieveByIdentifierResponse:
+      type: object
+      properties:
+        transferBatches:
+          type: array
+          description: Collection of retrieved Transfer Batches
+          items:
+            $ref: '#/components/schemas/TransferBatch'
+    InteraccountTransferResponse:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: Matches the correlationId provided in the inter-account transfer request.
+          example: '1234'
+        transferIdentifier:
+          type: string
+          description: The transfer batch's system-assigned identifier used for programmatic (API) interactions.
+          example: 5A9BBB98-73E5-4226-B55E-1B4AABFE3CF3
+      description: Interaccount Transfer Response
+    TransferBatchRetrieveByIdentifierRequest:
+      type: object
+      properties:
+        onBehalfOfSrcAcctId:
+          type: string
+          description: If permitted, allows the caller to initiate transfer batches on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
+        transferBatchIdentifiers:
+          uniqueItems: true
+          type: array
+          description: System-assigned identifiers associated with the transfer batches to be retrieved.
+          items:
+            type: string
+        includeHoldings:
+          type: boolean
+          description: If true, include holding details in response. Defaults to true if not specified.
+    BulkTransferRequest:
+      type: object
+      properties:
+        onBehalfOfSrcAcctId:
+          type: string
+          description: If permitted, allows the caller to initiate transfer batches on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
+        requests:
+          type: array
+          description: Collection of Transfer requests
+          items:
+            $ref: '#/components/schemas/InteraccountTransferRequest'
+    InteraccountTransferRequest:
+      type: object
+      properties:
+        transfereeSrcAcctId:
+          type: string
+          description: System-assigned account Identifier of the transfer counterparty; recipient of the transfer request.
+          example: b5d8d6b3-bcaf-11ef-ae69-b61606fd520c
+        holdingCriteria:
+          type: array
+          description: Criteria for holdings to be associated with this transfer batch.
+          items:
+            $ref: '#/components/schemas/QuantifiedHolding'
+        correlationId:
+          type: string
+          description: Client system correlation Id – allows the caller to correlate between requests and responses
+        requestConfirmation:
+          type: boolean
+        toSubaccountIdentifier:
+          type: string
+          description: Identifier of the subaccount in the transferee (receiving) account into which to deposit the goods
+        totalPrice:
+          type: number
+          description: Indicates the total price of the transfer
+        currencyCode:
+          type: string
+          description: Indicates the currency of the price of the transfer
+        notes:
+          type: string
+          description: Contains the transfer notes
+      description: Interaccount Transfer Request
+    NamedProtocolVersion:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Protocol code
+          example: AMS-I.D.
+        version:
+          type: string
+          description: Version of Protocol
+          example: 1.0.0
+        effectiveAt:
+          type: string
+          description: Start date of the Protocol Version
+          format: date-time
+        expiresAt:
+          type: string
+          description: End date of the Protocol Version
+          format: date-time
+        issuing:
+          type: boolean
+          description: Issuing/Adorning flag
+        shortName:
+          type: string
+          description: Protocol's short name
+          example: AMS-I.D.
+    AbstractRestError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
+    TransferBatch:
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: The system identifier for this transfer batch
+          example: 5A9BBB98-73E5-4226-B55E-1B4AABFE3CF3
+        fromSrcAcctId:
+          type: string
+          description: The transfer sender's system account identifier.
+          example: 009560e5-b724-11ef-a5d7-ee1d7e0f0847
+        fromSrcAcctIdentifier:
+          type: string
+          description: The transfer sender's account id, as displayed in the UI.
+          example: '14990148'
+        fromName:
+          type: string
+          description: The transfer sender's account name.
+          example: GHG Ohio
+        toSrcAcctId:
+          type: string
+          description: The transfer recipient's system-assigned unique account identifier.
+          example: b5d8d6b3-bcaf-11ef-ae69-b61606fd520c
+        toSrcAcctIdentifier:
+          type: string
+          description: The transfer recipient's account id, as displayed on the registry.
+        toName:
+          type: string
+          description: The transfer recipient's account name.
+          example: GHG Trading
+        initiationDate:
+          type: string
+          description: Time-stamp for when the transfer batch was initiated.
+          format: date-time
+        quantity:
+          type: number
+          description: Total quantity associated with the transfer batch
+        externalId:
+          type: string
+          description: If applicable, transfer identifier on the external ledger.
+        unitPriceCurrencyShortName:
+          type: string
+          description: If applicable, the short name for currency associated with the transfer.
+          example: USD
+        unitPriceAmount:
+          type: number
+          description: If applicable, the unit price associate with the transfer.
+        notes:
+          type: string
+          description: If applicable, any notes associate with the transfer.
+        actions:
+          uniqueItems: true
+          type: array
+          description: List of transfer actions the API user has authorities to request.
+          items:
+            type: string
+            enum:
+            - CONFIRM
+            - WITHDRAW
+            - REJECT
+        holdings:
+          type: array
+          description: Collection of holdings associated with this transfer batch.
+          items:
+            $ref: '#/components/schemas/Holding'
+        transferTypeCode:
+          type: string
+          description: The transfer type's system code.
+          example: INTRA
+        certificateTypeCode:
+          type: string
+          description: The holding's certificate type system code.
+          example: GOC
+        certificateTypeName:
+          type: string
+          description: The name of the holding's certificate type.
+          example: GhG Carbon Offset Credit
+        canWithdraw:
+          type: boolean
+          description: Whether or not the API user has authorities required to withdraw the transfer request.
+          example: true
+        totalPrice:
+          type: number
+        currencyCode:
+          type: string
+        toSubaccountIdentifier:
+          type: string
+        toSubaccountName:
+          type: string
+        toSubaccountNumber:
+          type: string
+    ProgramVersion:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Program code
+          example: GHG_MEASUREMENT_PROGRAM
+        version:
+          type: string
+          description: Version of Program.
+          example: 5.0.0
+        shortName:
+          type: string
+          description: Program short name
+          example: Carbon Measurement
+        protocolVersions:
+          type: array
+          description: A list of Protocols associated with Program.
+          items:
+            $ref: '#/components/schemas/NamedProtocolVersion'
+    SubaccountTransferRequest:
+      type: object
+      properties:
+        subaccountIdentifier:
+          type: string
+          description: Id of the sub-account to which to transfer the goods
+        holdingCriteria:
+          type: array
+          description: Criteria for holdings associated with the sub-account transfer batch.
+          items:
+            $ref: '#/components/schemas/QuantifiedHolding'
+        correlationId:
+          type: string
+          description: Client system correlation Id – allows the caller to correlate between requests and responses
+      description: Sub-account transfer request

@@ -1,0 +1,486 @@
+openapi: 3.2.0
+info:
+  title: Telemetry Meter Reading V1 API
+  description: Use API credentials to view or submit meter (telemetry) data.
+  version: 1.0.0
+servers:
+- url: https://optimalapi-ext.apx.com/meter/v1
+- url: https://optimalapi-uat-ext.apx.com/meter/v1
+security:
+- JWT: []
+tags:
+- name: meter-reading-v1
+  description: View or submit measurement data. Measurement data includes, but it is not limited to, telemetry data, emission records, verification records, etc.
+paths:
+  /api/meterReading/{readingProfileCode}:
+    post:
+      tags:
+      - meter-reading-v1
+      summary: Submit new measurement readings (new version)
+      description: Submit new measurement reading data. Measurement data includes, but it is not limited to, telemetry data, emission records, verification records, etc.
+      operationId: submit
+      parameters:
+      - name: readingProfileCode
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MeterDataSubmission'
+        required: true
+      responses:
+        '200':
+          description: Readings submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadingOutcomes'
+        '400':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadingOutcomes'
+        '413':
+          description: Too many readings submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadingOutcomes'
+  /api/meterReading/{readingProfileCode}/submit:
+    post:
+      tags:
+      - meter-reading-v1
+      summary: Submit new measurement readings
+      description: Submit new measurement reading data. Measurement data includes, but it is not limited to, telemetry data, emission records, verification records, etc.
+      operationId: submitInteractiveMeterReadings
+      parameters:
+      - name: readingProfileCode
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InteractiveMeterReadingSubmission'
+        required: true
+      responses:
+        '200':
+          description: Readings submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadingOutcomes'
+        '400':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadingOutcomes'
+  /api/meterReading/{readingProfileCode}/retrieveByStructure:
+    post:
+      tags:
+      - meter-reading-v1
+      summary: Retrieve measurement readings by structure
+      description: Retrieve measurement data in a specific reading structure. Measurement data includes, but it is not limited to, telemetry data, emission records, verification records, etc.
+      operationId: retrieveMeterReadingsByStructure
+      parameters:
+      - name: readingProfileCode
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MeterReadingsByStructureRequest'
+        required: true
+      responses:
+        '200':
+          description: Readings retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StructuredMeterReadings'
+components:
+  schemas:
+    InteractiveMeterReading:
+      required:
+      - discriminatedUsagePointIdentifier
+      - intervalEndExclusive
+      - intervalStartInclusive
+      - intervalTypeCode
+      - reading
+      - unitOfMeasureCode
+      type: object
+      properties:
+        correlationId:
+          type: string
+        discriminatedUsagePointIdentifier:
+          type: string
+        productLotIdentifier:
+          type: string
+          format: uuid
+        productLotExternalIdentifier:
+          type: string
+        intervalStartInclusive:
+          type: string
+          format: date-time
+        intervalEndExclusive:
+          type: string
+          format: date-time
+        intervalTypeCode:
+          type: string
+          enum:
+          - QUARTER
+          - HOUR
+          - DAY
+          - MONTH
+          - YEAR
+        reading:
+          minimum: 0
+          type: number
+        unitOfMeasureCode:
+          type: string
+        version:
+          type: string
+        stagedMeterReadingId:
+          type: integer
+          format: int64
+        canWithdraw:
+          type: boolean
+        assertNew:
+          type: boolean
+        ongoingAuditorIdentifier:
+          type: string
+        editable:
+          type: boolean
+        previousIntervalStartInclusive:
+          type: string
+          format: date-time
+        previousIntervalEndExclusive:
+          type: string
+          format: date-time
+        lastUpdatedAt:
+          type: string
+          format: date-time
+        fileId:
+          type: string
+          format: uuid
+      description: A interactive meter readings data object
+    ReadingStructureRelationship:
+      type: object
+      properties:
+        sourceStructureKey:
+          type: string
+        targetStructureKey:
+          type: string
+        relationshipTypeCode:
+          type: string
+        uiHint:
+          $ref: '#/components/schemas/RelationshipUiHint'
+      description: A reading structure relationship data object
+    InteractiveMeterReadingDTO:
+      required:
+      - discriminatedUsagePointIdentifier
+      - intervalEndExclusive
+      - intervalStartInclusive
+      - intervalTypeCode
+      - reading
+      - unitOfMeasureCode
+      type: object
+      properties:
+        correlationId:
+          type: string
+        discriminatedUsagePointIdentifier:
+          type: string
+        productLotIdentifier:
+          type: string
+          format: uuid
+        productLotExternalIdentifier:
+          type: string
+        intervalStartInclusive:
+          type: string
+          format: date-time
+        intervalEndExclusive:
+          type: string
+          format: date-time
+        intervalTypeCode:
+          type: string
+          enum:
+          - QUARTER
+          - HOUR
+          - DAY
+          - MONTH
+          - YEAR
+        reading:
+          minimum: 0
+          type: number
+        unitOfMeasureCode:
+          type: string
+        version:
+          type: string
+        stagedMeterReadingId:
+          type: integer
+          format: int64
+        canWithdraw:
+          type: boolean
+        assertNew:
+          type: boolean
+        ongoingAuditorIdentifier:
+          type: string
+        editable:
+          type: boolean
+        previousIntervalStartInclusive:
+          type: string
+          format: date-time
+        previousIntervalEndExclusive:
+          type: string
+          format: date-time
+        lastUpdatedAt:
+          type: string
+          format: date-time
+        fileId:
+          type: string
+          format: uuid
+        relatedReadingGroupId:
+          type: string
+          format: uuid
+        hasHistory:
+          type: boolean
+    RelationshipUiHint:
+      type: object
+      properties:
+        inline:
+          type: boolean
+    StructuredMeterReadings:
+      type: object
+      properties:
+        discriminatedUsagePoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifiedDiscriminatedUsagePoint'
+        readings:
+          type: array
+          items:
+            $ref: '#/components/schemas/InteractiveMeterReading'
+        stagedReadings:
+          type: array
+          items:
+            $ref: '#/components/schemas/InteractiveMeterReading'
+      description: A structured meter readings data object
+    ReadingOutcomes:
+      type: object
+      properties:
+        readingOutcomes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReadingOutcome'
+    InteractiveMeterReadingSubmission:
+      type: object
+      properties:
+        timeZone:
+          type: string
+        discriminatedUsagePoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifiedDiscriminatedUsagePoint'
+        readings:
+          type: array
+          items:
+            $ref: '#/components/schemas/InteractiveMeterReading'
+      description: A interactive meter readings submission
+    CoreReadingStructure:
+      type: object
+      properties:
+        discriminatedUsagePoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/TemplatedDiscriminatedUsagePoint'
+        relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReadingStructureRelationship'
+      description: A core reading structure data object
+    ReportingEntityStreamIdentifierUsagePointIdentifier:
+      required:
+      - reportingEntityStreamIdentifier
+      type: object
+      description: A usage point identifier that employs the reporting entity stream identifier
+      allOf:
+      - $ref: '#/components/schemas/IUsagePointIdentifier'
+      - type: object
+        properties:
+          reportingEntityStreamIdentifier:
+            type: string
+    MeterDataSubmissionStream:
+      required:
+      - readings
+      - usagePoint
+      type: object
+      properties:
+        usagePoint:
+          oneOf:
+          - $ref: '#/components/schemas/InternalUsagePointCodeUsagePointIdentifier'
+          - $ref: '#/components/schemas/ReportingEntityStreamIdentifierUsagePointIdentifier'
+        readings:
+          type: array
+          items:
+            $ref: '#/components/schemas/MeterDataSubmissionReading'
+      description: A set of meter readings for a specific usage point
+    ReadingOutcome:
+      type: object
+      properties:
+        correlationId:
+          type: string
+        level:
+          type: string
+          enum:
+          - ERROR
+          - WARNING
+          - OTHER
+        fieldReference:
+          type: string
+        code:
+          type: string
+        message:
+          type: string
+        usagePointCode:
+          type: string
+        readingType:
+          type: string
+    MeterDataSubmissionReading:
+      required:
+      - intervalEnd
+      - intervalStart
+      - reading
+      type: object
+      properties:
+        intervalStart:
+          type: string
+          format: date-time
+        intervalEnd:
+          type: string
+          format: date-time
+        reading:
+          type: number
+        externalId:
+          type: string
+      description: A submitted meter reading
+    IdentifiedDiscriminatedUsagePoint:
+      type: object
+      properties:
+        structureKey:
+          type: string
+        label:
+          type: string
+        internalUsagePointCode:
+          type: string
+        usagePointInput:
+          type: boolean
+        inputTypeCodes:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        outputTypeCodes:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        resourceProcessIdentifier:
+          type: string
+          format: uuid
+        resourceProcessName:
+          type: string
+        reportingEntityStreamIdentifier:
+          type: string
+        inputOutputStreamTypeCode:
+          type: string
+        unitOfMeasureCode:
+          type: string
+        discriminatedUsagePointIdentifier:
+          type: string
+      description: An identified discriminated usage point data object
+    InternalUsagePointCodeUsagePointIdentifier:
+      required:
+      - internalUsagePointCode
+      type: object
+      description: A usage point identifier that employs the internal usage point code (sometimes referred to as the stream identifier)
+      allOf:
+      - $ref: '#/components/schemas/IUsagePointIdentifier'
+      - type: object
+        properties:
+          internalUsagePointCode:
+            type: string
+    MeterDataSubmission:
+      required:
+      - streams
+      - timeZone
+      type: object
+      properties:
+        timeZone:
+          type: string
+        streams:
+          type: array
+          items:
+            $ref: '#/components/schemas/MeterDataSubmissionStream'
+      description: A submission of meter readings
+    IUsagePointIdentifier:
+      type: object
+    MeterReadingsByStructureRequest:
+      required:
+      - readingStructure
+      type: object
+      properties:
+        readingStructure:
+          $ref: '#/components/schemas/CoreReadingStructure'
+      description: A meter readings by structure data object
+    TemplatedDiscriminatedUsagePoint:
+      type: object
+      properties:
+        structureKey:
+          type: string
+        label:
+          type: string
+        internalUsagePointCode:
+          type: string
+        usagePointInput:
+          type: boolean
+        inputTypeCodes:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        outputTypeCodes:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        resourceProcessIdentifier:
+          type: string
+          format: uuid
+        resourceProcessName:
+          type: string
+        reportingEntityStreamIdentifier:
+          type: string
+        inputOutputStreamTypeCode:
+          type: string
+        unitOfMeasureCode:
+          type: string
+        template:
+          type: array
+          items:
+            $ref: '#/components/schemas/InteractiveMeterReadingDTO'
+      description: A templated discriminated usage point data object
+  securitySchemes:
+    JWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

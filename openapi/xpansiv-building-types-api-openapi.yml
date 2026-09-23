@@ -1,0 +1,236 @@
+openapi: 3.2.0
+info:
+  title: Xpansiv Managed Solutions Building types API
+  description: 'Access data from your Xpansiv Managed Solutions account using API calls.
+
+
+    You can generate an API key for your user on Xpansiv Managed Solutions API Access page. The API key is linked to a user and an account, and has the same rights as the user on the account.
+
+
+    When calling Xpansiv Managed Solutions API use that API key to set the Bearer Token authentication header.'
+  contact:
+    email: developers@xpansiv.com
+  version: '1.10'
+servers:
+- url: https://www.ms.xpansiv.com/app/api/v1
+security:
+- BearerAuth: []
+tags:
+- name: Building types
+  description: Building types
+paths:
+  /building_types:
+    get:
+      tags:
+      - Building types
+      summary: List building types
+      description: All building types ordered by name
+      operationId: getBuildingTypes
+      responses:
+        '200':
+          description: Success — standard API envelope; building types in `data`.
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 200
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/BuildingTypesListResponse'
+                  type: object
+        '400':
+          description: Bad request - authorization or validation errors
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 400
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/ValidationError'
+                  type: object
+        '403':
+          description: Access forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 403
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/AccessForbiddenError'
+                  type: object
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/ResponseEnvelope'
+                - properties:
+                    code:
+                      type: integer
+                      example: 500
+                    elements:
+                      type: integer
+                      example: 0
+                  type: object
+                - properties:
+                    data:
+                      $ref: '#/components/schemas/ServerError'
+                  type: object
+      security:
+      - BearerAuth: []
+components:
+  schemas:
+    BuildingTypesListResponse:
+      description: Building type rows returned in the API envelope `data` field.
+      type: array
+      items:
+        $ref: '#/components/schemas/BuildingTypeItem'
+    BuildingTypeItem:
+      description: 'One building type row in the API envelope `data` array for `getBuildingTypes`.
+
+
+        Runtime: {@see \Building_type_lib::get_building_types()} — `id`, `name`.'
+      required:
+      - id
+      - name
+      properties:
+        id:
+          description: Primary key (`building_type_id`).
+          type: integer
+        name:
+          description: Display name (`building_type_name`).
+          type: string
+      type: object
+    ValidationError:
+      description: 'Error payload for validation failures (400, 422) on request bodies and business rules.
+
+
+        For query/path validation, see {@see \Trade\CodeIgniter\dtos\shared\responses\errors\QueryValidationErrorResponse}
+
+        (`details` keyed by parameter name; this class uses `data` for the same purpose).'
+      properties:
+        error:
+          type: string
+          example: validation_error
+        message:
+          type: string
+          example: Errors when validating data
+        data:
+          type: object
+          additionalProperties: true
+      type: object
+    ServerError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 500 when an unexpected server or infrastructure failure occurs.
+            type: string
+            example: internal_error
+          message:
+            type: string
+            example: Error description
+        type: object
+    AccessForbiddenError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 403 when the caller lacks permission for the requested account or resource.
+            type: string
+            example: access_forbidden
+          message:
+            type: string
+            example: You do not have permission to access this resource
+        type: object
+    Error:
+      description: 'Generic error payload when no more specific error schema applies.
+
+
+        Implements JsonSerializable so it can be passed directly to API_Controller::response().
+
+        Implements Countable returning 0 so the response size guard in API_Controller treats it
+
+        as an empty collection (error responses never trigger the size limit).'
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Error description
+      type: object
+    ResponseEnvelope:
+      description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
+      required:
+      - url
+      - date
+      - code
+      - elements
+      - page
+      properties:
+        url:
+          description: Request URL including query string.
+          type: string
+          example: /app/api/v1/facilities
+        date:
+          description: Response timestamp.
+          type: string
+          example: 2024-09-17 04:26:39 EDT
+        code:
+          description: HTTP status code, mirrored in the JSON body (same as the response status).
+          type: integer
+        elements:
+          description: Number of items in `data` on HTTP 200; 0 for other status codes.
+          type: integer
+        page:
+          description: Page label (`1 of 1` when not paginated) or numeric page when listing with pagination.
+          oneOf:
+          - type: string
+            example: 1 of 1
+          - type: integer
+            example: 2
+      type: object
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer

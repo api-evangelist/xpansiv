@@ -1,0 +1,46 @@
+openapi: 3.2.0
+info:
+  title: System V1 API
+  description: Use API credentials to check system health.
+  version: 1.0.0
+servers:
+- url: https://optimalapi-ext.apx.com
+  description: Generated server url
+- url: https://optimalapi-uat-ext.apx.com
+security:
+- JWT: []
+tags:
+- name: System V1
+  description: Check the API system health.
+paths:
+  /optimal/v1/system/ping:
+    get:
+      tags:
+      - System V1
+      summary: Check API server health
+      description: Ping API, to ensure the API is available and your API credentials are valid.
+      operationId: ping
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pong'
+components:
+  schemas:
+    Pong:
+      required:
+      - pong
+      type: object
+      properties:
+        pong:
+          type: string
+          description: The current time on the server
+          format: date-time
+      description: Response indicating server health
+  securitySchemes:
+    JWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

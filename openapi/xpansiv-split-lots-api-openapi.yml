@@ -1,0 +1,227 @@
+openapi: 3.2.0
+info:
+  description: 'This is the OpenAPI spec for Xpansiv Connect API. Documentation: https://developer.xpansiv.com/developer-portal/'
+  title: Xpansiv Connect Split Lots API
+  version: 1.0.0-beta
+servers:
+- url: https://sandbox.preprod.connect.xpansiv.com/app/api/v1
+  description: SANDBOX
+- url: https://uat.preprod.connect.xpansiv.com/app/api/v1
+  description: UAT
+- url: https://connect.xpansiv.com/app/api/v1
+  description: PROD
+security:
+- bearerToken: []
+tags:
+- name: Split Lots
+  description: The Split Lots API allows the user to search split lot data on their Xpansiv Connect account and/or other Xpansiv Connect accounts that have granted your user that access.
+paths:
+  /split-lots/account/{AccountIdentifier}/action/search:
+    post:
+      tags:
+      - Split Lots
+      operationId: searchSplitLots
+      summary: Search split lots
+      parameters:
+      - $ref: '#/components/parameters/AccountIdentifier'
+      - $ref: '#/components/parameters/PageNumber'
+      - $ref: '#/components/parameters/PageSize'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                programs:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Ref.Program'
+                createdDateFrom:
+                  type: string
+                  format: date-time
+                createdDateTo:
+                  type: string
+                  format: date-time
+                counterpartyName:
+                  type: string
+      responses:
+        '200':
+          description: List of split lots
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Page'
+                - type: object
+                  properties:
+                    content:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          identifier:
+                            type: string
+                            description: Unique identifier.
+                          counterpartyName:
+                            type: string
+                            description: Counterparty name.
+                          type:
+                            type: string
+                            default: SPLIT
+                            description: Type of the split lot.
+                          status:
+                            type: string
+                            default: Success
+                            description: Status of the split lot.
+                          quantity:
+                            type: integer
+                            format: int64
+                            description: Quantity for the split lot.
+                          taxLotId:
+                            type: integer
+                            format: int64
+                            description: TaxLot id for the split lot.
+                          taxLotName:
+                            type: string
+                            description: TaxLot id for the split lot.
+                          sourceTaxLotId:
+                            type: integer
+                            format: int64
+                            description: The identifier of the source TaxLot.
+                          sourceTaxLotName:
+                            type: string
+                            description: The name of the source TaxLot.
+                          externalTransferIdentifier:
+                            type: string
+                            description: the external transfer identifier for the split lot.
+                          createdDate:
+                            type: string
+                            format: date-time
+                            description: Split lot created date.
+                          lastUpdatedDate:
+                            type: string
+                            format: date-time
+                            description: Split lot last updated date.
+                          unitPrice:
+                            $ref: '#/components/schemas/Price'
+                          ein:
+                            type: string
+                            description: 'Environment Instrument Number. Unique identifier associated with an issuance of credits from a given project,  vintage, technology/fuel type and associated certification(s)/eligibility(s). An EIN is associated with a  position and a position will never be associated with more than 1 EIN.
+
+                              '
+                          program:
+                            $ref: '#/components/schemas/Ref.Program'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                    - INVALID_REQUEST
+                    - INVALID_PROGRAM
+                    - INVALID_DATE_RANGE
+                    - INVALID_PAGE_SIZE
+                    - INVALID_PAGE_NUMBER
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+components:
+  schemas:
+    Price:
+      type: object
+      required:
+      - currency
+      - amount
+      properties:
+        currency:
+          $ref: '#/components/schemas/Ref.Currency'
+        amount:
+          type: number
+          description: The numeric value of the price
+          minimum: 0
+    Ref.Currency:
+      description: Ref.Data.CURRENCY
+      type: string
+      minLength: 3
+      example: USD
+    NotAuthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+    Ref.Program:
+      type: string
+      description: Ref.Data.PROGRAM
+    Page:
+      type: object
+      required:
+      - page
+      - size
+      - totalPages
+      - totalElements
+      properties:
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+  responses:
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
+    '401':
+      description: Not authorized error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotAuthorizedError'
+  parameters:
+    PageSize:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    AccountIdentifier:
+      description: Account identifier
+      name: AccountIdentifier
+      example: 098B0A25
+      in: path
+      required: true
+      schema:
+        type: string
+    PageNumber:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+  securitySchemes:
+    bearerToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,921 @@
+openapi: 3.2.0
+info:
+  title: Transfer Position External Ledger V1 API
+  description: Use API credentials to view and manage instruments.
+  version: 1.0.0
+servers:
+- url: https://optimalapi-ext.apx.com/transfer/v1
+- url: https://optimalapi-uat-ext.apx.com/transfer/v1
+tags:
+- name: ledger-v1
+  description: View an Account's current and historical instrument details
+paths:
+  /api/ledger/{ledgerIdentifier}/issuance/byIdentifier:
+    post:
+      tags:
+      - ledger-v1
+      summary: Retrieve instrument details at origination
+      description: View instrument details at origination using the issuance identifier.
+      operationId: getIssuanceBatchByIdentifier
+      parameters:
+      - name: ledgerIdentifier
+        in: path
+        description: Ledger identifier, can be found using /api/ledger endpoint
+        required: true
+        schema:
+          type: string
+          format: uuid
+        example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      requestBody:
+        description: Populated IssuanceRetrieveByIdentifierRequest
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssuanceRetrieveByIdentifierRequest'
+        required: true
+      responses:
+        '200':
+          description: success
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/IssuanceRetrieveByIdentifierResponse'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/GeneralError'
+                - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger:
+    get:
+      tags:
+      - ledger-v1
+      summary: Retrieve available ledgers
+      description: View the list of available ledgers by registry
+      operationId: getLedgers
+      responses:
+        '200':
+          description: Ledgers retrieved
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OwnershipLedgers'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/GeneralError'
+                - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger/{ledgerIdentifier}/holding:
+    get:
+      tags:
+      - ledger-v1
+      summary: Retrieve account holdings
+      description: View current instruments by ledger, using the ledger identifier.
+      operationId: getLedgerHoldings
+      parameters:
+      - name: ledgerIdentifier
+        in: path
+        description: Ledger identifier, can be found using /api/ledger endpoint
+        required: true
+        schema:
+          type: string
+        example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      - name: asset
+        in: query
+        description: If true, requests asset holdings, otherwise requests liability holdings.
+        required: false
+        schema:
+          type: boolean
+        example: true
+      - name: onBehalfOfSrcAcctId
+        in: query
+        description: If permitted, allows the caller to request holdings for another account holder, identifying that account holder by their system-assigned srcAcctId.
+        required: false
+        schema:
+          type: string
+        example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      - name: transferTypeCode
+        in: query
+        description: If specified, only holdings that qualify for the specified transfer type will be returned
+        required: false
+        schema:
+          type: string
+        example: RET
+      - name: $skip
+        in: query
+        description: Number of records to skip
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: $top
+        in: query
+        description: Maximum number of records to return
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: $filter
+        in: query
+        description: OData-like filter expression
+        required: false
+        schema:
+          type: string
+      - name: $apply
+        in: query
+        description: OData-like apply expression with groupby and aggregate only
+        required: false
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        description: Comma-separated list of columns for sorting
+        required: false
+        schema:
+          type: string
+      - name: $count
+        in: query
+        description: Whether to include the count of records with the result
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Holdings retrieved
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Holdings'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/GeneralError'
+                - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger/{ledgerIdentifier}/history:
+    get:
+      tags:
+      - ledger-v1
+      summary: Retrieve account transfers and retirements
+      description: View your account's ledger history, such as account-to-account transfers and retirements.
+      operationId: getLedgerHistory
+      parameters:
+      - name: ledgerIdentifier
+        in: path
+        description: Ledger identifier, can be found using /api/ledger endpoint
+        required: true
+        schema:
+          type: string
+          format: uuid
+        example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      - name: onBehalfOfSrcAcctId
+        in: query
+        description: If permitted, allows the caller to request transfer history on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
+        required: false
+        schema:
+          type: string
+        example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      - name: $skip
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: $top
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: $filter
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: $apply
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: $orderby
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: $count
+        in: query
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: transfer batches retrieved
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/LedgerHistoryList'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/GeneralError'
+                - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+  /api/ledger/{ledgerIdentifier}/account:
+    get:
+      tags:
+      - ledger-v1
+      summary: Retrieves list of counterparties
+      description: View counterparties for account-to-account transfers. Counterparties are returned by Program Ledger.
+      operationId: getLedgerAccounts
+      parameters:
+      - name: ledgerIdentifier
+        in: path
+        description: Ledger identifier, can be found using /api/ledger endpoint
+        required: true
+        schema:
+          type: string
+        example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+      responses:
+        '200':
+          description: Accounts retrieved
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/LedgerAccounts'
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '401':
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                oneOf:
+                - $ref: '#/components/schemas/GeneralError'
+                - $ref: '#/components/schemas/AbstractRestError'
+        '403':
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AbstractRestError'
+        '404':
+          description: Not Found
+          content: {}
+        '406':
+          description: Not Acceptable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorContainer'
+        '422':
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/GeneralError'
+components:
+  schemas:
+    OwnershipLedgerType:
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: The reference data's value.
+        name:
+          type: string
+          description: The reference data's name
+        ownershipLedgerTypeIdentifier:
+          type: string
+          description: The ownership ledger type's system-assigned identifier.
+          format: uuid
+          example: 7562eb1e-fe02-41f6-911a-aa3a805a1e29
+        centralized:
+          type: boolean
+          description: If true, the ownership ledger is centralized
+          example: true
+        serialized:
+          type: boolean
+          description: If true, goods tracked on this ownership ledger are serialized.
+          example: true
+      description: Ownership Ledger Type
+    Issuance:
+      type: object
+      properties:
+        identifier:
+          type: string
+        externalIdentifier:
+          type: string
+        resourceIdentifier:
+          type: string
+        resourceProgramAssignedIdentifier:
+          type: string
+        asset:
+          type: boolean
+        firm:
+          type: boolean
+        programCertificationGroupCode:
+          type: string
+        programPeriodBeginInclusive:
+          type: string
+        programPeriodEndExclusive:
+          type: string
+        certificateTypeCode:
+          type: string
+        serialNumberPrefix:
+          type: string
+        serialStart:
+          type: integer
+          format: int32
+        serialEnd:
+          type: integer
+          format: int32
+        quantity:
+          type: number
+        originalSrcAcctId:
+          type: string
+        originalSrcAcctIdentifier:
+          type: string
+        originalAcctName:
+          type: string
+        timeOfProductionBeginInclusive:
+          type: string
+          format: date-time
+        timeOfProductionEndExclusive:
+          type: string
+          format: date-time
+        deliveryLocationIdentifier:
+          type: string
+        externalSerialNumber:
+          type: string
+        inboundInterledgerTransferIdentifier:
+          type: string
+        batchNumber:
+          type: string
+        issuanceContractInstanceIdentifier:
+          type: string
+        ongoingAuditorIdentifier:
+          type: string
+        productIdentifier:
+          type: string
+        productLotIdentifier:
+          type: string
+        ein:
+          type: string
+        upn:
+          type: string
+        positions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Holding'
+    ProtocolVersion:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Protocol code
+          example: AMS-I.D.
+        version:
+          type: string
+          description: Version of Protocol
+          example: 1.0.0
+        effectiveAt:
+          type: string
+          description: Start date of the Protocol Version
+          format: date-time
+        expiresAt:
+          type: string
+          description: End date of the Protocol Version
+          format: date-time
+        issuing:
+          type: boolean
+          description: Issuing/Adorning flag
+    LedgerHistory:
+      type: object
+      properties:
+        ledgerEntryType:
+          type: string
+          description: 'The ledger entry type: TRANSFERBATCH = Transfer Batch (includes both inter-account and subaccount transfers); RETIREMENTBATCH = Retirement Batch; ISSUANCE = Issuance; ENCUMBRANCEBATCH = Encumbrance Batch; INTERLEDGERTRANSFER = Inter-Ledger Transfer'
+          example: ISSUANCE
+        identifier:
+          type: string
+          description: The  system-assigned identifier for the ledger entry.
+          example: 3F06C260-5760-4DFA-BE70-407067D60704
+        statusCode:
+          type: string
+          description: The ledger entry's current status code.
+          example: ISSUED
+        createdAt:
+          type: string
+          description: Timestamp for when ledger entry was created
+          format: date-time
+        lastModifiedAt:
+          type: string
+          description: Timestamp for when ledger entry was last modified
+          format: date-time
+    ErrorContainer:
+      type: object
+      properties:
+        submissionId:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+    LedgerAccount:
+      type: object
+      properties:
+        account:
+          $ref: '#/components/schemas/Account'
+        privileges:
+          uniqueItems: true
+          type: array
+          description: A list of the Account's participation privileges on the specified ownership ledger.
+          items:
+            type: string
+    LedgerAccounts:
+      type: object
+      properties:
+        ledgerAccounts:
+          type: array
+          description: A list of accounts related to the specified ownership ledger.
+          items:
+            $ref: '#/components/schemas/LedgerAccount'
+    LedgerHistoryList:
+      type: object
+      properties:
+        ledgerHistoryRecords:
+          type: array
+          description: A collection of ledger history entries.
+          items:
+            $ref: '#/components/schemas/LedgerHistory'
+    GeneralError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
+    ReferenceDatum:
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: The reference data's value.
+        name:
+          type: string
+          description: The reference data's name
+      description: A reference datum data object
+    OwnershipLedgers:
+      type: object
+      properties:
+        ownershipLedgers:
+          type: array
+          description: A list of available ownership ledgers.
+          items:
+            $ref: '#/components/schemas/OwnershipLedger'
+      description: Ownership Ledgers
+    OwnershipLedger:
+      type: object
+      properties:
+        ownershipLedgerIdentifier:
+          type: string
+          description: The Ownership Ledger's system-assigned identifier for programmatic (API) interactions.
+          format: uuid
+          example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+        marketplace:
+          $ref: '#/components/schemas/Marketplace'
+        code:
+          type: string
+          description: The ownership ledger's system code.
+          example: PLASTIC_WASTE_REDUCTION_PROGRAM
+        name:
+          type: string
+          description: Ownership ledger's name
+          example: Plastic Waste Reduction Offset Credit
+        description:
+          type: string
+          description: The ownership ledger's description, if applicable.
+        supportsSubaccounts:
+          type: boolean
+          description: If "true", the ownership ledger supports sub-accounts.
+          example: true
+        shadowing:
+          type: boolean
+          description: If "true", the ownership ledger contains replicas of instruments held in an external ledger.
+          example: false
+        ownershipLedgerTypeDTO:
+          $ref: '#/components/schemas/OwnershipLedgerType'
+        supportsTransferBatchNotes:
+          type: boolean
+          description: This parameter is true when ownership ledger supports transfer batch notes
+        supportsTransferBatchPricing:
+          type: boolean
+          description: This parameter is true when ownership ledger supports transfer batch pricing
+      description: Ownership Ledger
+    IssuanceRetrieveByIdentifierResponse:
+      type: object
+      properties:
+        issuances:
+          type: array
+          items:
+            $ref: '#/components/schemas/Issuance'
+    ErrorItem:
+      type: object
+      properties:
+        parameter:
+          type: string
+        correlationId:
+          type: string
+        path:
+          type: string
+        field:
+          type: string
+        code:
+          type: string
+        message:
+          type: string
+    Holding:
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: The holding's system-assigned identifier.
+        resourceProgramAssignedIdentifier:
+          type: string
+          description: The associated resource's program assigned identifier.
+          example: GHG1021
+        holdingStatus:
+          $ref: '#/components/schemas/ReferenceDatum'
+        programPeriodBeginInclusive:
+          type: string
+          description: Start of program period (vintage) associated to the holding record's issuance.
+          format: date-time
+          example: '2022-01-01T00:00:00-05:00'
+        programPeriodEndExclusive:
+          type: string
+          description: End of program period (vintage) associated to the holding record's issuance.
+          format: date-time
+          example: '2023-01-01T00:00:00-05:00'
+        timeOfProductionBeginInclusive:
+          type: string
+          description: Start of production period associated to the holding's issuance
+          format: date-time
+          example: '2022-01-01T00:00:00-05:00'
+        timeOfProductionEndExclusive:
+          type: string
+          description: End of production period associated to the holding's issuance
+          format: date-time
+          example: '2023-01-01T00:00:00-05:00'
+        serialNumber:
+          type: string
+          description: The holding record's serial number.
+          example: APXOPCAR-GOC-GHG1021-US-2022--46-5701-6700
+        quantity:
+          type: number
+          description: The quantity of the holding record.
+          example: 1000
+        programVersions:
+          type: array
+          description: Associated programs and their versions.
+          items:
+            $ref: '#/components/schemas/ProgramVersion'
+        protocolVersions:
+          type: array
+          description: Associated protocols and their versions.
+          items:
+            $ref: '#/components/schemas/ProtocolVersion'
+        resourceInputTypeCodes:
+          type: array
+          description: A list of resource input types associated with the holding record's issuance.
+          items:
+            type: string
+        resourceOutputTypeCodes:
+          type: array
+          description: A list of resource output types associated with the holding record's issuance.
+          example: CARBON_REDUCTION
+          items:
+            type: string
+        subaccountIdentifier:
+          type: string
+          description: The  system-assigned identifier for the subaccount.
+          example: 5FF7ABAA-095D-11EF-B304-AA080FC10FFA
+        subaccountName:
+          type: string
+          description: Subaccount name, as inputted by subaccount owner.
+          example: My Linked Holdings
+        subaccountNumber:
+          type: string
+          description: Subaccount Id displayed on the Optimal Outcomes platform's UI.
+          example: '10033'
+        programCertificationGroupCode:
+          type: string
+          description: The issuing program certification group of the holding record.
+          example: NONAFOLU_GHG_MEASUREMENT_PROGRAM
+        upn:
+          type: string
+          description: Xpansiv Connect Universal Project Number (UPN) for Resource associated to the holding's issuance, if assigned.
+          example: 0999F5B4
+        ein:
+          type: string
+          description: Xpansiv Connect Environmental Instrument Number (EIN), if assigned.
+          example: 1246AFA3E2
+        einDescription:
+          type: string
+          description: Xpansiv Connect Environmental Instrument Number (EIN) details, if assigned
+          example: VCU-20120101-20121231-EDEM-3267-ZMB
+        shadowedLedgerName:
+          type: string
+          description: If shadowing = true, the external ledger's name.
+          example: Verra
+        managingExternalPlatformName:
+          type: string
+          description: If the holding is held in an external subaccount, the name of the managing external platform associated with the external subaccount.
+          example: Xpansiv Connect
+        holdingGroupIdentifier:
+          type: string
+          description: Identifier for grouped holdings in transfer operations, if applicable.
+        certificateType:
+          $ref: '#/components/schemas/ReferenceDatum'
+    Holdings:
+      required:
+      - value
+      type: object
+      properties:
+        '@count':
+          type: integer
+          description: The total number of results (only present if requested)
+          format: int32
+        value:
+          type: array
+          description: Rows of information
+          items:
+            $ref: '#/components/schemas/Holding'
+    Marketplace:
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: The reference data's value.
+        name:
+          type: string
+          description: The reference data's name
+        marketplaceIdentifier:
+          type: string
+          description: The Marketplace's system-assigned identifier.
+          format: uuid
+          example: 732f1eaf-66db-44fa-aba8-036d184ae8e9
+        transactionsRequireContract:
+          type: boolean
+          description: If true, transactions in this marketplace must be associated with a contract
+          example: false
+        timeZone:
+          type: string
+          description: The marketplace's Internet Assigned Numbers Authority (IANA) time zone
+          example: America/New_York
+        requireTransactionProductLotSelection:
+          type: boolean
+          description: If true, the entry of a transaction associated with this marketplace will require the explicit quantified selection of product lots
+          example: false
+      description: A marketplace data object
+    NamedProtocolVersion:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Protocol code
+          example: AMS-I.D.
+        version:
+          type: string
+          description: Version of Protocol
+          example: 1.0.0
+        effectiveAt:
+          type: string
+          description: Start date of the Protocol Version
+          format: date-time
+        expiresAt:
+          type: string
+          description: End date of the Protocol Version
+          format: date-time
+        issuing:
+          type: boolean
+          description: Issuing/Adorning flag
+        shortName:
+          type: string
+          description: Protocol's short name
+          example: AMS-I.D.
+    AbstractRestError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
+    ProgramVersion:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Program code
+          example: GHG_MEASUREMENT_PROGRAM
+        version:
+          type: string
+          description: Version of Program.
+          example: 5.0.0
+        shortName:
+          type: string
+          description: Program short name
+          example: Carbon Measurement
+        protocolVersions:
+          type: array
+          description: A list of Protocols associated with Program.
+          items:
+            $ref: '#/components/schemas/NamedProtocolVersion'
+    IssuanceRetrieveByIdentifierRequest:
+      type: object
+      properties:
+        onBehalfOfSrcAcctId:
+          type: string
+          description: If permitted, allows the caller to retrieve issuances on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
+        issuanceIdentifiers:
+          uniqueItems: true
+          type: array
+          description: Collection of issuance identifiers for the issuances to retrieve.
+          items:
+            type: string
+    Account:
+      type: object
+      properties:
+        srcAcctId:
+          type: string
+          description: The Account's unique system-assigned identifier used for programmatic (API) interactions.
+          example: 4edse581-b97a-11ef-ea69-b61606fd520c
+        identifier:
+          type: string
+          description: The Account's ID as displayed in the registry.
+          example: '15184192'
+        name:
+          type: string
+          description: The Account Operating Name on the registry.
+          example: APXOPCAR Project Manager
+      description: Account record

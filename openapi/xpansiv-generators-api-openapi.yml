@@ -1,0 +1,320 @@
+openapi: 3.2.0
+info:
+  description: 'This is the OpenAPI spec for Xpansiv Connect API. Documentation: https://developer.xpansiv.com/developer-portal/'
+  title: Xpansiv Connect Generators API
+  version: 1.0.0-beta
+servers:
+- url: https://sandbox.preprod.connect.xpansiv.com/app/api/v1
+  description: SANDBOX
+- url: https://uat.preprod.connect.xpansiv.com/app/api/v1
+  description: UAT
+- url: https://connect.xpansiv.com/app/api/v1
+  description: PROD
+security:
+- bearerToken: []
+tags:
+- name: Generators
+paths:
+  /generators/action/search:
+    post:
+      operationId: searchGenerators
+      parameters:
+      - $ref: '#/components/parameters/PageNumber'
+      - $ref: '#/components/parameters/PageSize'
+      - $ref: '#/components/parameters/Include'
+      summary: Generators search
+      requestBody:
+        description: Generators search endpoint
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                upn:
+                  type: string
+                name:
+                  type: string
+                program:
+                  $ref: '#/components/schemas/Ref.RecProgram'
+                registryAssignedId:
+                  type: string
+                  deprecated: true
+                registryAssignedIds:
+                  type: array
+                  items:
+                    type: string
+                hostCountry:
+                  $ref: '#/components/schemas/Ref.Country'
+                fuelType:
+                  $ref: '#/components/schemas/Ref.FuelType'
+                state:
+                  $ref: '#/components/schemas/Ref.StateProvince'
+      responses:
+        '200':
+          description: Generators search successfully executed
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Page'
+                - type: object
+                  properties:
+                    content:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Generator'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    enum:
+                    - INVALID_REQUEST
+                    - INVALID_PROGRAM
+                    - INVALID_MARKET_SEARCH_TYPE
+                    - INVALID_FUEL_TYPE
+                    - INVALID_STATE
+                    - INVALID_COUNTRY
+                    - INVALID_PAGE_SIZE
+                    - INVALID_PAGE_NUMBER
+                  message:
+                    type: string
+        '401':
+          $ref: '#/components/responses/401'
+        '500':
+          $ref: '#/components/responses/500'
+      tags:
+      - Generators
+components:
+  parameters:
+    PageSize:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    PageNumber:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    Include:
+      name: include
+      description: Comma-separated values from optional response fields
+      in: query
+      required: false
+      schema:
+        type: string
+  schemas:
+    Page:
+      type: object
+      required:
+      - page
+      - size
+      - totalPages
+      - totalElements
+      properties:
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+    Generator:
+      allOf:
+      - $ref: '#/components/schemas/Resource'
+      - type: object
+        properties:
+          program:
+            $ref: '#/components/schemas/Ref.RecProgram'
+          registryAssignedId:
+            type: string
+            description: The registry assigned identifier for the generator.
+          status:
+            $ref: '#/components/schemas/Ref.GeneratorStatus'
+          siteCode:
+            type: string
+            description: The Site Code of the generator if provided by the registry.
+          unitName:
+            type: string
+            description: The Unit Name of the generator in the registry.
+          controlArea:
+            type: string
+            description: The Control Area that the generator is located in.
+          parentCompanyName:
+            type: string
+            description: The Parent Company Name of the generator if provided by the registry.
+          powerCompanyName:
+            type: string
+            description: The Power Company Name of the generator if provided by the registry.
+          powerCompanyCode:
+            type: string
+            description: The Power Company Code of the generator if provided by the registry.
+          ownerName:
+            type: string
+            description: The Owner Name of the generator if provided by the registry
+          ownershipType:
+            type: string
+            description: The Ownership Type of the generator if provided by the registry.
+          countyName:
+            type: string
+            description: The County Name locatio of the generator if provided by the registry.
+          stateProvince:
+            $ref: '#/components/schemas/Ref.StateProvince'
+          country:
+            $ref: '#/components/schemas/Ref.Country'
+          contactInfo:
+            type: string
+            description: Contact Information for the generator if provided by the registry.
+          registryAcctHolderName:
+            type: string
+            description: The Registry Account Holder name of the generator if provided by the registry.
+          commencedDt:
+            type: string
+            format: date-time
+            description: The Commenced Operation Date of the generator if provided by the registry.
+          nameplateCapacity:
+            type: number
+            format: double
+            description: The Nameplate Capacity of the generator if provided by the registry.
+          facNoncompetitiveCertData:
+            type: string
+          fuelTypes:
+            type: array
+            description: Additional information about a generator if it is multi-fuel. Optional property. Use `include` param.
+            items:
+              title: Fuel Type Eligibility aggregation
+              type: object
+              required:
+              - fuelType
+              properties:
+                fuelType:
+                  $ref: '#/components/schemas/FuelType'
+                stateEligibilities:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/StateEligibility'
+                voluntaryEligibilities:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/VoluntaryEligibility'
+    Ref.StateProvince:
+      type: string
+      description: Ref.Data.STATE_PROVINCE
+    FuelType:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The fuel type associated with the underlying asset.
+        type:
+          $ref: '#/components/schemas/Ref.FuelType'
+        fuelSource:
+          type: string
+          description: The registry fuel source associated with the fuel type (registry-dependent).
+    NotAuthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+    Ref.RecProgram:
+      type: string
+      description: Ref.Data.REC_PROGRAM
+    Ref.GeneratorStatus:
+      type: string
+      description: The status of the generator in the registry. Ref.Data.GENERATOR_STATUS
+    Ref.Country:
+      type: string
+      description: Ref.Data.COUNTRY
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+    StateEligibility:
+      type: object
+      description: Object to hold full state eligibility information - type of eligibility, extendable with other information
+      properties:
+        name:
+          type: string
+          description: Name of the state eligibility.
+        type:
+          $ref: '#/components/schemas/Ref.StateEligibilityType'
+        stateIdentifier:
+          type: string
+          description: This is the identifier of the eligibility from the registry
+    Ref.VoluntaryEligibilityType:
+      type: string
+      description: The type of the voluntary eligibility. Ref.Data.REC_VOLUNTARY_ELIGIBILITY
+    Ref.FuelType:
+      type: string
+      description: Ref.Data.REC_FUEL_TYPE
+    VoluntaryEligibility:
+      type: object
+      description: Object to hold full voluntary eligibility information - type of eligibility, effective date, expiration, extendable with other information
+      properties:
+        name:
+          type: string
+          description: The name of the registry voluntary eligibility.
+        type:
+          $ref: '#/components/schemas/Ref.VoluntaryEligibilityType'
+        effectiveDate:
+          type: string
+          format: date-time
+          description: The effective date of the eligibility.
+        expirationDate:
+          type: string
+          format: date-time
+          description: the expiration date of the eligibility.
+    Ref.StateEligibilityType:
+      type: string
+      description: The type of the state eligibility. Ref.Data.REC_STATE_ELIGIBILITY
+    Resource:
+      type: object
+      required:
+      - name
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: The unique XC db identifier for the project or generator.
+        upn:
+          type: string
+          description: 'Universal Project Identifier. The unique identifier assigned by Xpansiv Connect to every resource across all registries that  have integrated with the Xpansiv Connect platform.
+
+            '
+        name:
+          type: string
+          description: The registry assigned name of the project or generator.
+  responses:
+    '401':
+      description: Not authorized error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotAuthorizedError'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
+  securitySchemes:
+    bearerToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
