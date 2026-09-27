@@ -175,15 +175,22 @@ components:
           type: string
           description: The reference data's name
       description: A reference datum data object
-    AbstractRestError:
+    Account:
       type: object
       properties:
-        code:
+        srcAcctId:
           type: string
-        ticket:
+          description: The Account's unique system-assigned identifier used for programmatic (API) interactions.
+          example: 4edse581-b97a-11ef-ea69-b61606fd520c
+        identifier:
           type: string
-        message:
+          description: The Account's ID as displayed in the registry.
+          example: '15184192'
+        name:
           type: string
+          description: The Account Operating Name on the registry.
+          example: APXOPCAR Project Manager
+      description: Account record
     Subaccounts:
       type: object
       properties:
@@ -213,15 +220,6 @@ components:
         metadataConfig:
           type: string
           description: Metadata configuration (JSON) for additional fields required by the External Platform.
-    ErrorContainer:
-      type: object
-      properties:
-        submissionId:
-          type: string
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ErrorItem'
     ErrorItem:
       type: object
       properties:
@@ -237,22 +235,15 @@ components:
           type: string
         message:
           type: string
-    Account:
+    ErrorContainer:
       type: object
       properties:
-        srcAcctId:
+        submissionId:
           type: string
-          description: The Account's unique system-assigned identifier used for programmatic (API) interactions.
-          example: 4edse581-b97a-11ef-ea69-b61606fd520c
-        identifier:
-          type: string
-          description: The Account's ID as displayed in the registry.
-          example: '15184192'
-        name:
-          type: string
-          description: The Account Operating Name on the registry.
-          example: APXOPCAR Project Manager
-      description: Account record
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorItem'
     Subaccount:
       required:
       - name
@@ -310,3 +301,12 @@ components:
           readOnly: true
           example: true
       description: This class contains caller-visible set of sub-accounts for either the calling account or the account identified by onBehalfOfSrcAcctId
+    AbstractRestError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string

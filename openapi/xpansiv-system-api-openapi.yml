@@ -85,6 +85,16 @@ components:
           type: string
           description: The error code
       description: Describes a specific error
+    Pong:
+      required:
+      - pong
+      type: object
+      properties:
+        pong:
+          type: string
+          format: date-time
+          example: '2024-10-22T19:26:52.641Z'
+      description: Response indicating server is online and auth token is valid
     ErrorContainer:
       type: object
       properties:
@@ -97,16 +107,6 @@ components:
           items:
             $ref: '#/components/schemas/ErrorItem'
       description: Container for errors
-    Pong:
-      required:
-      - pong
-      type: object
-      properties:
-        pong:
-          type: string
-          format: date-time
-          example: '2024-10-22T19:26:52.641Z'
-      description: Response indicating server is online and auth token is valid
     ErrorItem_2:
       type: object
       required:
@@ -133,6 +133,18 @@ components:
           description: The path to the field specifically in error, if applicable
       title: ErrorItem
       description: Describes a specific error
+    Pong_2:
+      type: object
+      required:
+      - pong
+      properties:
+        pong:
+          type: string
+          format: date-time
+          description: The current time on the server
+          example: '2024-10-31T17:58:38.066Z'
+      title: Pong
+      description: Response indicating server health
     ErrorContainer_2:
       type: object
       properties:
@@ -146,18 +158,6 @@ components:
           description: Submission identifier for issue investigation
       title: ErrorContainer
       description: Container for errors
-    Pong_2:
-      type: object
-      required:
-      - pong
-      properties:
-        pong:
-          type: string
-          format: date-time
-          description: The current time on the server
-          example: '2024-10-31T17:58:38.066Z'
-      title: Pong
-      description: Response indicating server health
   securitySchemes:
     JWT:
       type: http

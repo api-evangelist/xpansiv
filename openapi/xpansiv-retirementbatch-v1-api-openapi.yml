@@ -154,7 +154,152 @@ paths:
                 $ref: '#/components/schemas/GeneralError'
 components:
   schemas:
-    ProtocolVersion:
+    RetirementResponse:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: Matches the correlationId provided in the retirement request.
+        retirementIdentifier:
+          type: string
+          description: Identifier associated with the retirement batch initiated by the system
+          example: b24ad896-d899-478d-9513-7061375b637c
+      description: Response for the balk retirement request
+    RetirementBatchRetrieveByIdentifierResponse:
+      type: object
+      properties:
+        retirementBatches:
+          type: array
+          description: Collection of retrieved retirement batches
+          items:
+            $ref: '#/components/schemas/RetirementBatch'
+    ReferenceDatum:
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: The reference data's value.
+        name:
+          type: string
+          description: The reference data's name
+      description: A reference datum data object
+    Account:
+      type: object
+      properties:
+        srcAcctId:
+          type: string
+          description: The Account's unique system-assigned identifier used for programmatic (API) interactions.
+          example: 4edse581-b97a-11ef-ea69-b61606fd520c
+        identifier:
+          type: string
+          description: The Account's ID as displayed in the registry.
+          example: '15184192'
+        name:
+          type: string
+          description: The Account Operating Name on the registry.
+          example: APXOPCAR Project Manager
+      description: Account record
+    BulkRetirementResponse:
+      type: object
+      properties:
+        responses:
+          type: array
+          description: responses for the bulk retirement request
+          items:
+            $ref: '#/components/schemas/RetirementResponse'
+    RetirementRequest:
+      type: object
+      properties:
+        liabilityHoldingIdentifier:
+          type: string
+          description: Identifier of the liability holding against which this retirement will be associated. Available liability holdings returned by GET /api/ledger/{ledgerIdentifier}/holding with asset = false.
+          example: '476022'
+        retirementReasonCode:
+          type: string
+          description: Retirement reason code to be associated with retirement
+          example: COMPLIANCE_REQUIREMENTS
+        holdingCriteria:
+          type: array
+          description: Criteria for holdings associated with the retirement batch.
+          items:
+            $ref: '#/components/schemas/QuantifiedHolding'
+        correlationId:
+          type: string
+          description: Client system correlation Id – allows the caller to correlate between requests and responses
+        subaccountIdentifier:
+          type: string
+          description: Target subaccount identifier – required if performing a retirement against a ledger that has subaccounts enabled.
+        retirementParameters:
+          $ref: '#/components/schemas/JsonNode'
+    RetirementBatchRetrieveByIdentifierRequest:
+      type: object
+      properties:
+        onBehalfOfSrcAcctId:
+          type: string
+          description: If permitted, allows the caller to retrieve retirement batches on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
+        retirementBatchIdentifiers:
+          uniqueItems: true
+          type: array
+          description: Identifiers associated with the retirement batch initiated by the system
+          example: 3574500f-6df3-400e-abc9-e6aeb64f03c7
+          items:
+            type: string
+    ExtShadowedLedgerRetirementOptionsDTO:
+      type: object
+      properties:
+        suppressShadowedLedgerInteraction:
+          type: boolean
+        shadowedLedgerRetirementIdentifiersByHoldingIdentifier:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ExtShadowedLedgerEntityIdentifierMappingDTO'
+    ExternalPlatform:
+      type: object
+      properties:
+        externalPlatformIdentifier:
+          type: string
+          description: The managing external platform's system-assigned identifier.
+          format: uuid
+          example: a5f8c9fa-001b-4444-b966-17b1a7871bbf
+        code:
+          type: string
+          description: The External Platform's system code, if applicable.
+        name:
+          type: string
+          description: The External Platform's name.
+          example: Xpansiv Connect
+        account:
+          $ref: '#/components/schemas/Account'
+        metadataConfig:
+          type: string
+          description: Metadata configuration (JSON) for additional fields required by the External Platform.
+    ErrorItem:
+      type: object
+      properties:
+        parameter:
+          type: string
+        correlationId:
+          type: string
+        path:
+          type: string
+        field:
+          type: string
+        code:
+          type: string
+        message:
+          type: string
+    ErrorContainer:
+      type: object
+      properties:
+        submissionId:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+    NamedProtocolVersion:
       type: object
       properties:
         code:
@@ -176,91 +321,10 @@ components:
         issuing:
           type: boolean
           description: Issuing/Adorning flag
-    ErrorContainer:
-      type: object
-      properties:
-        submissionId:
+        shortName:
           type: string
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ErrorItem'
-    RetirementBatchRetrieveByIdentifierRequest:
-      type: object
-      properties:
-        onBehalfOfSrcAcctId:
-          type: string
-          description: If permitted, allows the caller to retrieve retirement batches on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
-        retirementBatchIdentifiers:
-          uniqueItems: true
-          type: array
-          description: Identifiers associated with the retirement batch initiated by the system
-          example: 3574500f-6df3-400e-abc9-e6aeb64f03c7
-          items:
-            type: string
-    GeneralError:
-      type: object
-      properties:
-        code:
-          type: string
-        ticket:
-          type: string
-        message:
-          type: string
-    ReferenceDatum:
-      required:
-      - code
-      type: object
-      properties:
-        code:
-          type: string
-          description: The reference data's value.
-        name:
-          type: string
-          description: The reference data's name
-      description: A reference datum data object
-    QuantifiedHolding:
-      type: object
-      properties:
-        holdingIdentifier:
-          type: string
-          description: Holding Identifier, as returned by the holdings API
-          example: '476099'
-        quantity:
-          type: number
-          description: Quantity of holding to be used in this operation
-          example: 3
-      description: Quantified Holding
-    ExtShadowedLedgerEntityIdentifierMappingDTO:
-      type: object
-      properties:
-        holdingIdentifier:
-          type: string
-        shadowedLedgerEntityIdentifier:
-          type: string
-    RetirementBatchRetrieveByIdentifierResponse:
-      type: object
-      properties:
-        retirementBatches:
-          type: array
-          description: Collection of retrieved retirement batches
-          items:
-            $ref: '#/components/schemas/RetirementBatch'
-    ErrorItem:
-      type: object
-      properties:
-        parameter:
-          type: string
-        correlationId:
-          type: string
-        path:
-          type: string
-        field:
-          type: string
-        code:
-          type: string
-        message:
-          type: string
+          description: Protocol's short name
+          example: AMS-I.D.
     Holding:
       type: object
       properties:
@@ -363,71 +427,6 @@ components:
           description: Identifier for grouped holdings in transfer operations, if applicable.
         certificateType:
           $ref: '#/components/schemas/ReferenceDatum'
-    RetirementRequest:
-      type: object
-      properties:
-        liabilityHoldingIdentifier:
-          type: string
-          description: Identifier of the liability holding against which this retirement will be associated. Available liability holdings returned by GET /api/ledger/{ledgerIdentifier}/holding with asset = false.
-          example: '476022'
-        retirementReasonCode:
-          type: string
-          description: Retirement reason code to be associated with retirement
-          example: COMPLIANCE_REQUIREMENTS
-        holdingCriteria:
-          type: array
-          description: Criteria for holdings associated with the retirement batch.
-          items:
-            $ref: '#/components/schemas/QuantifiedHolding'
-        correlationId:
-          type: string
-          description: Client system correlation Id – allows the caller to correlate between requests and responses
-        subaccountIdentifier:
-          type: string
-          description: Target subaccount identifier – required if performing a retirement against a ledger that has subaccounts enabled.
-        retirementParameters:
-          $ref: '#/components/schemas/JsonNode'
-    BulkRetirementRequest:
-      type: object
-      properties:
-        onBehalfOfSrcAcctId:
-          type: string
-          description: If permitted, allows the caller to retire on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
-        requests:
-          type: array
-          description: retirement request
-          items:
-            $ref: '#/components/schemas/RetirementRequest'
-        shadowedLedgerRetirementOptions:
-          $ref: '#/components/schemas/ExtShadowedLedgerRetirementOptionsDTO'
-    BulkRetirementResponse:
-      type: object
-      properties:
-        responses:
-          type: array
-          description: responses for the bulk retirement request
-          items:
-            $ref: '#/components/schemas/RetirementResponse'
-    ExternalPlatform:
-      type: object
-      properties:
-        externalPlatformIdentifier:
-          type: string
-          description: The managing external platform's system-assigned identifier.
-          format: uuid
-          example: a5f8c9fa-001b-4444-b966-17b1a7871bbf
-        code:
-          type: string
-          description: The External Platform's system code, if applicable.
-        name:
-          type: string
-          description: The External Platform's name.
-          example: Xpansiv Connect
-        account:
-          $ref: '#/components/schemas/Account'
-        metadataConfig:
-          type: string
-          description: Metadata configuration (JSON) for additional fields required by the External Platform.
     RetirementBatch:
       type: object
       properties:
@@ -464,7 +463,79 @@ components:
           format: date-time
         retirementParameters:
           $ref: '#/components/schemas/JsonNode'
-    NamedProtocolVersion:
+    ExtShadowedLedgerEntityIdentifierMappingDTO:
+      type: object
+      properties:
+        holdingIdentifier:
+          type: string
+        shadowedLedgerEntityIdentifier:
+          type: string
+    QuantifiedHolding:
+      type: object
+      properties:
+        holdingIdentifier:
+          type: string
+          description: Holding Identifier, as returned by the holdings API
+          example: '476099'
+        quantity:
+          type: number
+          description: Quantity of holding to be used in this operation
+          example: 3
+      description: Quantified Holding
+    ProgramVersion:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Program code
+          example: GHG_MEASUREMENT_PROGRAM
+        version:
+          type: string
+          description: Version of Program.
+          example: 5.0.0
+        shortName:
+          type: string
+          description: Program short name
+          example: Carbon Measurement
+        protocolVersions:
+          type: array
+          description: A list of Protocols associated with Program.
+          items:
+            $ref: '#/components/schemas/NamedProtocolVersion'
+    AbstractRestError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
+    GeneralError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
+    BulkRetirementRequest:
+      type: object
+      properties:
+        onBehalfOfSrcAcctId:
+          type: string
+          description: If permitted, allows the caller to retire on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
+        requests:
+          type: array
+          description: retirement request
+          items:
+            $ref: '#/components/schemas/RetirementRequest'
+        shadowedLedgerRetirementOptions:
+          $ref: '#/components/schemas/ExtShadowedLedgerRetirementOptionsDTO'
+    JsonNode:
+      type: object
+    ProtocolVersion:
       type: object
       properties:
         code:
@@ -486,77 +557,6 @@ components:
         issuing:
           type: boolean
           description: Issuing/Adorning flag
-        shortName:
-          type: string
-          description: Protocol's short name
-          example: AMS-I.D.
-    RetirementResponse:
-      type: object
-      properties:
-        correlationId:
-          type: string
-          description: Matches the correlationId provided in the retirement request.
-        retirementIdentifier:
-          type: string
-          description: Identifier associated with the retirement batch initiated by the system
-          example: b24ad896-d899-478d-9513-7061375b637c
-      description: Response for the balk retirement request
-    AbstractRestError:
-      type: object
-      properties:
-        code:
-          type: string
-        ticket:
-          type: string
-        message:
-          type: string
-    ExtShadowedLedgerRetirementOptionsDTO:
-      type: object
-      properties:
-        suppressShadowedLedgerInteraction:
-          type: boolean
-        shadowedLedgerRetirementIdentifiersByHoldingIdentifier:
-          type: object
-          additionalProperties:
-            $ref: '#/components/schemas/ExtShadowedLedgerEntityIdentifierMappingDTO'
-    ProgramVersion:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Program code
-          example: GHG_MEASUREMENT_PROGRAM
-        version:
-          type: string
-          description: Version of Program.
-          example: 5.0.0
-        shortName:
-          type: string
-          description: Program short name
-          example: Carbon Measurement
-        protocolVersions:
-          type: array
-          description: A list of Protocols associated with Program.
-          items:
-            $ref: '#/components/schemas/NamedProtocolVersion'
-    JsonNode:
-      type: object
-    Account:
-      type: object
-      properties:
-        srcAcctId:
-          type: string
-          description: The Account's unique system-assigned identifier used for programmatic (API) interactions.
-          example: 4edse581-b97a-11ef-ea69-b61606fd520c
-        identifier:
-          type: string
-          description: The Account's ID as displayed in the registry.
-          example: '15184192'
-        name:
-          type: string
-          description: The Account Operating Name on the registry.
-          example: APXOPCAR Project Manager
-      description: Account record
     Subaccount:
       required:
       - name

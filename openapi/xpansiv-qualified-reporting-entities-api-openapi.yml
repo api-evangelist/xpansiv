@@ -108,27 +108,6 @@ paths:
       - BearerAuth: []
 components:
   schemas:
-    QualifiedReportingEntitiesListResponse:
-      description: QRE rows returned in the API envelope `data` field.
-      type: array
-      items:
-        $ref: '#/components/schemas/QualifiedReportingEntityItem'
-    ServerError:
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-      - properties:
-          error:
-            description: 500 when an unexpected server or infrastructure failure occurs.
-            type: string
-            example: internal_error
-          message:
-            type: string
-            example: Error description
-        type: object
     ValidationError:
       description: 'Error payload for validation failures (400, 422) on request bodies and business rules.
 
@@ -167,6 +146,22 @@ components:
           type: string
           example: Error description
       type: object
+    ServerError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 500 when an unexpected server or infrastructure failure occurs.
+            type: string
+            example: internal_error
+          message:
+            type: string
+            example: Error description
+        type: object
     QualifiedReportingEntityItem:
       description: 'One QRE row in the API envelope `data` array for `getQualifiedReportingEntities`.
 
@@ -183,6 +178,11 @@ components:
           description: Same as `id` in the current implementation.
           type: string
       type: object
+    QualifiedReportingEntitiesListResponse:
+      description: QRE rows returned in the API envelope `data` field.
+      type: array
+      items:
+        $ref: '#/components/schemas/QualifiedReportingEntityItem'
     ResponseEnvelope:
       description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
       required:

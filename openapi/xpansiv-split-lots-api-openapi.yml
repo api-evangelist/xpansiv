@@ -134,28 +134,6 @@ paths:
           $ref: '#/components/responses/500'
 components:
   schemas:
-    Price:
-      type: object
-      required:
-      - currency
-      - amount
-      properties:
-        currency:
-          $ref: '#/components/schemas/Ref.Currency'
-        amount:
-          type: number
-          description: The numeric value of the price
-          minimum: 0
-    Ref.Currency:
-      description: Ref.Data.CURRENCY
-      type: string
-      minLength: 3
-      example: USD
-    NotAuthorizedError:
-      type: object
-      properties:
-        message:
-          type: string
     Ref.Program:
       type: string
       description: Ref.Data.PROGRAM
@@ -180,6 +158,28 @@ components:
           type: integer
           format: int64
     InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+    Price:
+      type: object
+      required:
+      - currency
+      - amount
+      properties:
+        currency:
+          $ref: '#/components/schemas/Ref.Currency'
+        amount:
+          type: number
+          description: The numeric value of the price
+          minimum: 0
+    Ref.Currency:
+      description: Ref.Data.CURRENCY
+      type: string
+      minLength: 3
+      example: USD
+    NotAuthorizedError:
       type: object
       properties:
         message:

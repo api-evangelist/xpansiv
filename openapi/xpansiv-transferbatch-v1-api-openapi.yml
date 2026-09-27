@@ -420,6 +420,123 @@ paths:
                 $ref: '#/components/schemas/GeneralError'
 components:
   schemas:
+    BulkTransferResponse:
+      type: object
+      properties:
+        responses:
+          type: array
+          description: Bulk Transfer Response
+          items:
+            $ref: '#/components/schemas/InteraccountTransferResponse'
+      description: Bulk Transfer Response
+    ReferenceDatum:
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: The reference data's value.
+        name:
+          type: string
+          description: The reference data's name
+      description: A reference datum data object
+    InteraccountTransferResponse:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: Matches the correlationId provided in the inter-account transfer request.
+          example: '1234'
+        transferIdentifier:
+          type: string
+          description: The transfer batch's system-assigned identifier used for programmatic (API) interactions.
+          example: 5A9BBB98-73E5-4226-B55E-1B4AABFE3CF3
+      description: Interaccount Transfer Response
+    ActionTransferBatches:
+      type: object
+      properties:
+        onBehalfOfSrcAcctId:
+          type: string
+          description: If permitted, allows the caller to perform actions on open transfer batches on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
+        action:
+          type: string
+          description: Specifies code of action to take; same action for all transfer batches included in "items".
+          example: WITHDRAW
+          enum:
+          - CONFIRM
+          - WITHDRAW
+          - REJECT
+        items:
+          type: array
+          description: List of transfer batch identifiers
+          items:
+            $ref: '#/components/schemas/ActionTransferBatchItem'
+    OpenTransferBatchResponse:
+      type: object
+      properties:
+        inbound:
+          type: array
+          description: Inbound transfer batches that are visible-to-the-caller; as the transfer recipient, the API user can usually accept or reject.
+          items:
+            $ref: '#/components/schemas/TransferBatch'
+        outbound:
+          type: array
+          description: Outbound transfer batches that are visible-to-the-caller; as the transfer initiator, the API user can usually withdraw.
+          items:
+            $ref: '#/components/schemas/TransferBatch'
+      description: Includes visible-to-the-caller transfer batches – both incoming and outgoing. If includeHoldings = true, it has the holding collection associated with each of those transfer batches is populated with the holding details
+    SubaccountTransferRequest:
+      type: object
+      properties:
+        subaccountIdentifier:
+          type: string
+          description: Id of the sub-account to which to transfer the goods
+        holdingCriteria:
+          type: array
+          description: Criteria for holdings associated with the sub-account transfer batch.
+          items:
+            $ref: '#/components/schemas/QuantifiedHolding'
+        correlationId:
+          type: string
+          description: Client system correlation Id – allows the caller to correlate between requests and responses
+      description: Sub-account transfer request
+    ErrorItem:
+      type: object
+      properties:
+        parameter:
+          type: string
+        correlationId:
+          type: string
+        path:
+          type: string
+        field:
+          type: string
+        code:
+          type: string
+        message:
+          type: string
+    SubaccountTransferResponse:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: Matches the correlationId provided in the subaccount transfer request.
+        transferBatchIdentifier:
+          type: string
+          description: Transfer batch identifier for the Subaccount Transfer Batch associated with subaccount transfer
+      description: Sub-account bulk transfer response
+    BulkTransferRequest:
+      type: object
+      properties:
+        onBehalfOfSrcAcctId:
+          type: string
+          description: If permitted, allows the caller to initiate transfer batches on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
+        requests:
+          type: array
+          description: Collection of Transfer requests
+          items:
+            $ref: '#/components/schemas/InteraccountTransferRequest'
     BulkSubaccountTransferRequest:
       type: object
       properties:
@@ -432,7 +549,16 @@ components:
           items:
             $ref: '#/components/schemas/SubaccountTransferRequest'
       description: Sub-account bulk transfer request
-    ProtocolVersion:
+    ErrorContainer:
+      type: object
+      properties:
+        submissionId:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+    NamedProtocolVersion:
       type: object
       properties:
         code:
@@ -454,130 +580,10 @@ components:
         issuing:
           type: boolean
           description: Issuing/Adorning flag
-    BulkTransferResponse:
-      type: object
-      properties:
-        responses:
-          type: array
-          description: Bulk Transfer Response
-          items:
-            $ref: '#/components/schemas/InteraccountTransferResponse'
-      description: Bulk Transfer Response
-    ErrorContainer:
-      type: object
-      properties:
-        submissionId:
+        shortName:
           type: string
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ErrorItem'
-    ActionTransferBatches:
-      type: object
-      properties:
-        onBehalfOfSrcAcctId:
-          type: string
-          description: If permitted, allows the caller to perform actions on open transfer batches on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
-        action:
-          type: string
-          description: Specifies code of action to take; same action for all transfer batches included in "items".
-          example: WITHDRAW
-          enum:
-          - CONFIRM
-          - WITHDRAW
-          - REJECT
-        items:
-          type: array
-          description: List of transfer batch identifiers
-          items:
-            $ref: '#/components/schemas/ActionTransferBatchItem'
-    GeneralError:
-      type: object
-      properties:
-        code:
-          type: string
-        ticket:
-          type: string
-        message:
-          type: string
-    ReferenceDatum:
-      required:
-      - code
-      type: object
-      properties:
-        code:
-          type: string
-          description: The reference data's value.
-        name:
-          type: string
-          description: The reference data's name
-      description: A reference datum data object
-    QuantifiedHolding:
-      type: object
-      properties:
-        holdingIdentifier:
-          type: string
-          description: Holding Identifier, as returned by the holdings API
-          example: '476099'
-        quantity:
-          type: number
-          description: Quantity of holding to be used in this operation
-          example: 3
-      description: Quantified Holding
-    ActionTransferBatchItem:
-      type: object
-      properties:
-        batchIdentifier:
-          type: string
-          description: The system identifier for a specific transfer batch
-          example: 7644439A-A56B-45E5-AFE6-94E149CF014E
-    OpenTransferBatchResponse:
-      type: object
-      properties:
-        inbound:
-          type: array
-          description: Inbound transfer batches that are visible-to-the-caller; as the transfer recipient, the API user can usually accept or reject.
-          items:
-            $ref: '#/components/schemas/TransferBatch'
-        outbound:
-          type: array
-          description: Outbound transfer batches that are visible-to-the-caller; as the transfer initiator, the API user can usually withdraw.
-          items:
-            $ref: '#/components/schemas/TransferBatch'
-      description: Includes visible-to-the-caller transfer batches – both incoming and outgoing. If includeHoldings = true, it has the holding collection associated with each of those transfer batches is populated with the holding details
-    BulkSubaccountTransferResponse:
-      type: object
-      properties:
-        responses:
-          type: array
-          description: Bulk Subaccount Transfer response
-          items:
-            $ref: '#/components/schemas/SubaccountTransferResponse'
-    SubaccountTransferResponse:
-      type: object
-      properties:
-        correlationId:
-          type: string
-          description: Matches the correlationId provided in the subaccount transfer request.
-        transferBatchIdentifier:
-          type: string
-          description: Transfer batch identifier for the Subaccount Transfer Batch associated with subaccount transfer
-      description: Sub-account bulk transfer response
-    ErrorItem:
-      type: object
-      properties:
-        parameter:
-          type: string
-        correlationId:
-          type: string
-        path:
-          type: string
-        field:
-          type: string
-        code:
-          type: string
-        message:
-          type: string
+          description: Protocol's short name
+          example: AMS-I.D.
     Holding:
       type: object
       properties:
@@ -680,117 +686,18 @@ components:
           description: Identifier for grouped holdings in transfer operations, if applicable.
         certificateType:
           $ref: '#/components/schemas/ReferenceDatum'
-    TransferBatchRetrieveByIdentifierResponse:
+    QuantifiedHolding:
       type: object
       properties:
-        transferBatches:
-          type: array
-          description: Collection of retrieved Transfer Batches
-          items:
-            $ref: '#/components/schemas/TransferBatch'
-    InteraccountTransferResponse:
-      type: object
-      properties:
-        correlationId:
+        holdingIdentifier:
           type: string
-          description: Matches the correlationId provided in the inter-account transfer request.
-          example: '1234'
-        transferIdentifier:
-          type: string
-          description: The transfer batch's system-assigned identifier used for programmatic (API) interactions.
-          example: 5A9BBB98-73E5-4226-B55E-1B4AABFE3CF3
-      description: Interaccount Transfer Response
-    TransferBatchRetrieveByIdentifierRequest:
-      type: object
-      properties:
-        onBehalfOfSrcAcctId:
-          type: string
-          description: If permitted, allows the caller to initiate transfer batches on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
-        transferBatchIdentifiers:
-          uniqueItems: true
-          type: array
-          description: System-assigned identifiers associated with the transfer batches to be retrieved.
-          items:
-            type: string
-        includeHoldings:
-          type: boolean
-          description: If true, include holding details in response. Defaults to true if not specified.
-    BulkTransferRequest:
-      type: object
-      properties:
-        onBehalfOfSrcAcctId:
-          type: string
-          description: If permitted, allows the caller to initiate transfer batches on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
-        requests:
-          type: array
-          description: Collection of Transfer requests
-          items:
-            $ref: '#/components/schemas/InteraccountTransferRequest'
-    InteraccountTransferRequest:
-      type: object
-      properties:
-        transfereeSrcAcctId:
-          type: string
-          description: System-assigned account Identifier of the transfer counterparty; recipient of the transfer request.
-          example: b5d8d6b3-bcaf-11ef-ae69-b61606fd520c
-        holdingCriteria:
-          type: array
-          description: Criteria for holdings to be associated with this transfer batch.
-          items:
-            $ref: '#/components/schemas/QuantifiedHolding'
-        correlationId:
-          type: string
-          description: Client system correlation Id – allows the caller to correlate between requests and responses
-        requestConfirmation:
-          type: boolean
-        toSubaccountIdentifier:
-          type: string
-          description: Identifier of the subaccount in the transferee (receiving) account into which to deposit the goods
-        totalPrice:
+          description: Holding Identifier, as returned by the holdings API
+          example: '476099'
+        quantity:
           type: number
-          description: Indicates the total price of the transfer
-        currencyCode:
-          type: string
-          description: Indicates the currency of the price of the transfer
-        notes:
-          type: string
-          description: Contains the transfer notes
-      description: Interaccount Transfer Request
-    NamedProtocolVersion:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Protocol code
-          example: AMS-I.D.
-        version:
-          type: string
-          description: Version of Protocol
-          example: 1.0.0
-        effectiveAt:
-          type: string
-          description: Start date of the Protocol Version
-          format: date-time
-        expiresAt:
-          type: string
-          description: End date of the Protocol Version
-          format: date-time
-        issuing:
-          type: boolean
-          description: Issuing/Adorning flag
-        shortName:
-          type: string
-          description: Protocol's short name
-          example: AMS-I.D.
-    AbstractRestError:
-      type: object
-      properties:
-        code:
-          type: string
-        ticket:
-          type: string
-        message:
-          type: string
+          description: Quantity of holding to be used in this operation
+          example: 3
+      description: Quantified Holding
     TransferBatch:
       type: object
       properties:
@@ -902,18 +809,111 @@ components:
           description: A list of Protocols associated with Program.
           items:
             $ref: '#/components/schemas/NamedProtocolVersion'
-    SubaccountTransferRequest:
+    AbstractRestError:
       type: object
       properties:
-        subaccountIdentifier:
+        code:
           type: string
-          description: Id of the sub-account to which to transfer the goods
+        ticket:
+          type: string
+        message:
+          type: string
+    GeneralError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
+    InteraccountTransferRequest:
+      type: object
+      properties:
+        transfereeSrcAcctId:
+          type: string
+          description: System-assigned account Identifier of the transfer counterparty; recipient of the transfer request.
+          example: b5d8d6b3-bcaf-11ef-ae69-b61606fd520c
         holdingCriteria:
           type: array
-          description: Criteria for holdings associated with the sub-account transfer batch.
+          description: Criteria for holdings to be associated with this transfer batch.
           items:
             $ref: '#/components/schemas/QuantifiedHolding'
         correlationId:
           type: string
           description: Client system correlation Id – allows the caller to correlate between requests and responses
-      description: Sub-account transfer request
+        requestConfirmation:
+          type: boolean
+        toSubaccountIdentifier:
+          type: string
+          description: Identifier of the subaccount in the transferee (receiving) account into which to deposit the goods
+        totalPrice:
+          type: number
+          description: Indicates the total price of the transfer
+        currencyCode:
+          type: string
+          description: Indicates the currency of the price of the transfer
+        notes:
+          type: string
+          description: Contains the transfer notes
+      description: Interaccount Transfer Request
+    BulkSubaccountTransferResponse:
+      type: object
+      properties:
+        responses:
+          type: array
+          description: Bulk Subaccount Transfer response
+          items:
+            $ref: '#/components/schemas/SubaccountTransferResponse'
+    ProtocolVersion:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Protocol code
+          example: AMS-I.D.
+        version:
+          type: string
+          description: Version of Protocol
+          example: 1.0.0
+        effectiveAt:
+          type: string
+          description: Start date of the Protocol Version
+          format: date-time
+        expiresAt:
+          type: string
+          description: End date of the Protocol Version
+          format: date-time
+        issuing:
+          type: boolean
+          description: Issuing/Adorning flag
+    ActionTransferBatchItem:
+      type: object
+      properties:
+        batchIdentifier:
+          type: string
+          description: The system identifier for a specific transfer batch
+          example: 7644439A-A56B-45E5-AFE6-94E149CF014E
+    TransferBatchRetrieveByIdentifierResponse:
+      type: object
+      properties:
+        transferBatches:
+          type: array
+          description: Collection of retrieved Transfer Batches
+          items:
+            $ref: '#/components/schemas/TransferBatch'
+    TransferBatchRetrieveByIdentifierRequest:
+      type: object
+      properties:
+        onBehalfOfSrcAcctId:
+          type: string
+          description: If permitted, allows the caller to initiate transfer batches on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
+        transferBatchIdentifiers:
+          uniqueItems: true
+          type: array
+          description: System-assigned identifiers associated with the transfer batches to be retrieved.
+          items:
+            type: string
+        includeHoldings:
+          type: boolean
+          description: If true, include holding details in response. Defaults to true if not specified.

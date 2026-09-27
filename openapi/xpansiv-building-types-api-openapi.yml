@@ -108,27 +108,6 @@ paths:
       - BearerAuth: []
 components:
   schemas:
-    BuildingTypesListResponse:
-      description: Building type rows returned in the API envelope `data` field.
-      type: array
-      items:
-        $ref: '#/components/schemas/BuildingTypeItem'
-    BuildingTypeItem:
-      description: 'One building type row in the API envelope `data` array for `getBuildingTypes`.
-
-
-        Runtime: {@see \Building_type_lib::get_building_types()} — `id`, `name`.'
-      required:
-      - id
-      - name
-      properties:
-        id:
-          description: Primary key (`building_type_id`).
-          type: integer
-        name:
-          description: Display name (`building_type_name`).
-          type: string
-      type: object
     ValidationError:
       description: 'Error payload for validation failures (400, 422) on request bodies and business rules.
 
@@ -146,6 +125,31 @@ components:
         data:
           type: object
           additionalProperties: true
+      type: object
+    BuildingTypesListResponse:
+      description: Building type rows returned in the API envelope `data` field.
+      type: array
+      items:
+        $ref: '#/components/schemas/BuildingTypeItem'
+    Error:
+      description: 'Generic error payload when no more specific error schema applies.
+
+
+        Implements JsonSerializable so it can be passed directly to API_Controller::response().
+
+        Implements Countable returning 0 so the response size guard in API_Controller treats it
+
+        as an empty collection (error responses never trigger the size limit).'
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Error description
       type: object
     ServerError:
       required:
@@ -179,25 +183,21 @@ components:
             type: string
             example: You do not have permission to access this resource
         type: object
-    Error:
-      description: 'Generic error payload when no more specific error schema applies.
+    BuildingTypeItem:
+      description: 'One building type row in the API envelope `data` array for `getBuildingTypes`.
 
 
-        Implements JsonSerializable so it can be passed directly to API_Controller::response().
-
-        Implements Countable returning 0 so the response size guard in API_Controller treats it
-
-        as an empty collection (error responses never trigger the size limit).'
+        Runtime: {@see \Building_type_lib::get_building_types()} — `id`, `name`.'
       required:
-      - error
-      - message
+      - id
+      - name
       properties:
-        error:
+        id:
+          description: Primary key (`building_type_id`).
+          type: integer
+        name:
+          description: Display name (`building_type_name`).
           type: string
-          example: error
-        message:
-          type: string
-          example: Error description
       type: object
     ResponseEnvelope:
       description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.

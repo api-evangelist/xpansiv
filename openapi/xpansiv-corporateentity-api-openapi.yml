@@ -126,33 +126,6 @@ components:
           description: The path to the field specifically in error, if applicable
       title: ErrorItem
       description: Describes a specific error
-    ODataEnvelopeOfCorporateEntities:
-      type: object
-      properties:
-        '@count':
-          type: integer
-          format: int32
-          description: The total number of results (only present if requested)
-        value:
-          type: array
-          description: Rows of information
-          items:
-            $ref: '#/components/schemas/CorporateEntities'
-      title: ODataEnvelopeOfCorporateEntities
-      description: Container for OData-like rows of information
-    ErrorContainer:
-      type: object
-      properties:
-        errors:
-          type: array
-          description: List of errors
-          items:
-            $ref: '#/components/schemas/ErrorItem'
-        submissionId:
-          type: string
-          description: Submission identifier for issue investigation
-      title: ErrorContainer
-      description: Container for errors
     CorporateEntities:
       type: object
       required:
@@ -186,6 +159,33 @@ components:
           example: DUNS
       title: CorporateEntities
       description: Corporate entities information
+    ErrorContainer:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: List of errors
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+        submissionId:
+          type: string
+          description: Submission identifier for issue investigation
+      title: ErrorContainer
+      description: Container for errors
+    ODataEnvelopeOfCorporateEntities:
+      type: object
+      properties:
+        '@count':
+          type: integer
+          format: int32
+          description: The total number of results (only present if requested)
+        value:
+          type: array
+          description: Rows of information
+          items:
+            $ref: '#/components/schemas/CorporateEntities'
+      title: ODataEnvelopeOfCorporateEntities
+      description: Container for OData-like rows of information
   securitySchemes:
     JWT:
       type: apiKey

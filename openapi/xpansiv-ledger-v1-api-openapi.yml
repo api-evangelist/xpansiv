@@ -426,7 +426,19 @@ paths:
                 $ref: '#/components/schemas/GeneralError'
 components:
   schemas:
-    OwnershipLedgerType:
+    IssuanceRetrieveByIdentifierRequest:
+      type: object
+      properties:
+        onBehalfOfSrcAcctId:
+          type: string
+          description: If permitted, allows the caller to retrieve issuances on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
+        issuanceIdentifiers:
+          uniqueItems: true
+          type: array
+          description: Collection of issuance identifiers for the issuances to retrieve.
+          items:
+            type: string
+    ReferenceDatum:
       required:
       - code
       type: object
@@ -437,111 +449,23 @@ components:
         name:
           type: string
           description: The reference data's name
-        ownershipLedgerTypeIdentifier:
-          type: string
-          description: The ownership ledger type's system-assigned identifier.
-          format: uuid
-          example: 7562eb1e-fe02-41f6-911a-aa3a805a1e29
-        centralized:
-          type: boolean
-          description: If true, the ownership ledger is centralized
-          example: true
-        serialized:
-          type: boolean
-          description: If true, goods tracked on this ownership ledger are serialized.
-          example: true
-      description: Ownership Ledger Type
-    Issuance:
+      description: A reference datum data object
+    Account:
       type: object
       properties:
+        srcAcctId:
+          type: string
+          description: The Account's unique system-assigned identifier used for programmatic (API) interactions.
+          example: 4edse581-b97a-11ef-ea69-b61606fd520c
         identifier:
           type: string
-        externalIdentifier:
+          description: The Account's ID as displayed in the registry.
+          example: '15184192'
+        name:
           type: string
-        resourceIdentifier:
-          type: string
-        resourceProgramAssignedIdentifier:
-          type: string
-        asset:
-          type: boolean
-        firm:
-          type: boolean
-        programCertificationGroupCode:
-          type: string
-        programPeriodBeginInclusive:
-          type: string
-        programPeriodEndExclusive:
-          type: string
-        certificateTypeCode:
-          type: string
-        serialNumberPrefix:
-          type: string
-        serialStart:
-          type: integer
-          format: int32
-        serialEnd:
-          type: integer
-          format: int32
-        quantity:
-          type: number
-        originalSrcAcctId:
-          type: string
-        originalSrcAcctIdentifier:
-          type: string
-        originalAcctName:
-          type: string
-        timeOfProductionBeginInclusive:
-          type: string
-          format: date-time
-        timeOfProductionEndExclusive:
-          type: string
-          format: date-time
-        deliveryLocationIdentifier:
-          type: string
-        externalSerialNumber:
-          type: string
-        inboundInterledgerTransferIdentifier:
-          type: string
-        batchNumber:
-          type: string
-        issuanceContractInstanceIdentifier:
-          type: string
-        ongoingAuditorIdentifier:
-          type: string
-        productIdentifier:
-          type: string
-        productLotIdentifier:
-          type: string
-        ein:
-          type: string
-        upn:
-          type: string
-        positions:
-          type: array
-          items:
-            $ref: '#/components/schemas/Holding'
-    ProtocolVersion:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Protocol code
-          example: AMS-I.D.
-        version:
-          type: string
-          description: Version of Protocol
-          example: 1.0.0
-        effectiveAt:
-          type: string
-          description: Start date of the Protocol Version
-          format: date-time
-        expiresAt:
-          type: string
-          description: End date of the Protocol Version
-          format: date-time
-        issuing:
-          type: boolean
-          description: Issuing/Adorning flag
+          description: The Account Operating Name on the registry.
+          example: APXOPCAR Project Manager
+      description: Account record
     LedgerHistory:
       type: object
       properties:
@@ -565,15 +489,37 @@ components:
           type: string
           description: Timestamp for when ledger entry was last modified
           format: date-time
-    ErrorContainer:
+    LedgerHistoryList:
       type: object
       properties:
-        submissionId:
-          type: string
-        errors:
+        ledgerHistoryRecords:
           type: array
+          description: A collection of ledger history entries.
           items:
-            $ref: '#/components/schemas/ErrorItem'
+            $ref: '#/components/schemas/LedgerHistory'
+    LedgerAccounts:
+      type: object
+      properties:
+        ledgerAccounts:
+          type: array
+          description: A list of accounts related to the specified ownership ledger.
+          items:
+            $ref: '#/components/schemas/LedgerAccount'
+    ErrorItem:
+      type: object
+      properties:
+        parameter:
+          type: string
+        correlationId:
+          type: string
+        path:
+          type: string
+        field:
+          type: string
+        code:
+          type: string
+        message:
+          type: string
     LedgerAccount:
       type: object
       properties:
@@ -585,52 +531,6 @@ components:
           description: A list of the Account's participation privileges on the specified ownership ledger.
           items:
             type: string
-    LedgerAccounts:
-      type: object
-      properties:
-        ledgerAccounts:
-          type: array
-          description: A list of accounts related to the specified ownership ledger.
-          items:
-            $ref: '#/components/schemas/LedgerAccount'
-    LedgerHistoryList:
-      type: object
-      properties:
-        ledgerHistoryRecords:
-          type: array
-          description: A collection of ledger history entries.
-          items:
-            $ref: '#/components/schemas/LedgerHistory'
-    GeneralError:
-      type: object
-      properties:
-        code:
-          type: string
-        ticket:
-          type: string
-        message:
-          type: string
-    ReferenceDatum:
-      required:
-      - code
-      type: object
-      properties:
-        code:
-          type: string
-          description: The reference data's value.
-        name:
-          type: string
-          description: The reference data's name
-      description: A reference datum data object
-    OwnershipLedgers:
-      type: object
-      properties:
-        ownershipLedgers:
-          type: array
-          description: A list of available ownership ledgers.
-          items:
-            $ref: '#/components/schemas/OwnershipLedger'
-      description: Ownership Ledgers
     OwnershipLedger:
       type: object
       properties:
@@ -669,28 +569,41 @@ components:
           type: boolean
           description: This parameter is true when ownership ledger supports transfer batch pricing
       description: Ownership Ledger
-    IssuanceRetrieveByIdentifierResponse:
+    ErrorContainer:
       type: object
       properties:
-        issuances:
+        submissionId:
+          type: string
+        errors:
           type: array
           items:
-            $ref: '#/components/schemas/Issuance'
-    ErrorItem:
+            $ref: '#/components/schemas/ErrorItem'
+    NamedProtocolVersion:
       type: object
       properties:
-        parameter:
-          type: string
-        correlationId:
-          type: string
-        path:
-          type: string
-        field:
-          type: string
         code:
           type: string
-        message:
+          description: Protocol code
+          example: AMS-I.D.
+        version:
           type: string
+          description: Version of Protocol
+          example: 1.0.0
+        effectiveAt:
+          type: string
+          description: Start date of the Protocol Version
+          format: date-time
+        expiresAt:
+          type: string
+          description: End date of the Protocol Version
+          format: date-time
+        issuing:
+          type: boolean
+          description: Issuing/Adorning flag
+        shortName:
+          type: string
+          description: Protocol's short name
+          example: AMS-I.D.
     Holding:
       type: object
       properties:
@@ -793,6 +706,136 @@ components:
           description: Identifier for grouped holdings in transfer operations, if applicable.
         certificateType:
           $ref: '#/components/schemas/ReferenceDatum'
+    Issuance:
+      type: object
+      properties:
+        identifier:
+          type: string
+        externalIdentifier:
+          type: string
+        resourceIdentifier:
+          type: string
+        resourceProgramAssignedIdentifier:
+          type: string
+        asset:
+          type: boolean
+        firm:
+          type: boolean
+        programCertificationGroupCode:
+          type: string
+        programPeriodBeginInclusive:
+          type: string
+        programPeriodEndExclusive:
+          type: string
+        certificateTypeCode:
+          type: string
+        serialNumberPrefix:
+          type: string
+        serialStart:
+          type: integer
+          format: int32
+        serialEnd:
+          type: integer
+          format: int32
+        quantity:
+          type: number
+        originalSrcAcctId:
+          type: string
+        originalSrcAcctIdentifier:
+          type: string
+        originalAcctName:
+          type: string
+        timeOfProductionBeginInclusive:
+          type: string
+          format: date-time
+        timeOfProductionEndExclusive:
+          type: string
+          format: date-time
+        deliveryLocationIdentifier:
+          type: string
+        externalSerialNumber:
+          type: string
+        inboundInterledgerTransferIdentifier:
+          type: string
+        batchNumber:
+          type: string
+        issuanceContractInstanceIdentifier:
+          type: string
+        ongoingAuditorIdentifier:
+          type: string
+        productIdentifier:
+          type: string
+        productLotIdentifier:
+          type: string
+        ein:
+          type: string
+        upn:
+          type: string
+        positions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Holding'
+    OwnershipLedgerType:
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: The reference data's value.
+        name:
+          type: string
+          description: The reference data's name
+        ownershipLedgerTypeIdentifier:
+          type: string
+          description: The ownership ledger type's system-assigned identifier.
+          format: uuid
+          example: 7562eb1e-fe02-41f6-911a-aa3a805a1e29
+        centralized:
+          type: boolean
+          description: If true, the ownership ledger is centralized
+          example: true
+        serialized:
+          type: boolean
+          description: If true, goods tracked on this ownership ledger are serialized.
+          example: true
+      description: Ownership Ledger Type
+    ProgramVersion:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Program code
+          example: GHG_MEASUREMENT_PROGRAM
+        version:
+          type: string
+          description: Version of Program.
+          example: 5.0.0
+        shortName:
+          type: string
+          description: Program short name
+          example: Carbon Measurement
+        protocolVersions:
+          type: array
+          description: A list of Protocols associated with Program.
+          items:
+            $ref: '#/components/schemas/NamedProtocolVersion'
+    AbstractRestError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
+    IssuanceRetrieveByIdentifierResponse:
+      type: object
+      properties:
+        issuances:
+          type: array
+          items:
+            $ref: '#/components/schemas/Issuance'
     Holdings:
       required:
       - value
@@ -807,6 +850,15 @@ components:
           description: Rows of information
           items:
             $ref: '#/components/schemas/Holding'
+    GeneralError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
     Marketplace:
       required:
       - code
@@ -836,7 +888,7 @@ components:
           description: If true, the entry of a transaction associated with this marketplace will require the explicit quantified selection of product lots
           example: false
       description: A marketplace data object
-    NamedProtocolVersion:
+    ProtocolVersion:
       type: object
       properties:
         code:
@@ -858,64 +910,12 @@ components:
         issuing:
           type: boolean
           description: Issuing/Adorning flag
-        shortName:
-          type: string
-          description: Protocol's short name
-          example: AMS-I.D.
-    AbstractRestError:
+    OwnershipLedgers:
       type: object
       properties:
-        code:
-          type: string
-        ticket:
-          type: string
-        message:
-          type: string
-    ProgramVersion:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Program code
-          example: GHG_MEASUREMENT_PROGRAM
-        version:
-          type: string
-          description: Version of Program.
-          example: 5.0.0
-        shortName:
-          type: string
-          description: Program short name
-          example: Carbon Measurement
-        protocolVersions:
+        ownershipLedgers:
           type: array
-          description: A list of Protocols associated with Program.
+          description: A list of available ownership ledgers.
           items:
-            $ref: '#/components/schemas/NamedProtocolVersion'
-    IssuanceRetrieveByIdentifierRequest:
-      type: object
-      properties:
-        onBehalfOfSrcAcctId:
-          type: string
-          description: If permitted, allows the caller to retrieve issuances on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
-        issuanceIdentifiers:
-          uniqueItems: true
-          type: array
-          description: Collection of issuance identifiers for the issuances to retrieve.
-          items:
-            type: string
-    Account:
-      type: object
-      properties:
-        srcAcctId:
-          type: string
-          description: The Account's unique system-assigned identifier used for programmatic (API) interactions.
-          example: 4edse581-b97a-11ef-ea69-b61606fd520c
-        identifier:
-          type: string
-          description: The Account's ID as displayed in the registry.
-          example: '15184192'
-        name:
-          type: string
-          description: The Account Operating Name on the registry.
-          example: APXOPCAR Project Manager
-      description: Account record
+            $ref: '#/components/schemas/OwnershipLedger'
+      description: Ownership Ledgers

@@ -86,95 +86,46 @@ paths:
       tags:
       - Projects
 components:
-  parameters:
-    PageSize:
-      name: size
-      in: query
-      required: false
-      schema:
-        type: integer
-        format: int32
-    PageNumber:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        format: int32
-    Include:
-      name: include
-      description: Comma-separated values from optional response fields
-      in: query
-      required: false
-      schema:
-        type: string
+  responses:
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
+    '401':
+      description: Not authorized error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotAuthorizedError'
   schemas:
-    Ref.Certification:
-      type: string
-      description: Certification code. Ref.Data.CARBON_CERTIFICATION
-    Ref.ProjectStatus:
-      type: string
-      description: Ref.Data.PROJECT_STATUS
-    Page:
+    ProjectCertification:
       type: object
-      required:
-      - page
-      - size
-      - totalPages
-      - totalElements
       properties:
-        page:
-          type: integer
-          format: int32
-        size:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-        totalElements:
-          type: integer
-          format: int64
-    Ref.CreditType:
-      type: string
-      description: The type of the credit. Ref.Data.CARBON_CREDIT_TYPE
-    Ref.ProjectType:
-      type: string
-      description: The project type. Ref.Data.CARBON_PROJECT_TYPE
-    Ref.BaselineMethodology:
-      type: string
-      description: Ref.Data.BASELINE_METHODOLOGY
+        code:
+          $ref: '#/components/schemas/Ref.Certification'
+        projectCertificationDateRanges:
+          type: array
+          items:
+            type: object
+            properties:
+              certificationStart:
+                type: string
+                format: date-time
+                description: The project certification start date.
+              certificationEnd:
+                type: string
+                format: date-time
+                description: The project certification end date.
     NotAuthorizedError:
       type: object
       properties:
         message:
           type: string
-    Ref.Country:
-      type: string
-      description: Ref.Data.COUNTRY
-    InternalServerError:
-      type: object
-      properties:
-        message:
-          type: string
-    Ref.ProjectRegistryStatus:
-      type: string
-      description: The registry status of the project. Ref.Data.PROJECT_REGISTRY_STATUS
     Ref.CarbonProgram:
       type: string
       description: Ref.Data.CARBON_PROGRAM
-    Location:
-      title: Resource location
-      type: object
-      properties:
-        latitude:
-          type: number
-          format: double
-          description: Latitude.
-        longitude:
-          type: number
-          format: double
-          description: Longitude.
     Project:
       allOf:
       - $ref: '#/components/schemas/Resource'
@@ -252,6 +203,55 @@ components:
             description: Optional property. Use `include` param.
             items:
               $ref: '#/components/schemas/IssuanceCertification'
+    Location:
+      title: Resource location
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+          description: Latitude.
+        longitude:
+          type: number
+          format: double
+          description: Longitude.
+    Page:
+      type: object
+      required:
+      - page
+      - size
+      - totalPages
+      - totalElements
+      properties:
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+    Ref.ProjectType:
+      type: string
+      description: The project type. Ref.Data.CARBON_PROJECT_TYPE
+    Ref.Country:
+      type: string
+      description: Ref.Data.COUNTRY
+    Ref.ProjectStatus:
+      type: string
+      description: Ref.Data.PROJECT_STATUS
+    Ref.Certification:
+      type: string
+      description: Certification code. Ref.Data.CARBON_CERTIFICATION
     IssuanceCertification:
       type: object
       properties:
@@ -263,6 +263,12 @@ components:
           items:
             type: integer
             format: int32
+    Ref.ProjectRegistryStatus:
+      type: string
+      description: The registry status of the project. Ref.Data.PROJECT_REGISTRY_STATUS
+    Ref.BaselineMethodology:
+      type: string
+      description: Ref.Data.BASELINE_METHODOLOGY
     Resource:
       type: object
       required:
@@ -280,37 +286,31 @@ components:
         name:
           type: string
           description: The registry assigned name of the project or generator.
-    ProjectCertification:
-      type: object
-      properties:
-        code:
-          $ref: '#/components/schemas/Ref.Certification'
-        projectCertificationDateRanges:
-          type: array
-          items:
-            type: object
-            properties:
-              certificationStart:
-                type: string
-                format: date-time
-                description: The project certification start date.
-              certificationEnd:
-                type: string
-                format: date-time
-                description: The project certification end date.
-  responses:
-    '401':
-      description: Not authorized error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/NotAuthorizedError'
-    '500':
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/InternalServerError'
+    Ref.CreditType:
+      type: string
+      description: The type of the credit. Ref.Data.CARBON_CREDIT_TYPE
+  parameters:
+    PageSize:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    Include:
+      name: include
+      description: Comma-separated values from optional response fields
+      in: query
+      required: false
+      schema:
+        type: string
+    PageNumber:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
   securitySchemes:
     bearerToken:
       type: http

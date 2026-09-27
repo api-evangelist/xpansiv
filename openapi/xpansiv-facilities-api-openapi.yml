@@ -1184,6 +1184,683 @@ paths:
                   type: object
 components:
   schemas:
+    FacilityListDetails:
+      description: Facility summary returned in the account facilities list.
+      properties:
+        facility_id:
+          type: integer
+          example: 130235
+        name:
+          type:
+          - string
+          - 'null'
+          example: test API facility name
+        energy_type_id:
+          type:
+          - integer
+          - 'null'
+          example: 1
+        energy_type:
+          type:
+          - string
+          - 'null'
+          example: Solar Photovoltaic
+        facility_size:
+          type:
+          - number
+          - 'null'
+          format: float
+          example: 1.5713
+        facility_type:
+          type:
+          - string
+          - 'null'
+          example: RES
+        facility_type_long:
+          type:
+          - string
+          - 'null'
+          example: Residential
+        usable_energy:
+          type: number
+          format: float
+          example: 12.34
+        system_cost:
+          type:
+          - number
+          - 'null'
+          format: float
+          example: 12345
+        is_battery_backup:
+          type: boolean
+          example: false
+        system_leased:
+          type: boolean
+          example: false
+        referrer_company:
+          type:
+          - string
+          - 'null'
+          example: test - Bayer, Jast and Champlin
+        ticket_owner:
+          description: May be empty when unset.
+          type: string
+          example: ''
+        ticket_owner_user_id:
+          type:
+          - integer
+          - 'null'
+          example: 42
+        independent_verifier:
+          type:
+          - string
+          - 'null'
+          example: Verifier Inc
+        operation_start_date:
+          description: Commissioning / operation start date (locations.operation_start_date).
+          type:
+          - string
+          - 'null'
+          format: date
+          example: '2024-03-01'
+        registry:
+          $ref: '#/components/schemas/Registry'
+        address:
+          $ref: '#/components/schemas/Address'
+        owner:
+          $ref: '#/components/schemas/Owner'
+        installer:
+          $ref: '#/components/schemas/Installer'
+        meter:
+          $ref: '#/components/schemas/Meter'
+      type: object
+    postAbpPanelCreate:
+      description: Panel array entry for ABP facility creation (`facilityAbpFlatCreateOrUpdate.panels`).
+      required:
+      - number_of_panels
+      - panel_location
+      - panel_rating_dc
+      - panel_manufacturer
+      - panel_model_type
+      - tracking
+      - array_tilt
+      - array_orientation_azimuth
+      - panels_bifacial
+      properties:
+        number_of_panels:
+          type: number
+          example: 20
+        panel_location:
+          type: string
+          example: Roof
+          enum:
+          - Ground
+          - Roof
+        panel_rating_dc:
+          description: Wattage of each module in W (DC).
+          type: number
+          example: 400
+        panel_manufacturer:
+          type: string
+          example: Solartech Energy
+        panel_model_type:
+          type: string
+          example: ASC-6M-72-295-3BB (295W Monocrystalline Module)
+        tracking:
+          type: string
+          example: Fixed
+          enum:
+          - Fixed
+          - '1'
+          - '2'
+        array_tilt:
+          type: number
+          example: 22
+        array_orientation_azimuth:
+          type: number
+          example: 180
+        panels_bifacial:
+          description: Whether the panel array is bifacial.
+          example: 0
+          oneOf:
+          - type: integer
+            enum:
+            - 0
+            - 1
+          - type: string
+            enum:
+            - '0'
+            - '1'
+          - type: boolean
+      type: object
+    ValidationError:
+      description: 'Error payload for validation failures (400, 422) on request bodies and business rules.
+
+
+        For query/path validation, see {@see \Trade\CodeIgniter\dtos\shared\responses\errors\QueryValidationErrorResponse}
+
+        (`details` keyed by parameter name; this class uses `data` for the same purpose).'
+      properties:
+        error:
+          type: string
+          example: validation_error
+        message:
+          type: string
+          example: Errors when validating data
+        data:
+          type: object
+          additionalProperties: true
+      type: object
+    UploadFacilityDocumentsRequest:
+      required:
+      - documents
+      properties:
+        state:
+          description: Optional two-letter state abbreviation. When omitted, documents are matched to all eligible facility states.
+          type: string
+          example: OH
+          maxLength: 2
+        documents:
+          type: array
+          items:
+            required:
+            - document_name
+            - document_content
+            properties:
+              document_name:
+                description: Required document slug from the facility state eligibility response.
+                type: string
+                example: schedule_a
+              document_content:
+                description: Document file content.
+                type: string
+                format: binary
+            type: object
+          minItems: 1
+      type: object
+      example:
+        state: OH
+        documents:
+        - document_name: photo_of_solar_meter
+          document_content: file content
+        - document_name: schedule_a
+          document_content: file content
+    FacilityAbpFields:
+      description: Illinois Adjustable Block Program (ABP) fields. Required when creating an ABP facility (`address.state` is `IL` and your account is ABP-enabled). See nested `panels[].bifacial` and `inverters[].efficiency` on the parent schema.
+      properties:
+        installer_demographics:
+          oneOf:
+          - $ref: '#/components/schemas/InstallerDemographics'
+          description: Installer workforce demographics required for Illinois ABP applications.
+        existing_project_application_id:
+          description: ABP application ID when this facility is an expansion of an existing project on the same parcel.
+          type: string
+          example: ABP-12345
+          maxLength: 20
+        pv_system_disclosure_form_id:
+          description: Illinois PV System Disclosure Form identifier.
+          type: string
+          example: '12345'
+        custom_capacity_factor:
+          description: Custom capacity factor as a decimal (e.g. `0.1426` for 14.26%). Required when `rec_estimate_methodology` is `CUSTOM_CAPACITY_FACTOR`. Do not send a percentage scaled to 100.
+          type: number
+          format: float
+          example: 0.1426
+        custom_capacity_explanation:
+          description: Narrative explaining the custom capacity factor when `rec_estimate_methodology` is `CUSTOM_CAPACITY_FACTOR`.
+          type: string
+        icc_docket_number:
+          description: Illinois Commerce Commission docket number when applicable.
+          type: string
+        facility_energized:
+          description: Whether the facility has been energized / received permission to operate.
+          type: boolean
+          example: true
+        net_metering_approved:
+          description: Whether net metering has been approved. Drives which net-metering-related documents appear in `GET /facilities/{id}/state_eligibilities`.
+          type: boolean
+          example: true
+        install_contract_exec_date:
+          description: Installation contract execution date (`YYYY-MM-DD`).
+          type: string
+          format: date
+          example: '2025-06-01'
+        financial_structure:
+          description: How the system is financed. PPA is common for leased portfolio operators.
+          type: string
+          example: PPA
+          enum:
+          - Customer-owned
+          - Lease
+          - PPA
+        is_already_completed_project_app_on_the_same_parcel_of_land:
+          description: Whether a project application was already completed on the same parcel of land.
+          type: boolean
+          example: false
+        is_project_located_on_public_school_owned_land:
+          description: Whether the project is located on public school-owned land.
+          type: boolean
+          example: false
+        rec_estimate_methodology:
+          description: Method used to estimate REC production. Use `CUSTOM_CAPACITY_FACTOR` when supplying `custom_capacity_factor`.
+          type: string
+          example: CUSTOM_CAPACITY_FACTOR
+          enum:
+          - PVWATTS
+          - CUSTOM_CAPACITY_FACTOR
+        ground_cover_ratio:
+          description: Ground cover ratio for the installation when applicable.
+          type: number
+          format: float
+        prevailing_wage_subject:
+          description: Whether the project is subject to prevailing wage requirements.
+          type: boolean
+        minimal_shading_criteria:
+          description: Whether the site meets minimal shading criteria.
+          type: boolean
+        qualified_installer_person:
+          description: Name of the qualified installer contact for the ABP application.
+          type: string
+        construction_activities_completion_date:
+          description: Date construction activities were completed (`YYYY-MM-DD`).
+          type: string
+          format: date
+          example: '2015-05-15'
+        is_expansion:
+          description: Whether this application is an expansion of an existing system. Defaults to `false` when omitted.
+          type: boolean
+          example: false
+      type: object
+    StateCertificationInput:
+      required:
+      - state
+      - state_certification_number
+      properties:
+        state:
+          type: string
+          example: PA
+          maxLength: 2
+        state_certification_number:
+          type: string
+          example: PA-1234567-SUN-I
+      type: object
+    Inverter:
+      properties:
+        id:
+          type: integer
+          example: 107060
+        number_of_inverters:
+          type:
+          - integer
+          - 'null'
+          example: 2
+        manufacturer:
+          type:
+          - string
+          - 'null'
+          example: Agepower Limit
+        model_type:
+          type:
+          - string
+          - 'null'
+        inverter_capacity_kw:
+          type:
+          - number
+          - 'null'
+          format: float
+          example: 2.23
+      type: object
+    AccessForbiddenError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 403 when the caller lacks permission for the requested account or resource.
+            type: string
+            example: access_forbidden
+          message:
+            type: string
+            example: You do not have permission to access this resource
+        type: object
+    FacilityCreateStandardFields:
+      required:
+      - name
+      - i_am_owner
+      - i_have_solar_production_meter
+      - facility_type
+      - facility_size
+      - street
+      - city
+      - county
+      - zip
+      - state
+      - installer_company
+      - referrer_company
+      - owner_first_name
+      - owner_last_name
+      - owner_street
+      - owner_city
+      - owner_state
+      - owner_zip
+      - owner_phone
+      - owner_county
+      - system_cost
+      - meter_manufacturer
+      - meter_model_type
+      - utility_interconnection_date
+      - utility_name
+      - utility_account_number
+      properties:
+        state:
+          type: string
+          example: VA
+        installer_company:
+          type: string
+          example: Installer company name
+          maxLength: 100
+        owner_phone:
+          type: string
+          example: 122-223-3321
+        owner_county:
+          type: string
+          example: York County
+          maxLength: 80
+        utility_account_number:
+          type: string
+          maxLength: 50
+        installer_first_name:
+          type: string
+          example: John
+          maxLength: 80
+        installer_last_name:
+          type: string
+          example: Doe
+          maxLength: 80
+        installer_email:
+          type: string
+          example: contact@email.com
+          maxLength: 100
+        installer_phone:
+          type: string
+          example: 123-123-1234
+        installer_street:
+          type: string
+          example: 7312 Random Street
+          maxLength: 80
+        installer_apartment_suite:
+          type: string
+          maxLength: 80
+        installer_city:
+          type: string
+          example: Yorktown
+          maxLength: 80
+        installer_county:
+          type: string
+          example: York County
+          maxLength: 80
+        installer_state:
+          type: string
+          example: VA
+        installer_zip:
+          type: string
+          example: '23693'
+        hostname:
+          type: string
+          example: Host name
+          maxLength: 80
+        registry_id_number:
+          type: string
+          example: NON12345
+          maxLength: 10
+          minLength: 4
+        facility_location_type:
+          type: string
+          example: Rooftop
+          enum:
+          - Rooftop
+          - Parking canopy
+          - Brownfield
+          - Other
+        aggregate_net_metering:
+          type: boolean
+          example: true
+        colocated_facility:
+          type: boolean
+          example: true
+        cmty_application_number:
+          type: string
+          maxLength: 100
+        meter_last_date_certification:
+          type: string
+          example: '2016-08-02'
+        current_production_reading:
+          type: number
+          example: 39.95
+          minimum: 0
+        date_of_production_reading:
+          type: string
+          example: '2018-10-17'
+        panels:
+          type: array
+          items:
+            $ref: '#/components/schemas/panelFlatCreate'
+      type: object
+    inverterFlatCreate:
+      required:
+      - number_of_inverters
+      - inverter_capacity_kw
+      - inverter_manufacturer
+      - inverter_model_type
+      properties:
+        number_of_inverters:
+          type: number
+          example: 5
+        inverter_capacity_kw:
+          type: number
+          example: 4.6
+        inverter_manufacturer:
+          type: string
+          example: SunPower
+        inverter_model_type:
+          type: string
+          example: SPR-4600 (4600W (208Vac) Utility Interactive Inverter)
+      type: object
+    facilityInverterInput:
+      required:
+      - number_of_inverters
+      - capacity_kw
+      - manufacturer
+      - model_type
+      properties:
+        number_of_inverters:
+          type: number
+          example: 5
+        capacity_kw:
+          type: number
+          example: 4.6
+        manufacturer:
+          type: string
+          example: SunPower
+        model_type:
+          type: string
+          example: SPR-4600 (4600W (208Vac) Utility Interactive Inverter)
+        efficiency:
+          description: Inverter efficiency percentage (e.g. `97.5`). Required for Illinois ABP facilities.
+          type: number
+          example: 97.5
+      type: object
+    facilityDggCreateOrUpdate:
+      description: California DGG facility create payload in nested format.
+      allOf:
+      - $ref: '#/components/schemas/facilityCreateOrUpdateCommonProperties'
+      - $ref: '#/components/schemas/FacilityDggFields'
+    facilityAbpCreateOrUpdate:
+      description: ABP facility create payload in nested DTO format.
+      allOf:
+      - $ref: '#/components/schemas/facilityCreateOrUpdateCommonProperties'
+      - $ref: '#/components/schemas/FacilityAbpFields'
+    facilityDggFlatCreateOrUpdate:
+      description: 'California DGG facility create payload. Requires `dgg`: true and `state`: CA. Uses `postDggPanelCreate` for `panels` (not `panelFlatCreate`).'
+      allOf:
+      - $ref: '#/components/schemas/facilityFlatCreateOrUpdateCommonProperties'
+      - $ref: '#/components/schemas/FacilityCreateDggFields'
+    FacilityDocumentsUploadResult:
+      description: Upload counts and error messages inside {@see FacilityDocumentsUploadSuccess}.
+      required:
+      - uploaded
+      - errors
+      properties:
+        uploaded:
+          type: integer
+          example: 3
+        errors:
+          type: array
+          items:
+            type: string
+          example: []
+      type: object
+    postAbpInverterCreate:
+      description: Inverter array entry for ABP facility creation (`facilityAbpFlatCreateOrUpdate.inverters`).
+      required:
+      - number_of_inverters
+      - inverter_capacity_kw
+      - inverter_manufacturer
+      - inverter_model_type
+      - inverter_efficiency
+      properties:
+        number_of_inverters:
+          type: number
+          example: 5
+        inverter_capacity_kw:
+          type: number
+          example: 4.6
+        inverter_manufacturer:
+          type: string
+          example: SunPower
+        inverter_model_type:
+          type: string
+          example: SPR-4600 (4600W (208Vac) Utility Interactive Inverter)
+        inverter_efficiency:
+          description: Inverter efficiency percentage (e.g. `97.5`).
+          type: number
+          example: 97.5
+      type: object
+    CreateFacilityStateApplicationRequest:
+      description: Request body for `POST /facilities/{facility_id}/state_applications`.
+      required:
+      - state
+      properties:
+        state:
+          type: string
+          example: PA
+          maxLength: 2
+      type: object
+    postDggPanelCreate:
+      description: Panel array entry for DGG facility creation (`facilityDggFlatCreateOrUpdate.panels`). `panel_location` is optional (unlike `panelFlatCreate`).
+      required:
+      - number_of_panels
+      - panel_rating_dc
+      - panel_manufacturer
+      - panel_model_type
+      - tracking
+      - array_tilt
+      - array_orientation_azimuth
+      properties:
+        number_of_panels:
+          type: number
+          example: 20
+        panel_rating_dc:
+          description: Wattage of each module in W (DC); up to 3 decimal places.
+          type: number
+          example: 400
+        panel_manufacturer:
+          type: string
+          example: Solartech Energy
+        panel_model_type:
+          type: string
+          example: ASC-6M-72-295-3BB (295W Monocrystalline Module)
+        tracking:
+          description: Fixed for stationary arrays; `1` single-axis tracking; `2` dual-axis tracking.
+          type: string
+          example: Fixed
+          enum:
+          - Fixed
+          - '1'
+          - '2'
+        array_tilt:
+          description: Degrees (0–90); numeric strings are accepted.
+          type: number
+          example: 22
+        array_orientation_azimuth:
+          description: Degrees (0–359.99); numeric strings are accepted.
+          type: number
+          example: 180
+        panel_location:
+          type: string
+          example: Roof
+          enum:
+          - Ground
+          - Roof
+      type: object
+    AuthError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 401 when API authentication is missing or invalid.
+            type: string
+            example: connection_failed
+          message:
+            type: string
+            example: Authentication error
+        type: object
+    FacilityResponse:
+      description: Facility detail rows returned in the API envelope `data` field (single-facility GET returns one element).
+      type: array
+      items:
+        oneOf:
+        - $ref: '#/components/schemas/AbpFacilityDetails'
+        - $ref: '#/components/schemas/DggFacilityDetails'
+        - $ref: '#/components/schemas/FacilityDetails'
+    facilityAbpFlatCreateOrUpdate:
+      description: 'Illinois ABP facility create payload in legacy flat format. Requires `state`: IL. Uses `postAbpPanelCreate` for `panels` and `postAbpInverterCreate` for `inverters`. Your account must be ABP-enabled.'
+      allOf:
+      - $ref: '#/components/schemas/facilityFlatCreateOrUpdateCommonProperties'
+      - $ref: '#/components/schemas/FacilityCreateAbpFields'
+    facilityInstallerInput:
+      required:
+      - company
+      properties:
+        company:
+          type: string
+          example: Installer company name
+          maxLength: 100
+        first_name:
+          type: string
+          example: John
+          maxLength: 80
+        last_name:
+          type: string
+          example: Doe
+          maxLength: 80
+        email:
+          type: string
+          example: contact@email.com
+          maxLength: 100
+        phone:
+          type: string
+          example: 123-123-1234
+        address:
+          $ref: '#/components/schemas/facilityAddressInput'
+      type: object
     panelFlatCreate:
       required:
       - number_of_panels
@@ -1227,107 +1904,36 @@ components:
           type: number
           example: 35
       type: object
-    AbpFacilityDetailsFields:
-      description: Illinois ABP-specific fields included on facility detail responses.
+    ResponseEnvelope:
+      description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
+      required:
+      - url
+      - date
+      - code
+      - elements
+      - page
       properties:
-        icc_docket_number:
-          description: Illinois Commerce Commission docket number.
-          type:
-          - string
-          - 'null'
-        install_contract_exec_date:
-          description: Installation contract execution date.
-          type:
-          - string
-          - 'null'
-          format: date
-        is_expansion:
-          description: Whether this is an expansion application.
-          type:
-          - boolean
-          - 'null'
-        existing_project_application_id:
-          description: Prior ABP application ID when this is an expansion.
-          type:
-          - string
-          - 'null'
-        pv_system_disclosure_form_id:
-          description: Illinois PV System Disclosure Form identifier.
-          type:
-          - string
-          - 'null'
-        rec_estimate_methodology:
-          description: REC estimate methodology (`PVWATTS` or `CUSTOM_CAPACITY_FACTOR`).
-          type:
-          - string
-          - 'null'
-        custom_capacity_factor:
-          description: Custom capacity factor as a decimal.
-          type:
-          - number
-          - 'null'
-          format: float
-        custom_capacity_explanation:
-          description: Explanation for a custom capacity factor.
-          type:
-          - string
-          - 'null'
-        facility_energized:
-          description: Whether the facility is energized.
-          type:
-          - boolean
-          - 'null'
-        net_metering_approved:
-          description: Whether net metering is approved.
-          type:
-          - boolean
-          - 'null'
-        financial_structure:
-          description: Financing structure (`Customer-owned`, `Lease`, or `PPA`).
-          type:
-          - string
-          - 'null'
-        is_already_completed_project_app_on_the_same_parcel_of_land:
-          description: Whether a prior project application exists on the same parcel.
-          type:
-          - boolean
-          - 'null'
-        is_project_located_on_public_school_owned_land:
-          description: Whether the site is on public school-owned land.
-          type:
-          - boolean
-          - 'null'
-        ground_cover_ratio:
-          description: Ground cover ratio.
-          type:
-          - number
-          - 'null'
-          format: float
-        prevailing_wage_subject:
-          description: Prevailing wage applicability.
-          type:
-          - boolean
-          - 'null'
-        minimal_shading_criteria:
-          description: Whether minimal shading criteria are met.
-          type:
-          - boolean
-          - 'null'
-        qualified_installer_person:
-          description: Qualified installer contact name.
-          type:
-          - string
-          - 'null'
-        construction_activities_completion_date:
-          description: Construction completion date.
-          type:
-          - string
-          - 'null'
-          format: date
-        installer_demographics:
+        url:
+          description: Request URL including query string.
+          type: string
+          example: /app/api/v1/facilities
+        date:
+          description: Response timestamp.
+          type: string
+          example: 2024-09-17 04:26:39 EDT
+        code:
+          description: HTTP status code, mirrored in the JSON body (same as the response status).
+          type: integer
+        elements:
+          description: Number of items in `data` on HTTP 200; 0 for other status codes.
+          type: integer
+        page:
+          description: Page label (`1 of 1` when not paginated) or numeric page when listing with pagination.
           oneOf:
-          - $ref: '#/components/schemas/InstallerDemographics'
-          description: Installer workforce demographics.
+          - type: string
+            example: 1 of 1
+          - type: integer
+            example: 2
       type: object
     FacilityDetails:
       description: Single facility detail object returned in FacilityResponse.
@@ -1471,271 +2077,51 @@ components:
           items:
             $ref: '#/components/schemas/StateCertification'
       type: object
-    FacilitiesListForAccountList:
+    Registry:
       properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/FacilityListDetails'
+        registry:
+          type:
+          - string
+          - 'null'
+          example: GATS
+        registry_id_number:
+          type:
+          - string
+          - 'null'
+          example: NON00220
       type: object
-    facilityDggCreateOrUpdate:
-      description: California DGG facility create payload in nested format.
-      allOf:
-      - $ref: '#/components/schemas/facilityCreateOrUpdateCommonProperties'
-      - $ref: '#/components/schemas/FacilityDggFields'
-    DggFacilityDetails:
-      allOf:
-      - $ref: '#/components/schemas/FacilityDetails'
-      - $ref: '#/components/schemas/DggFacilityDetailsFields'
-    facilityFlatCreateOrUpdate:
-      description: Standard facility create payload.
-      allOf:
-      - $ref: '#/components/schemas/facilityFlatCreateOrUpdateCommonProperties'
-      - $ref: '#/components/schemas/FacilityCreateStandardFields'
-    InstallerDemographics:
-      description: Installer workforce demographics for facility create/update requests and ABP detail responses.
-      properties:
-        hours_race_white:
-          description: Total hours worked by White employees.
-          type:
-          - number
-          - 'null'
-          format: float
-        hours_race_black_or_aa:
-          description: Total hours worked by Black or African American employees.
-          type:
-          - number
-          - 'null'
-          format: float
-        hours_race_ai_or_an:
-          description: Total hours worked by American Indian or Alaskan Native employees.
-          type:
-          - number
-          - 'null'
-          format: float
-        hours_race_asian:
-          description: Total hours worked by Asian employees.
-          type:
-          - number
-          - 'null'
-          format: float
-        hours_race_h_or_pi:
-          description: Total hours worked by Hawaiian or other Pacific Islander employees.
-          type:
-          - number
-          - 'null'
-          format: float
-        hours_race_multi:
-          description: Total hours worked by employees of More Than One Race.
-          type:
-          - number
-          - 'null'
-          format: float
-        hours_race_other:
-          description: Total hours worked by employees of Some Other Race.
-          type:
-          - number
-          - 'null'
-          format: float
-        hours_race_decline:
-          description: Total hours worked by employees who decline to identify race.
-          type:
-          - number
-          - 'null'
-          format: float
-        hours_eth_hispanic_latino:
-          description: Total hours worked by Hispanic or Latino employees.
-          type:
-          - number
-          - 'null'
-          format: float
-        hours_eth_non_hispanic_latino:
-          description: Total hours worked by Not Hispanic or Latino employees.
-          type:
-          - number
-          - 'null'
-          format: float
-        hours_eth_decline:
-          description: Total hours worked by employees who decline to identify ethnicity.
-          type:
-          - number
-          - 'null'
-          format: float
-        training_solar:
-          description: Solar Training Pipeline Program (FEJA program) hours.
-          type:
-          - number
-          - 'null'
-          format: float
-        training_craft:
-          description: Craft Apprenticeship Program (FEJA program) hours.
-          type:
-          - number
-          - 'null'
-          format: float
-        training_multi_cult:
-          description: Multi-Cultural Job Training Program (FEJA program) hours.
-          type:
-          - number
-          - 'null'
-          format: float
-      type: object
-    postDggPanelCreate:
-      description: Panel array entry for DGG facility creation (`facilityDggFlatCreateOrUpdate.panels`). `panel_location` is optional (unlike `panelFlatCreate`).
+    FacilityDggFields:
       required:
-      - number_of_panels
-      - panel_rating_dc
-      - panel_manufacturer
-      - panel_model_type
-      - tracking
-      - array_tilt
-      - array_orientation_azimuth
+      - can_provide_solar_production_data_access
       properties:
-        number_of_panels:
-          type: number
-          example: 20
-        panel_rating_dc:
-          description: Wattage of each module in W (DC); up to 3 decimal places.
-          type: number
-          example: 400
-        panel_manufacturer:
-          type: string
-          example: Solartech Energy
-        panel_model_type:
-          type: string
-          example: ASC-6M-72-295-3BB (295W Monocrystalline Module)
-        tracking:
-          description: Fixed for stationary arrays; `1` single-axis tracking; `2` dual-axis tracking.
-          type: string
-          example: Fixed
-          enum:
-          - Fixed
-          - '1'
-          - '2'
-        array_tilt:
-          description: Degrees (0–90); numeric strings are accepted.
-          type: number
-          example: 22
-        array_orientation_azimuth:
-          description: Degrees (0–359.99); numeric strings are accepted.
-          type: number
-          example: 180
-        panel_location:
-          type: string
-          example: Roof
-          enum:
-          - Ground
-          - Roof
-      type: object
-    StateCertificationCreateData:
-      description: State certification create success payload returned in the API envelope `data` field.
-      required:
-      - status
-      - data
-      properties:
-        status:
-          type: string
-          example: success
-        data:
-          description: Empty array on successful certification create.
-          type: array
-          items: {}
-          example: []
-      type: object
-    FacilityResponse:
-      description: Facility detail rows returned in the API envelope `data` field (single-facility GET returns one element).
-      type: array
-      items:
-        oneOf:
-        - $ref: '#/components/schemas/AbpFacilityDetails'
-        - $ref: '#/components/schemas/DggFacilityDetails'
-        - $ref: '#/components/schemas/FacilityDetails'
-    ValidationError:
-      description: 'Error payload for validation failures (400, 422) on request bodies and business rules.
-
-
-        For query/path validation, see {@see \Trade\CodeIgniter\dtos\shared\responses\errors\QueryValidationErrorResponse}
-
-        (`details` keyed by parameter name; this class uses `data` for the same purpose).'
-      properties:
-        error:
-          type: string
-          example: validation_error
-        message:
-          type: string
-          example: Errors when validating data
-        data:
-          type: object
-          additionalProperties: true
-      type: object
-    CompleteFacilityRequest:
-      description: Request body for `POST /facilities/{facility_id}/complete`.
-      required:
-      - agree_to_terms_and_conditions
-      properties:
-        agree_to_terms_and_conditions:
-          description: Must be `true` to confirm agreement to Xpansiv Managed Solutions terms and conditions. Runtime also accepts `1`, `"true"`, `"yes"`, and `"Yes"`.
+        can_provide_solar_production_data_access:
+          description: '`true` / `1` — send `meter.remote_data_collector` and `meter.online_monitoring_api_id`; omit QRE fields. `false` / `0` — send `qualified_reporting_entity` and `qualified_reporting_entity_id_value`; omit remote monitoring fields.'
+          oneOf:
+          - type: boolean
+          - type: integer
+            enum:
+            - 0
+            - 1
+        dgg:
+          description: Set `true` so the request is treated as DGG when your account is DGG-enabled.
           type: boolean
           example: true
-        states:
-          description: State abbreviations to complete. When omitted or empty, all eligible zero-fee states are completed.
-          type:
-          - array
-          - 'null'
-          items:
-            type: string
-            maxLength: 2
-          example:
-          - PA
-          - MD
-      type: object
-    facilityAbpCreateOrUpdate:
-      description: ABP facility create payload in nested DTO format.
-      allOf:
-      - $ref: '#/components/schemas/facilityCreateOrUpdateCommonProperties'
-      - $ref: '#/components/schemas/FacilityAbpFields'
-    AccessForbiddenError:
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-      - properties:
-          error:
-            description: 403 when the caller lacks permission for the requested account or resource.
-            type: string
-            example: access_forbidden
-          message:
-            type: string
-            example: You do not have permission to access this resource
-        type: object
-    FacilityCompleteError:
-      description: Error payload for `POST /facilities/{facility_id}/complete` business-rule and validation failures.
-      required:
-      - error
-      - message
-      properties:
-        error:
+        group_name:
+          description: Optional distributed-generation group display name (maps to registry facility group name).
           type: string
-          example: error
-        message:
+          maxLength: 255
+        qualified_reporting_entity:
+          description: QRE name matching `GET /qualified_reporting_entities` when not using production data access.
           type: string
-          example: Facility data validation failed.
-        details:
-          description: 'Optional structured context. Shape depends on the error: field validation map (`{ "field": "error message" }`), list of state codes (`["NJ"]`), or missing document slugs keyed by state (`{ "PA": ["schedule_a"] }`). Document slugs match `upload_field_name` from `GET /facilities/{facility_id}/state_eligibilities`.'
+          maxLength: 255
+        qualified_reporting_entity_id_value:
+          description: QRE / utility identifier when not using production data access.
           oneOf:
-          - type: object
-            additionalProperties:
-              type: string
-          - type: array
-            items:
-              type: string
-          - type: object
-            additionalProperties:
-              type: array
-              items:
-                type: string
+          - type: string
+            maxLength: 255
+          - type: integer
+        max_annual_energy:
+          type: number
       type: object
     facilityFlatCreateOrUpdateResponse200:
       description: Facility create/update success payload returned in the API envelope `data` field.
@@ -1753,35 +2139,140 @@ components:
           - $ref: '#/components/schemas/DggFacilityDetails'
           - $ref: '#/components/schemas/FacilityDetails'
       type: object
-    Installer:
+    uploadFacilityDocumentsResponse:
+      description: Document upload result returned in the API envelope `data` field.
+      required:
+      - status
+      - data
       properties:
-        company:
+        data:
+          $ref: '#/components/schemas/FacilityDocumentsUploadResult'
+        status:
+          type: string
+          example: success
+      type: object
+    Pagination:
+      properties:
+        total:
+          description: Total number of items
+          type: integer
+          example: 100
+        per_page:
+          description: Items per page
+          type: integer
+          example: 20
+        current_page:
+          description: Current page number
+          type: integer
+          example: 1
+        last_page:
+          description: Last page number
+          type: integer
+          example: 5
+      type: object
+    facilityRegistryInput:
+      description: Registry fields accepted on create/update. The registry name is derived from the facility state and cannot be set or updated.
+      properties:
+        registry_id_number:
+          type: string
+          example: NON12345
+          maxLength: 10
+          minLength: 4
+      type: object
+    StateApplicationCreateData:
+      description: State application create success payload returned in the API envelope `data` field.
+      required:
+      - status
+      - data
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          required:
+          - application_id
+          properties:
+            application_id:
+              type: integer
+              example: 12345
+          type: object
+      type: object
+    StateCertification:
+      properties:
+        id:
+          type: integer
+          example: 181904
+        state_abbreviation:
+          type: string
+          example: DC
+        certification_number:
           type:
           - string
           - 'null'
-          example: test - Conn - Kulas
-        first_name:
-          type:
-          - string
-          - 'null'
-          example: Leola
-        last_name:
-          type:
-          - string
-          - 'null'
-          example: Doe
-        email:
-          type:
-          - string
-          - 'null'
-          example: Josue59@example.com
-        phone:
-          type:
-          - string
-          - 'null'
-          example: 987-223-7611
-        address:
-          $ref: '#/components/schemas/Address'
+          example: DC-426425-SUN-I
+      type: object
+    facilityMeterInput:
+      required:
+      - manufacturer
+      - model_type
+      - utility_interconnection_date
+      - utility_name
+      - utility_account_number
+      properties:
+        manufacturer:
+          type: string
+          example: AstroPower
+        model_type:
+          type: string
+          example: GTY-7676
+        utility_interconnection_date:
+          description: Utility interconnection date (YYYY-MM-DD or legacy date string).
+          type: string
+          example: '2018-10-17'
+        utility_name:
+          description: Should be a valid utility for the site county; must match `GET /utilities` for DGG payloads.
+          type: string
+        utility_account_number:
+          type: string
+          maxLength: 50
+        accuracy:
+          description: '- ''revenue'' if the meter is a Revenue Grade Meter
+
+            - ''standard'' if the meter is not a Revenue Grade Meter'
+          type: string
+          example: revenue
+          enum:
+          - revenue
+          - standard
+        serial_number:
+          type: string
+          example: '12345'
+          maxLength: 50
+        last_date_certification:
+          type: string
+          example: '2016-08-02'
+        remote_data_collector:
+          type: string
+          example: Enphase
+        online_monitoring_api_id:
+          type: string
+          example: '123456'
+        operation_start:
+          description: Optional operation start date (YYYY-MM-DD or legacy date string accepted by the server).
+          type: string
+          example: '2018-10-17'
+        reading_at_interconnection:
+          description: Often `0` for new interconnects; optional unless your program requires it.
+          type: number
+          example: 39.95
+          minimum: 0
+        current_production_reading:
+          type: number
+          example: 39.95
+          minimum: 0
+        date_of_production_reading:
+          type: string
+          example: '2018-10-17'
       type: object
     FacilityCreateAbpFields:
       required:
@@ -2089,206 +2580,230 @@ components:
           items:
             $ref: '#/components/schemas/postAbpInverterCreate'
       type: object
-    UploadFacilityDocumentsRequest:
+    FacilityCreateDggFields:
       required:
-      - documents
-      properties:
-        state:
-          description: Optional two-letter state abbreviation. When omitted, documents are matched to all eligible facility states.
-          type: string
-          example: OH
-          maxLength: 2
-        documents:
-          type: array
-          items:
-            required:
-            - document_name
-            - document_content
-            properties:
-              document_name:
-                description: Required document slug from the facility state eligibility response.
-                type: string
-                example: schedule_a
-              document_content:
-                description: Document file content.
-                type: string
-                format: binary
-            type: object
-          minItems: 1
-      type: object
-      example:
-        state: OH
-        documents:
-        - document_name: photo_of_solar_meter
-          document_content: file content
-        - document_name: schedule_a
-          document_content: file content
-    facilityCreateOrUpdateCommonProperties:
-      description: Payload format accepted by `POST /facilities` and `PATCH /facilities/{facility_id}`. Legacy flat payload keys are still accepted for backwards compatibility and will be deprecated in a future release.
-      required:
+      - state
       - name
       - i_am_owner
-      - has_solar_production_meter
+      - i_have_solar_production_meter
       - facility_type
       - facility_size
-      - address
-      - installer
+      - is_battery_backup
+      - street
+      - city
+      - county
+      - zip
       - referrer_company
-      - owner
-      - system_cost
-      - meter
+      - owner_first_name
+      - owner_last_name
+      - owner_email
+      - owner_street
+      - owner_city
+      - owner_state
+      - owner_zip
+      - meter_accuracy
+      - utility_interconnection_date
+      - meter_serial_number
+      - meter_manufacturer
+      - meter_model_type
+      - can_provide_solar_production_data_access
+      - utility_name
+      - utility_account_number
       properties:
-        name:
+        state:
+          description: DGG rules require California.
           type: string
-          example: Facility name
-          maxLength: 80
-        i_am_owner:
-          description: Whether the submitter is the generation attribute owner (`0` / `1`; string forms are coerced).
-          example: 1
-          oneOf:
-          - type: integer
-            enum:
-            - 0
-            - 1
-          - type: string
-            enum:
-            - '0'
-            - '1'
-          - type: boolean
-        has_solar_production_meter:
-          example: 1
-          oneOf:
-          - type: integer
-            enum:
-            - 0
-            - 1
-          - type: string
-            enum:
-            - '0'
-            - '1'
-          - type: boolean
-        facility_type:
-          description: 'Possible values are:
-
-            - RES (Residential)
-
-            - COM (Commercial)
-
-            - MUNI (Municipal)
-
-            - CMTY (Community Solar)'
-          type: string
-          example: RES
+          example: CA
           enum:
-          - RES
-          - COM
-          - MUNI
-          - CMTY
-        facility_size:
-          description: Facility DC capacity (DC kW). Minimum 0.000001.
-          type: number
-          example: 5.657
-          minimum: 1.0e-06
-        is_battery_backup:
-          example: 0
+          - CA
+        can_provide_solar_production_data_access:
+          description: '`true` / `1` — send `meter_remote_data_collector` and `online_monitoring_api_id`; omit QRE fields. `false` / `0` — send `qualified_reporting_entity` and `qualified_reporting_entity_id_value`; omit remote monitoring fields.'
           oneOf:
+          - type: boolean
           - type: integer
             enum:
             - 0
             - 1
-          - type: string
-            enum:
-            - '0'
-            - '1'
-          - type: boolean
-          default: 0
-        system_leased:
-          example: 0
+        utility_account_number:
+          description: Optional for DGG when a Utility Bill is uploaded separately via `POST /facilities/{id}/documents`.
           oneOf:
+          - type: string
+            maxLength: 50
           - type: integer
-            enum:
-            - 0
-            - 1
-          - type: string
-            enum:
-            - '0'
-            - '1'
-          - type: boolean
-          default: 0
-        leasing_company:
-          description: Required when `system_leased` is `true`.
-          type: string
-          example: Leasing company name
-          maxLength: 100
-        usable_energy:
-          description: Required when `is_battery_backup` is `true`. Numeric strings are accepted.
-          example: 2.36
-          oneOf:
-          - type: number
-            minimum: 1.0e-06
-          - type: string
-        system_cost:
-          description: Numeric strings are accepted.
-          example: 12345
-          oneOf:
-          - type: integer
-            minimum: 1
-          - type: string
-        referrer_company:
-          type: string
-          example: Referrer company name
-          maxLength: 100
-        building_type:
-          type: string
-          example: Single Family Detached
-        hostname:
-          type: string
-          example: Host name
-          maxLength: 80
-        facility_location_type:
-          type: string
-          example: Rooftop
-          enum:
-          - Rooftop
-          - Parking canopy
-          - Brownfield
-          - Other
-        aggregate_net_metering:
+        dgg:
+          description: Set `true` so the request is treated as DGG when your account is DGG-enabled.
           type: boolean
           example: true
-        colocated_facility:
-          type: boolean
-          example: false
-        cmty_application_number:
+        group_name:
+          description: Optional distributed-generation group display name (maps to registry facility group name).
           type: string
-          maxLength: 100
-        external_id:
+          maxLength: 255
+        leasing_company:
+          description: Required when `system_leased` is `1`.
           type: string
-          example: EXTERNAL-123
-          maxLength: 100
-        comment_box:
+          maxLength: 80
+        qualified_reporting_entity:
+          description: QRE name matching `GET /qualified_reporting_entities` when not using production data access.
           type: string
-        dgg:
-          type: boolean
-          example: false
-        address:
-          $ref: '#/components/schemas/facilityAddressInput'
-        owner:
-          $ref: '#/components/schemas/facilityOwnerInput'
-        installer:
-          $ref: '#/components/schemas/facilityInstallerInput'
-        meter:
-          $ref: '#/components/schemas/facilityMeterInput'
-        registry:
-          $ref: '#/components/schemas/facilityRegistryInput'
+          maxLength: 255
+        qualified_reporting_entity_id_value:
+          description: QRE / utility identifier when not using production data access.
+          oneOf:
+          - type: string
+            maxLength: 255
+          - type: integer
+        max_annual_energy:
+          type: number
         panels:
           type: array
           items:
-            $ref: '#/components/schemas/facilityPanelInput'
-        inverters:
+            $ref: '#/components/schemas/postDggPanelCreate'
+      type: object
+    CompleteFacilityRequest:
+      description: Request body for `POST /facilities/{facility_id}/complete`.
+      required:
+      - agree_to_terms_and_conditions
+      properties:
+        agree_to_terms_and_conditions:
+          description: Must be `true` to confirm agreement to Xpansiv Managed Solutions terms and conditions. Runtime also accepts `1`, `"true"`, `"yes"`, and `"Yes"`.
+          type: boolean
+          example: true
+        states:
+          description: State abbreviations to complete. When omitted or empty, all eligible zero-fee states are completed.
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+            maxLength: 2
+          example:
+          - PA
+          - MD
+      type: object
+    Meter:
+      properties:
+        id:
+          type:
+          - integer
+          - 'null'
+          example: 113521
+        accuracy:
+          type:
+          - string
+          - 'null'
+          example: standard
+        serial_number:
+          type:
+          - string
+          - 'null'
+          example: SE704
+        model_type:
+          type:
+          - string
+          - 'null'
+          example: Test
+        manufacturer:
+          type:
+          - string
+          - 'null'
+          example: Test2
+        operation_start:
+          type:
+          - string
+          - 'null'
+          format: date
+          example: '2024-03-01'
+        last_date_certification:
+          type:
+          - string
+          - 'null'
+          format: date
+          example: '2024-02-10'
+        utility_name:
+          type:
+          - string
+          - 'null'
+          example: Virginia Electric & Power Co
+        utility_id:
+          type:
+          - integer
+          - 'null'
+          example: 56810
+        utility_account_number:
+          type:
+          - string
+          - 'null'
+          example: '234567'
+        reading_at_interconnection:
+          type:
+          - number
+          - 'null'
+          format: float
+          example: 2
+        utility_interconnection_date:
+          type:
+          - string
+          - 'null'
+          format: date
+          example: '2024-03-01'
+        current_production_reading:
+          type:
+          - number
+          - 'null'
+          format: float
+          example: 12.321
+        date_of_production_reading:
+          type:
+          - string
+          - 'null'
+          format: date
+          example: '2024-05-14'
+        remote_data_collector:
+          type:
+          - string
+          - 'null'
+          example: enphase
+        remote_data_collector_id:
+          type:
+          - string
+          - 'null'
+          example: '61'
+        online_monitoring_api_id:
+          type:
+          - string
+          - 'null'
+          example: '234567'
+      type: object
+    StateEligibilityDocument:
+      description: 'Required document row for a state eligibility entry.
+
+
+        Runtime: {@see \Trade\CodeIgniter\models\dto\Document_dto}.'
+      required:
+      - name
+      - required
+      - filetype
+      properties:
+        name:
+          type: string
+          example: Photo of Solar Meter
+        required:
+          type: boolean
+          example: true
+        filetype:
+          type: string
+          example: png|gif|jpg|pdf|jpeg
+      type: object
+    AddFacilityStateCertificationRequest:
+      description: Request body for `POST /facilities/{facility_id}/state_certifications`.
+      required:
+      - certificates
+      properties:
+        certificates:
           type: array
           items:
-            $ref: '#/components/schemas/facilityInverterInput'
+            $ref: '#/components/schemas/StateCertificationInput'
+          minItems: 1
       type: object
     FacilityGetMissingIdError:
       required:
@@ -2306,822 +2821,6 @@ components:
             type: string
             example: Missing facility_id parameter
         type: object
-    inverterFlatCreate:
-      required:
-      - number_of_inverters
-      - inverter_capacity_kw
-      - inverter_manufacturer
-      - inverter_model_type
-      properties:
-        number_of_inverters:
-          type: number
-          example: 5
-        inverter_capacity_kw:
-          type: number
-          example: 4.6
-        inverter_manufacturer:
-          type: string
-          example: SunPower
-        inverter_model_type:
-          type: string
-          example: SPR-4600 (4600W (208Vac) Utility Interactive Inverter)
-      type: object
-    FacilityGetError:
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-      - properties:
-          error:
-            description: GET `/facilities/{facility_id}` when the facility is missing or not visible to the account.
-            type: string
-            example: error
-          message:
-            type: string
-            example: Wrong facility_id parameter
-        type: object
-    StateEligibilityItem:
-      required:
-      - state
-      - is_eligible
-      - product_type
-      properties:
-        documents:
-          description: 'One state''s eligibility details returned in the API envelope `data` array.
-
-
-            Runtime: {@see \Trade\CodeIgniter\models\dto\Eligible_state_dto::jsonSerialize()}.'
-          type: array
-          items:
-            $ref: '#/components/schemas/StateEligibilityDocument'
-        errors:
-          description: Validation messages when the state is not eligible
-          type:
-          - array
-          - 'null'
-          items:
-            type: string
-        state:
-          type: string
-          example: PA
-        is_eligible:
-          type: boolean
-          example: true
-        product_type:
-          type: string
-          example: Tier-I
-      type: object
-    StateCertificationInput:
-      required:
-      - state
-      - state_certification_number
-      properties:
-        state:
-          type: string
-          example: PA
-          maxLength: 2
-        state_certification_number:
-          type: string
-          example: PA-1234567-SUN-I
-      type: object
-    Pagination:
-      properties:
-        total:
-          description: Total number of items
-          type: integer
-          example: 100
-        per_page:
-          description: Items per page
-          type: integer
-          example: 20
-        current_page:
-          description: Current page number
-          type: integer
-          example: 1
-        last_page:
-          description: Last page number
-          type: integer
-          example: 5
-      type: object
-    facilityInverterInput:
-      required:
-      - number_of_inverters
-      - capacity_kw
-      - manufacturer
-      - model_type
-      properties:
-        number_of_inverters:
-          type: number
-          example: 5
-        capacity_kw:
-          type: number
-          example: 4.6
-        manufacturer:
-          type: string
-          example: SunPower
-        model_type:
-          type: string
-          example: SPR-4600 (4600W (208Vac) Utility Interactive Inverter)
-        efficiency:
-          description: Inverter efficiency percentage (e.g. `97.5`). Required for Illinois ABP facilities.
-          type: number
-          example: 97.5
-      type: object
-    AbpFacilityDetails:
-      description: 'Facility detail for an Illinois Adjustable Block Program (ABP) system. Returned from `GET /facilities/{id}?data=all` when the facility has an ABP application. Program access: Illinois ABP via API is limited to authorized accounts; contact our support team to enroll.'
-      allOf:
-      - $ref: '#/components/schemas/FacilityDetails'
-      - $ref: '#/components/schemas/AbpFacilityDetailsFields'
-    FacilityStateEligibilitiesList:
-      description: State eligibility rows in the API envelope `data` field.
-      type: array
-      items:
-        $ref: '#/components/schemas/StateEligibilityItem'
-    facilityAbpFlatCreateOrUpdate:
-      description: 'Illinois ABP facility create payload in legacy flat format. Requires `state`: IL. Uses `postAbpPanelCreate` for `panels` and `postAbpInverterCreate` for `inverters`. Your account must be ABP-enabled.'
-      allOf:
-      - $ref: '#/components/schemas/facilityFlatCreateOrUpdateCommonProperties'
-      - $ref: '#/components/schemas/FacilityCreateAbpFields'
-    Error:
-      description: 'Generic error payload when no more specific error schema applies.
-
-
-        Implements JsonSerializable so it can be passed directly to API_Controller::response().
-
-        Implements Countable returning 0 so the response size guard in API_Controller treats it
-
-        as an empty collection (error responses never trigger the size limit).'
-      required:
-      - error
-      - message
-      properties:
-        error:
-          type: string
-          example: error
-        message:
-          type: string
-          example: Error description
-      type: object
-    Registry:
-      properties:
-        registry:
-          type:
-          - string
-          - 'null'
-          example: GATS
-        registry_id_number:
-          type:
-          - string
-          - 'null'
-          example: NON00220
-      type: object
-    Panel:
-      properties:
-        array_id:
-          type: integer
-          example: 189624
-        location:
-          type:
-          - string
-          - 'null'
-          example: Roof
-        tracking:
-          type:
-          - string
-          - 'null'
-          example: Fixed
-        array_orientation_azimuth:
-          type:
-          - number
-          - 'null'
-          format: float
-          example: 320
-        array_tilt:
-          type:
-          - number
-          - 'null'
-          format: float
-          example: 80
-        number_of_panels:
-          type:
-          - integer
-          - 'null'
-          example: 3
-        manufacturer:
-          type:
-          - string
-          - 'null'
-        model_type:
-          type:
-          - string
-          - 'null'
-          example: test
-        rating_dc:
-          type:
-          - number
-          - 'null'
-          format: float
-          example: 230.1
-      type: object
-    ResponseEnvelope:
-      description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
-      required:
-      - url
-      - date
-      - code
-      - elements
-      - page
-      properties:
-        url:
-          description: Request URL including query string.
-          type: string
-          example: /app/api/v1/facilities
-        date:
-          description: Response timestamp.
-          type: string
-          example: 2024-09-17 04:26:39 EDT
-        code:
-          description: HTTP status code, mirrored in the JSON body (same as the response status).
-          type: integer
-        elements:
-          description: Number of items in `data` on HTTP 200; 0 for other status codes.
-          type: integer
-        page:
-          description: Page label (`1 of 1` when not paginated) or numeric page when listing with pagination.
-          oneOf:
-          - type: string
-            example: 1 of 1
-          - type: integer
-            example: 2
-      type: object
-    StateApplicationCreateData:
-      description: State application create success payload returned in the API envelope `data` field.
-      required:
-      - status
-      - data
-      properties:
-        status:
-          type: string
-          example: success
-        data:
-          required:
-          - application_id
-          properties:
-            application_id:
-              type: integer
-              example: 12345
-          type: object
-      type: object
-    AuthError:
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-      - properties:
-          error:
-            description: 401 when API authentication is missing or invalid.
-            type: string
-            example: connection_failed
-          message:
-            type: string
-            example: Authentication error
-        type: object
-    facilityAddressInput:
-      required:
-      - street
-      - city
-      - county
-      - state
-      - zip
-      properties:
-        street:
-          type: string
-          example: 7312 Random Street
-          maxLength: 80
-        city:
-          type: string
-          example: Yorktown
-          maxLength: 80
-        county:
-          type: string
-          example: York County
-          maxLength: 80
-        state:
-          type: string
-          example: VA
-        zip:
-          type: string
-          example: '23693'
-        apartment:
-          type: string
-          maxLength: 80
-      type: object
-    FacilityDggFields:
-      required:
-      - can_provide_solar_production_data_access
-      properties:
-        can_provide_solar_production_data_access:
-          description: '`true` / `1` — send `meter.remote_data_collector` and `meter.online_monitoring_api_id`; omit QRE fields. `false` / `0` — send `qualified_reporting_entity` and `qualified_reporting_entity_id_value`; omit remote monitoring fields.'
-          oneOf:
-          - type: boolean
-          - type: integer
-            enum:
-            - 0
-            - 1
-        dgg:
-          description: Set `true` so the request is treated as DGG when your account is DGG-enabled.
-          type: boolean
-          example: true
-        group_name:
-          description: Optional distributed-generation group display name (maps to registry facility group name).
-          type: string
-          maxLength: 255
-        qualified_reporting_entity:
-          description: QRE name matching `GET /qualified_reporting_entities` when not using production data access.
-          type: string
-          maxLength: 255
-        qualified_reporting_entity_id_value:
-          description: QRE / utility identifier when not using production data access.
-          oneOf:
-          - type: string
-            maxLength: 255
-          - type: integer
-        max_annual_energy:
-          type: number
-      type: object
-    postAbpPanelCreate:
-      description: Panel array entry for ABP facility creation (`facilityAbpFlatCreateOrUpdate.panels`).
-      required:
-      - number_of_panels
-      - panel_location
-      - panel_rating_dc
-      - panel_manufacturer
-      - panel_model_type
-      - tracking
-      - array_tilt
-      - array_orientation_azimuth
-      - panels_bifacial
-      properties:
-        number_of_panels:
-          type: number
-          example: 20
-        panel_location:
-          type: string
-          example: Roof
-          enum:
-          - Ground
-          - Roof
-        panel_rating_dc:
-          description: Wattage of each module in W (DC).
-          type: number
-          example: 400
-        panel_manufacturer:
-          type: string
-          example: Solartech Energy
-        panel_model_type:
-          type: string
-          example: ASC-6M-72-295-3BB (295W Monocrystalline Module)
-        tracking:
-          type: string
-          example: Fixed
-          enum:
-          - Fixed
-          - '1'
-          - '2'
-        array_tilt:
-          type: number
-          example: 22
-        array_orientation_azimuth:
-          type: number
-          example: 180
-        panels_bifacial:
-          description: Whether the panel array is bifacial.
-          example: 0
-          oneOf:
-          - type: integer
-            enum:
-            - 0
-            - 1
-          - type: string
-            enum:
-            - '0'
-            - '1'
-          - type: boolean
-      type: object
-    FacilityDocumentsUploadResult:
-      description: Upload counts and error messages inside {@see FacilityDocumentsUploadSuccess}.
-      required:
-      - uploaded
-      - errors
-      properties:
-        uploaded:
-          type: integer
-          example: 3
-        errors:
-          type: array
-          items:
-            type: string
-          example: []
-      type: object
-    facilityCreateOrUpdate:
-      description: Standard facility create payload in nested format.
-      allOf:
-      - $ref: '#/components/schemas/facilityCreateOrUpdateCommonProperties'
-    Owner:
-      properties:
-        first_name:
-          type:
-          - string
-          - 'null'
-          example: Isaac
-        last_name:
-          type:
-          - string
-          - 'null'
-          example: Doe
-        email:
-          type:
-          - string
-          - 'null'
-          example: test@example.com
-        phone:
-          type:
-          - string
-          - 'null'
-          example: 122-223-3321
-        company_name:
-          type:
-          - string
-          - 'null'
-          example: test name Towne Inc
-        address:
-          $ref: '#/components/schemas/Address'
-      type: object
-    CreateFacilityStateApplicationRequest:
-      description: Request body for `POST /facilities/{facility_id}/state_applications`.
-      required:
-      - state
-      properties:
-        state:
-          type: string
-          example: PA
-          maxLength: 2
-      type: object
-    facilityMeterInput:
-      required:
-      - manufacturer
-      - model_type
-      - utility_interconnection_date
-      - utility_name
-      - utility_account_number
-      properties:
-        manufacturer:
-          type: string
-          example: AstroPower
-        model_type:
-          type: string
-          example: GTY-7676
-        utility_interconnection_date:
-          description: Utility interconnection date (YYYY-MM-DD or legacy date string).
-          type: string
-          example: '2018-10-17'
-        utility_name:
-          description: Should be a valid utility for the site county; must match `GET /utilities` for DGG payloads.
-          type: string
-        utility_account_number:
-          type: string
-          maxLength: 50
-        accuracy:
-          description: '- ''revenue'' if the meter is a Revenue Grade Meter
-
-            - ''standard'' if the meter is not a Revenue Grade Meter'
-          type: string
-          example: revenue
-          enum:
-          - revenue
-          - standard
-        serial_number:
-          type: string
-          example: '12345'
-          maxLength: 50
-        last_date_certification:
-          type: string
-          example: '2016-08-02'
-        remote_data_collector:
-          type: string
-          example: Enphase
-        online_monitoring_api_id:
-          type: string
-          example: '123456'
-        operation_start:
-          description: Optional operation start date (YYYY-MM-DD or legacy date string accepted by the server).
-          type: string
-          example: '2018-10-17'
-        reading_at_interconnection:
-          description: Often `0` for new interconnects; optional unless your program requires it.
-          type: number
-          example: 39.95
-          minimum: 0
-        current_production_reading:
-          type: number
-          example: 39.95
-          minimum: 0
-        date_of_production_reading:
-          type: string
-          example: '2018-10-17'
-      type: object
-    postAbpInverterCreate:
-      description: Inverter array entry for ABP facility creation (`facilityAbpFlatCreateOrUpdate.inverters`).
-      required:
-      - number_of_inverters
-      - inverter_capacity_kw
-      - inverter_manufacturer
-      - inverter_model_type
-      - inverter_efficiency
-      properties:
-        number_of_inverters:
-          type: number
-          example: 5
-        inverter_capacity_kw:
-          type: number
-          example: 4.6
-        inverter_manufacturer:
-          type: string
-          example: SunPower
-        inverter_model_type:
-          type: string
-          example: SPR-4600 (4600W (208Vac) Utility Interactive Inverter)
-        inverter_efficiency:
-          description: Inverter efficiency percentage (e.g. `97.5`).
-          type: number
-          example: 97.5
-      type: object
-    facilityDggFlatCreateOrUpdate:
-      description: 'California DGG facility create payload. Requires `dgg`: true and `state`: CA. Uses `postDggPanelCreate` for `panels` (not `panelFlatCreate`).'
-      allOf:
-      - $ref: '#/components/schemas/facilityFlatCreateOrUpdateCommonProperties'
-      - $ref: '#/components/schemas/FacilityCreateDggFields'
-    FacilityListDetails:
-      description: Facility summary returned in the account facilities list.
-      properties:
-        facility_id:
-          type: integer
-          example: 130235
-        name:
-          type:
-          - string
-          - 'null'
-          example: test API facility name
-        energy_type_id:
-          type:
-          - integer
-          - 'null'
-          example: 1
-        energy_type:
-          type:
-          - string
-          - 'null'
-          example: Solar Photovoltaic
-        facility_size:
-          type:
-          - number
-          - 'null'
-          format: float
-          example: 1.5713
-        facility_type:
-          type:
-          - string
-          - 'null'
-          example: RES
-        facility_type_long:
-          type:
-          - string
-          - 'null'
-          example: Residential
-        usable_energy:
-          type: number
-          format: float
-          example: 12.34
-        system_cost:
-          type:
-          - number
-          - 'null'
-          format: float
-          example: 12345
-        is_battery_backup:
-          type: boolean
-          example: false
-        system_leased:
-          type: boolean
-          example: false
-        referrer_company:
-          type:
-          - string
-          - 'null'
-          example: test - Bayer, Jast and Champlin
-        ticket_owner:
-          description: May be empty when unset.
-          type: string
-          example: ''
-        ticket_owner_user_id:
-          type:
-          - integer
-          - 'null'
-          example: 42
-        independent_verifier:
-          type:
-          - string
-          - 'null'
-          example: Verifier Inc
-        operation_start_date:
-          description: Commissioning / operation start date (locations.operation_start_date).
-          type:
-          - string
-          - 'null'
-          format: date
-          example: '2024-03-01'
-        registry:
-          $ref: '#/components/schemas/Registry'
-        address:
-          $ref: '#/components/schemas/Address'
-        owner:
-          $ref: '#/components/schemas/Owner'
-        installer:
-          $ref: '#/components/schemas/Installer'
-        meter:
-          $ref: '#/components/schemas/Meter'
-      type: object
-    FacilityCreateStandardFields:
-      required:
-      - name
-      - i_am_owner
-      - i_have_solar_production_meter
-      - facility_type
-      - facility_size
-      - street
-      - city
-      - county
-      - zip
-      - state
-      - installer_company
-      - referrer_company
-      - owner_first_name
-      - owner_last_name
-      - owner_street
-      - owner_city
-      - owner_state
-      - owner_zip
-      - owner_phone
-      - owner_county
-      - system_cost
-      - meter_manufacturer
-      - meter_model_type
-      - utility_interconnection_date
-      - utility_name
-      - utility_account_number
-      properties:
-        state:
-          type: string
-          example: VA
-        installer_company:
-          type: string
-          example: Installer company name
-          maxLength: 100
-        owner_phone:
-          type: string
-          example: 122-223-3321
-        owner_county:
-          type: string
-          example: York County
-          maxLength: 80
-        utility_account_number:
-          type: string
-          maxLength: 50
-        installer_first_name:
-          type: string
-          example: John
-          maxLength: 80
-        installer_last_name:
-          type: string
-          example: Doe
-          maxLength: 80
-        installer_email:
-          type: string
-          example: contact@email.com
-          maxLength: 100
-        installer_phone:
-          type: string
-          example: 123-123-1234
-        installer_street:
-          type: string
-          example: 7312 Random Street
-          maxLength: 80
-        installer_apartment_suite:
-          type: string
-          maxLength: 80
-        installer_city:
-          type: string
-          example: Yorktown
-          maxLength: 80
-        installer_county:
-          type: string
-          example: York County
-          maxLength: 80
-        installer_state:
-          type: string
-          example: VA
-        installer_zip:
-          type: string
-          example: '23693'
-        hostname:
-          type: string
-          example: Host name
-          maxLength: 80
-        registry_id_number:
-          type: string
-          example: NON12345
-          maxLength: 10
-          minLength: 4
-        facility_location_type:
-          type: string
-          example: Rooftop
-          enum:
-          - Rooftop
-          - Parking canopy
-          - Brownfield
-          - Other
-        aggregate_net_metering:
-          type: boolean
-          example: true
-        colocated_facility:
-          type: boolean
-          example: true
-        cmty_application_number:
-          type: string
-          maxLength: 100
-        meter_last_date_certification:
-          type: string
-          example: '2016-08-02'
-        current_production_reading:
-          type: number
-          example: 39.95
-          minimum: 0
-        date_of_production_reading:
-          type: string
-          example: '2018-10-17'
-        panels:
-          type: array
-          items:
-            $ref: '#/components/schemas/panelFlatCreate'
-      type: object
-    facilityOwnerInput:
-      required:
-      - first_name
-      - last_name
-      - phone
-      - address
-      properties:
-        first_name:
-          type: string
-          example: John
-        last_name:
-          type: string
-          example: Doe
-        phone:
-          type: string
-          example: 122-223-3321
-        address:
-          $ref: '#/components/schemas/facilityAddressInput'
-        email:
-          type: string
-          example: owner@email.com
-          maxLength: 100
-        company_name:
-          type: string
-          example: Owner company name
-      type: object
-    facilityRegistryInput:
-      description: Registry fields accepted on create/update. The registry name is derived from the facility state and cannot be set or updated.
-      properties:
-        registry_id_number:
-          type: string
-          example: NON12345
-          maxLength: 10
-          minLength: 4
-      type: object
-    FacilityCompleteSuccess:
-      description: Facility application completed successfully.
-      required:
-      - status
-      properties:
-        status:
-          type: string
-          example: success
-      type: object
     facilityFlatCreateOrUpdateCommonProperties:
       description: Shared JSON properties for standard facility create (`facilityFlatCreateOrUpdate`), California DGG create (`facilityDggFlatCreateOrUpdate`), and Illinois ABP create (`facilityAbpFlatCreateOrUpdate`). Each schema defines its own `required` list, `state` rules, installer vs owner contact requirements, and the `panels` / `inverters` item schema.
       properties:
@@ -3312,95 +3011,198 @@ components:
           items:
             $ref: '#/components/schemas/inverterFlatCreate'
       type: object
-    AddFacilityStateCertificationRequest:
-      description: Request body for `POST /facilities/{facility_id}/state_certifications`.
+    facilityCreateOrUpdateCommonProperties:
+      description: Payload format accepted by `POST /facilities` and `PATCH /facilities/{facility_id}`. Legacy flat payload keys are still accepted for backwards compatibility and will be deprecated in a future release.
       required:
-      - certificates
-      properties:
-        certificates:
-          type: array
-          items:
-            $ref: '#/components/schemas/StateCertificationInput'
-          minItems: 1
-      type: object
-    FacilityCreateDggFields:
-      required:
-      - state
       - name
       - i_am_owner
-      - i_have_solar_production_meter
+      - has_solar_production_meter
       - facility_type
       - facility_size
-      - is_battery_backup
-      - street
-      - city
-      - county
-      - zip
+      - address
+      - installer
       - referrer_company
-      - owner_first_name
-      - owner_last_name
-      - owner_email
-      - owner_street
-      - owner_city
-      - owner_state
-      - owner_zip
-      - meter_accuracy
-      - utility_interconnection_date
-      - meter_serial_number
-      - meter_manufacturer
-      - meter_model_type
-      - can_provide_solar_production_data_access
-      - utility_name
-      - utility_account_number
+      - owner
+      - system_cost
+      - meter
       properties:
-        state:
-          description: DGG rules require California.
+        name:
           type: string
-          example: CA
-          enum:
-          - CA
-        can_provide_solar_production_data_access:
-          description: '`true` / `1` — send `meter_remote_data_collector` and `online_monitoring_api_id`; omit QRE fields. `false` / `0` — send `qualified_reporting_entity` and `qualified_reporting_entity_id_value`; omit remote monitoring fields.'
+          example: Facility name
+          maxLength: 80
+        i_am_owner:
+          description: Whether the submitter is the generation attribute owner (`0` / `1`; string forms are coerced).
+          example: 1
           oneOf:
-          - type: boolean
           - type: integer
             enum:
             - 0
             - 1
-        utility_account_number:
-          description: Optional for DGG when a Utility Bill is uploaded separately via `POST /facilities/{id}/documents`.
-          oneOf:
           - type: string
-            maxLength: 50
+            enum:
+            - '0'
+            - '1'
+          - type: boolean
+        has_solar_production_meter:
+          example: 1
+          oneOf:
           - type: integer
-        dgg:
-          description: Set `true` so the request is treated as DGG when your account is DGG-enabled.
+            enum:
+            - 0
+            - 1
+          - type: string
+            enum:
+            - '0'
+            - '1'
+          - type: boolean
+        facility_type:
+          description: 'Possible values are:
+
+            - RES (Residential)
+
+            - COM (Commercial)
+
+            - MUNI (Municipal)
+
+            - CMTY (Community Solar)'
+          type: string
+          example: RES
+          enum:
+          - RES
+          - COM
+          - MUNI
+          - CMTY
+        facility_size:
+          description: Facility DC capacity (DC kW). Minimum 0.000001.
+          type: number
+          example: 5.657
+          minimum: 1.0e-06
+        is_battery_backup:
+          example: 0
+          oneOf:
+          - type: integer
+            enum:
+            - 0
+            - 1
+          - type: string
+            enum:
+            - '0'
+            - '1'
+          - type: boolean
+          default: 0
+        system_leased:
+          example: 0
+          oneOf:
+          - type: integer
+            enum:
+            - 0
+            - 1
+          - type: string
+            enum:
+            - '0'
+            - '1'
+          - type: boolean
+          default: 0
+        leasing_company:
+          description: Required when `system_leased` is `true`.
+          type: string
+          example: Leasing company name
+          maxLength: 100
+        usable_energy:
+          description: Required when `is_battery_backup` is `true`. Numeric strings are accepted.
+          example: 2.36
+          oneOf:
+          - type: number
+            minimum: 1.0e-06
+          - type: string
+        system_cost:
+          description: Numeric strings are accepted.
+          example: 12345
+          oneOf:
+          - type: integer
+            minimum: 1
+          - type: string
+        referrer_company:
+          type: string
+          example: Referrer company name
+          maxLength: 100
+        building_type:
+          type: string
+          example: Single Family Detached
+        hostname:
+          type: string
+          example: Host name
+          maxLength: 80
+        facility_location_type:
+          type: string
+          example: Rooftop
+          enum:
+          - Rooftop
+          - Parking canopy
+          - Brownfield
+          - Other
+        aggregate_net_metering:
           type: boolean
           example: true
-        group_name:
-          description: Optional distributed-generation group display name (maps to registry facility group name).
+        colocated_facility:
+          type: boolean
+          example: false
+        cmty_application_number:
           type: string
-          maxLength: 255
-        leasing_company:
-          description: Required when `system_leased` is `1`.
+          maxLength: 100
+        external_id:
           type: string
-          maxLength: 80
-        qualified_reporting_entity:
-          description: QRE name matching `GET /qualified_reporting_entities` when not using production data access.
+          example: EXTERNAL-123
+          maxLength: 100
+        comment_box:
           type: string
-          maxLength: 255
-        qualified_reporting_entity_id_value:
-          description: QRE / utility identifier when not using production data access.
-          oneOf:
-          - type: string
-            maxLength: 255
-          - type: integer
-        max_annual_energy:
-          type: number
+        dgg:
+          type: boolean
+          example: false
+        address:
+          $ref: '#/components/schemas/facilityAddressInput'
+        owner:
+          $ref: '#/components/schemas/facilityOwnerInput'
+        installer:
+          $ref: '#/components/schemas/facilityInstallerInput'
+        meter:
+          $ref: '#/components/schemas/facilityMeterInput'
+        registry:
+          $ref: '#/components/schemas/facilityRegistryInput'
         panels:
           type: array
           items:
-            $ref: '#/components/schemas/postDggPanelCreate'
+            $ref: '#/components/schemas/facilityPanelInput'
+        inverters:
+          type: array
+          items:
+            $ref: '#/components/schemas/facilityInverterInput'
+      type: object
+    facilityOwnerInput:
+      required:
+      - first_name
+      - last_name
+      - phone
+      - address
+      properties:
+        first_name:
+          type: string
+          example: John
+        last_name:
+          type: string
+          example: Doe
+        phone:
+          type: string
+          example: 122-223-3321
+        address:
+          $ref: '#/components/schemas/facilityAddressInput'
+        email:
+          type: string
+          example: owner@email.com
+          maxLength: 100
+        company_name:
+          type: string
+          example: Owner company name
       type: object
     facilityPanelInput:
       required:
@@ -3449,255 +3251,317 @@ components:
           type: boolean
           example: false
       type: object
-    StateEligibilityDocument:
-      description: 'Required document row for a state eligibility entry.
-
-
-        Runtime: {@see \Trade\CodeIgniter\models\dto\Document_dto}.'
-      required:
-      - name
-      - required
-      - filetype
+    Panel:
       properties:
-        name:
-          type: string
-          example: Photo of Solar Meter
-        required:
-          type: boolean
-          example: true
-        filetype:
-          type: string
-          example: png|gif|jpg|pdf|jpeg
-      type: object
-    Meter:
-      properties:
-        id:
+        array_id:
+          type: integer
+          example: 189624
+        location:
+          type:
+          - string
+          - 'null'
+          example: Roof
+        tracking:
+          type:
+          - string
+          - 'null'
+          example: Fixed
+        array_orientation_azimuth:
+          type:
+          - number
+          - 'null'
+          format: float
+          example: 320
+        array_tilt:
+          type:
+          - number
+          - 'null'
+          format: float
+          example: 80
+        number_of_panels:
           type:
           - integer
           - 'null'
-          example: 113521
-        accuracy:
-          type:
-          - string
-          - 'null'
-          example: standard
-        serial_number:
-          type:
-          - string
-          - 'null'
-          example: SE704
-        model_type:
-          type:
-          - string
-          - 'null'
-          example: Test
+          example: 3
         manufacturer:
           type:
           - string
           - 'null'
-          example: Test2
-        operation_start:
+        model_type:
           type:
           - string
           - 'null'
-          format: date
-          example: '2024-03-01'
-        last_date_certification:
-          type:
-          - string
-          - 'null'
-          format: date
-          example: '2024-02-10'
-        utility_name:
-          type:
-          - string
-          - 'null'
-          example: Virginia Electric & Power Co
-        utility_id:
-          type:
-          - integer
-          - 'null'
-          example: 56810
-        utility_account_number:
-          type:
-          - string
-          - 'null'
-          example: '234567'
-        reading_at_interconnection:
+          example: test
+        rating_dc:
           type:
           - number
           - 'null'
           format: float
-          example: 2
-        utility_interconnection_date:
-          type:
-          - string
-          - 'null'
-          format: date
-          example: '2024-03-01'
-        current_production_reading:
-          type:
-          - number
-          - 'null'
-          format: float
-          example: 12.321
-        date_of_production_reading:
-          type:
-          - string
-          - 'null'
-          format: date
-          example: '2024-05-14'
-        remote_data_collector:
-          type:
-          - string
-          - 'null'
-          example: enphase
-        remote_data_collector_id:
-          type:
-          - string
-          - 'null'
-          example: '61'
-        online_monitoring_api_id:
-          type:
-          - string
-          - 'null'
-          example: '234567'
+          example: 230.1
       type: object
-    FacilityAbpFields:
-      description: Illinois Adjustable Block Program (ABP) fields. Required when creating an ABP facility (`address.state` is `IL` and your account is ABP-enabled). See nested `panels[].bifacial` and `inverters[].efficiency` on the parent schema.
+    Installer:
       properties:
-        installer_demographics:
-          oneOf:
-          - $ref: '#/components/schemas/InstallerDemographics'
-          description: Installer workforce demographics required for Illinois ABP applications.
-        existing_project_application_id:
-          description: ABP application ID when this facility is an expansion of an existing project on the same parcel.
-          type: string
-          example: ABP-12345
-          maxLength: 20
-        pv_system_disclosure_form_id:
-          description: Illinois PV System Disclosure Form identifier.
-          type: string
-          example: '12345'
-        custom_capacity_factor:
-          description: Custom capacity factor as a decimal (e.g. `0.1426` for 14.26%). Required when `rec_estimate_methodology` is `CUSTOM_CAPACITY_FACTOR`. Do not send a percentage scaled to 100.
-          type: number
+        company:
+          type:
+          - string
+          - 'null'
+          example: test - Conn - Kulas
+        first_name:
+          type:
+          - string
+          - 'null'
+          example: Leola
+        last_name:
+          type:
+          - string
+          - 'null'
+          example: Doe
+        email:
+          type:
+          - string
+          - 'null'
+          example: Josue59@example.com
+        phone:
+          type:
+          - string
+          - 'null'
+          example: 987-223-7611
+        address:
+          $ref: '#/components/schemas/Address'
+      type: object
+    InstallerDemographics:
+      description: Installer workforce demographics for facility create/update requests and ABP detail responses.
+      properties:
+        hours_race_white:
+          description: Total hours worked by White employees.
+          type:
+          - number
+          - 'null'
           format: float
-          example: 0.1426
-        custom_capacity_explanation:
-          description: Narrative explaining the custom capacity factor when `rec_estimate_methodology` is `CUSTOM_CAPACITY_FACTOR`.
-          type: string
+        hours_race_black_or_aa:
+          description: Total hours worked by Black or African American employees.
+          type:
+          - number
+          - 'null'
+          format: float
+        hours_race_ai_or_an:
+          description: Total hours worked by American Indian or Alaskan Native employees.
+          type:
+          - number
+          - 'null'
+          format: float
+        hours_race_asian:
+          description: Total hours worked by Asian employees.
+          type:
+          - number
+          - 'null'
+          format: float
+        hours_race_h_or_pi:
+          description: Total hours worked by Hawaiian or other Pacific Islander employees.
+          type:
+          - number
+          - 'null'
+          format: float
+        hours_race_multi:
+          description: Total hours worked by employees of More Than One Race.
+          type:
+          - number
+          - 'null'
+          format: float
+        hours_race_other:
+          description: Total hours worked by employees of Some Other Race.
+          type:
+          - number
+          - 'null'
+          format: float
+        hours_race_decline:
+          description: Total hours worked by employees who decline to identify race.
+          type:
+          - number
+          - 'null'
+          format: float
+        hours_eth_hispanic_latino:
+          description: Total hours worked by Hispanic or Latino employees.
+          type:
+          - number
+          - 'null'
+          format: float
+        hours_eth_non_hispanic_latino:
+          description: Total hours worked by Not Hispanic or Latino employees.
+          type:
+          - number
+          - 'null'
+          format: float
+        hours_eth_decline:
+          description: Total hours worked by employees who decline to identify ethnicity.
+          type:
+          - number
+          - 'null'
+          format: float
+        training_solar:
+          description: Solar Training Pipeline Program (FEJA program) hours.
+          type:
+          - number
+          - 'null'
+          format: float
+        training_craft:
+          description: Craft Apprenticeship Program (FEJA program) hours.
+          type:
+          - number
+          - 'null'
+          format: float
+        training_multi_cult:
+          description: Multi-Cultural Job Training Program (FEJA program) hours.
+          type:
+          - number
+          - 'null'
+          format: float
+      type: object
+    AbpFacilityDetailsFields:
+      description: Illinois ABP-specific fields included on facility detail responses.
+      properties:
         icc_docket_number:
-          description: Illinois Commerce Commission docket number when applicable.
-          type: string
-        facility_energized:
-          description: Whether the facility has been energized / received permission to operate.
-          type: boolean
-          example: true
-        net_metering_approved:
-          description: Whether net metering has been approved. Drives which net-metering-related documents appear in `GET /facilities/{id}/state_eligibilities`.
-          type: boolean
-          example: true
+          description: Illinois Commerce Commission docket number.
+          type:
+          - string
+          - 'null'
         install_contract_exec_date:
-          description: Installation contract execution date (`YYYY-MM-DD`).
-          type: string
+          description: Installation contract execution date.
+          type:
+          - string
+          - 'null'
           format: date
-          example: '2025-06-01'
-        financial_structure:
-          description: How the system is financed. PPA is common for leased portfolio operators.
-          type: string
-          example: PPA
-          enum:
-          - Customer-owned
-          - Lease
-          - PPA
-        is_already_completed_project_app_on_the_same_parcel_of_land:
-          description: Whether a project application was already completed on the same parcel of land.
-          type: boolean
-          example: false
-        is_project_located_on_public_school_owned_land:
-          description: Whether the project is located on public school-owned land.
-          type: boolean
-          example: false
-        rec_estimate_methodology:
-          description: Method used to estimate REC production. Use `CUSTOM_CAPACITY_FACTOR` when supplying `custom_capacity_factor`.
-          type: string
-          example: CUSTOM_CAPACITY_FACTOR
-          enum:
-          - PVWATTS
-          - CUSTOM_CAPACITY_FACTOR
-        ground_cover_ratio:
-          description: Ground cover ratio for the installation when applicable.
-          type: number
-          format: float
-        prevailing_wage_subject:
-          description: Whether the project is subject to prevailing wage requirements.
-          type: boolean
-        minimal_shading_criteria:
-          description: Whether the site meets minimal shading criteria.
-          type: boolean
-        qualified_installer_person:
-          description: Name of the qualified installer contact for the ABP application.
-          type: string
-        construction_activities_completion_date:
-          description: Date construction activities were completed (`YYYY-MM-DD`).
-          type: string
-          format: date
-          example: '2015-05-15'
         is_expansion:
-          description: Whether this application is an expansion of an existing system. Defaults to `false` when omitted.
-          type: boolean
-          example: false
-      type: object
-    DggFacilityDetailsFields:
-      properties:
-        group_name:
-          type:
-          - string
-          - 'null'
-        qualified_reporting_entity:
-          type:
-          - string
-          - 'null'
-        qualified_reporting_entity_id_value:
-          type:
-          - string
-          - 'null'
-        ac_facility_size:
-          type:
-          - number
-          - 'null'
-          format: float
-        can_provide_solar_production_data_access:
+          description: Whether this is an expansion application.
           type:
           - boolean
           - 'null'
-      type: object
-    uploadFacilityDocumentsResponse:
-      description: Document upload result returned in the API envelope `data` field.
-      required:
-      - status
-      - data
-      properties:
-        data:
-          $ref: '#/components/schemas/FacilityDocumentsUploadResult'
-        status:
-          type: string
-          example: success
-      type: object
-    StateCertification:
-      properties:
-        id:
-          type: integer
-          example: 181904
-        state_abbreviation:
-          type: string
-          example: DC
-        certification_number:
+        existing_project_application_id:
+          description: Prior ABP application ID when this is an expansion.
           type:
           - string
           - 'null'
-          example: DC-426425-SUN-I
+        pv_system_disclosure_form_id:
+          description: Illinois PV System Disclosure Form identifier.
+          type:
+          - string
+          - 'null'
+        rec_estimate_methodology:
+          description: REC estimate methodology (`PVWATTS` or `CUSTOM_CAPACITY_FACTOR`).
+          type:
+          - string
+          - 'null'
+        custom_capacity_factor:
+          description: Custom capacity factor as a decimal.
+          type:
+          - number
+          - 'null'
+          format: float
+        custom_capacity_explanation:
+          description: Explanation for a custom capacity factor.
+          type:
+          - string
+          - 'null'
+        facility_energized:
+          description: Whether the facility is energized.
+          type:
+          - boolean
+          - 'null'
+        net_metering_approved:
+          description: Whether net metering is approved.
+          type:
+          - boolean
+          - 'null'
+        financial_structure:
+          description: Financing structure (`Customer-owned`, `Lease`, or `PPA`).
+          type:
+          - string
+          - 'null'
+        is_already_completed_project_app_on_the_same_parcel_of_land:
+          description: Whether a prior project application exists on the same parcel.
+          type:
+          - boolean
+          - 'null'
+        is_project_located_on_public_school_owned_land:
+          description: Whether the site is on public school-owned land.
+          type:
+          - boolean
+          - 'null'
+        ground_cover_ratio:
+          description: Ground cover ratio.
+          type:
+          - number
+          - 'null'
+          format: float
+        prevailing_wage_subject:
+          description: Prevailing wage applicability.
+          type:
+          - boolean
+          - 'null'
+        minimal_shading_criteria:
+          description: Whether minimal shading criteria are met.
+          type:
+          - boolean
+          - 'null'
+        qualified_installer_person:
+          description: Qualified installer contact name.
+          type:
+          - string
+          - 'null'
+        construction_activities_completion_date:
+          description: Construction completion date.
+          type:
+          - string
+          - 'null'
+          format: date
+        installer_demographics:
+          oneOf:
+          - $ref: '#/components/schemas/InstallerDemographics'
+          description: Installer workforce demographics.
+      type: object
+    PaginatedResponseEnvelope:
+      description: Standard API response envelope for paginated endpoints.
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/ResponseEnvelope'
+      - required:
+        - pagination
+        properties:
+          pagination:
+            $ref: '#/components/schemas/Pagination'
+        type: object
+    facilityCreateOrUpdate:
+      description: Standard facility create payload in nested format.
+      allOf:
+      - $ref: '#/components/schemas/facilityCreateOrUpdateCommonProperties'
+    Error:
+      description: 'Generic error payload when no more specific error schema applies.
+
+
+        Implements JsonSerializable so it can be passed directly to API_Controller::response().
+
+        Implements Countable returning 0 so the response size guard in API_Controller treats it
+
+        as an empty collection (error responses never trigger the size limit).'
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Error description
+      type: object
+    FacilityCompleteSuccess:
+      description: Facility application completed successfully.
+      required:
+      - status
+      properties:
+        status:
+          type: string
+          example: success
       type: object
     ServerError:
       required:
@@ -3715,6 +3579,131 @@ components:
             type: string
             example: Error description
         type: object
+    AbpFacilityDetails:
+      description: 'Facility detail for an Illinois Adjustable Block Program (ABP) system. Returned from `GET /facilities/{id}?data=all` when the facility has an ABP application. Program access: Illinois ABP via API is limited to authorized accounts; contact our support team to enroll.'
+      allOf:
+      - $ref: '#/components/schemas/FacilityDetails'
+      - $ref: '#/components/schemas/AbpFacilityDetailsFields'
+    facilityFlatCreateOrUpdate:
+      description: Standard facility create payload.
+      allOf:
+      - $ref: '#/components/schemas/facilityFlatCreateOrUpdateCommonProperties'
+      - $ref: '#/components/schemas/FacilityCreateStandardFields'
+    FacilitiesListForAccountList:
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FacilityListDetails'
+      type: object
+    StateEligibilityItem:
+      required:
+      - state
+      - is_eligible
+      - product_type
+      properties:
+        documents:
+          description: 'One state''s eligibility details returned in the API envelope `data` array.
+
+
+            Runtime: {@see \Trade\CodeIgniter\models\dto\Eligible_state_dto::jsonSerialize()}.'
+          type: array
+          items:
+            $ref: '#/components/schemas/StateEligibilityDocument'
+        errors:
+          description: Validation messages when the state is not eligible
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+        state:
+          type: string
+          example: PA
+        is_eligible:
+          type: boolean
+          example: true
+        product_type:
+          type: string
+          example: Tier-I
+      type: object
+    FacilityCompleteError:
+      description: Error payload for `POST /facilities/{facility_id}/complete` business-rule and validation failures.
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Facility data validation failed.
+        details:
+          description: 'Optional structured context. Shape depends on the error: field validation map (`{ "field": "error message" }`), list of state codes (`["NJ"]`), or missing document slugs keyed by state (`{ "PA": ["schedule_a"] }`). Document slugs match `upload_field_name` from `GET /facilities/{facility_id}/state_eligibilities`.'
+          oneOf:
+          - type: object
+            additionalProperties:
+              type: string
+          - type: array
+            items:
+              type: string
+          - type: object
+            additionalProperties:
+              type: array
+              items:
+                type: string
+      type: object
+    FacilityGetError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: GET `/facilities/{facility_id}` when the facility is missing or not visible to the account.
+            type: string
+            example: error
+          message:
+            type: string
+            example: Wrong facility_id parameter
+        type: object
+    DggFacilityDetails:
+      allOf:
+      - $ref: '#/components/schemas/FacilityDetails'
+      - $ref: '#/components/schemas/DggFacilityDetailsFields'
+    facilityAddressInput:
+      required:
+      - street
+      - city
+      - county
+      - state
+      - zip
+      properties:
+        street:
+          type: string
+          example: 7312 Random Street
+          maxLength: 80
+        city:
+          type: string
+          example: Yorktown
+          maxLength: 80
+        county:
+          type: string
+          example: York County
+          maxLength: 80
+        state:
+          type: string
+          example: VA
+        zip:
+          type: string
+          example: '23693'
+        apartment:
+          type: string
+          maxLength: 80
+      type: object
     Address:
       properties:
         street:
@@ -3746,68 +3735,79 @@ components:
           - 'null'
           example: '23693'
       type: object
-    PaginatedResponseEnvelope:
-      description: Standard API response envelope for paginated endpoints.
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/ResponseEnvelope'
-      - required:
-        - pagination
-        properties:
-          pagination:
-            $ref: '#/components/schemas/Pagination'
-        type: object
-    Inverter:
+    FacilityStateEligibilitiesList:
+      description: State eligibility rows in the API envelope `data` field.
+      type: array
+      items:
+        $ref: '#/components/schemas/StateEligibilityItem'
+    StateCertificationCreateData:
+      description: State certification create success payload returned in the API envelope `data` field.
+      required:
+      - status
+      - data
       properties:
-        id:
-          type: integer
-          example: 107060
-        number_of_inverters:
-          type:
-          - integer
-          - 'null'
-          example: 2
-        manufacturer:
-          type:
-          - string
-          - 'null'
-          example: Agepower Limit
-        model_type:
+        status:
+          type: string
+          example: success
+        data:
+          description: Empty array on successful certification create.
+          type: array
+          items: {}
+          example: []
+      type: object
+    DggFacilityDetailsFields:
+      properties:
+        group_name:
           type:
           - string
           - 'null'
-        inverter_capacity_kw:
+        qualified_reporting_entity:
+          type:
+          - string
+          - 'null'
+        qualified_reporting_entity_id_value:
+          type:
+          - string
+          - 'null'
+        ac_facility_size:
           type:
           - number
           - 'null'
           format: float
-          example: 2.23
+        can_provide_solar_production_data_access:
+          type:
+          - boolean
+          - 'null'
       type: object
-    facilityInstallerInput:
-      required:
-      - company
+    Owner:
       properties:
-        company:
-          type: string
-          example: Installer company name
-          maxLength: 100
         first_name:
-          type: string
-          example: John
-          maxLength: 80
+          type:
+          - string
+          - 'null'
+          example: Isaac
         last_name:
-          type: string
+          type:
+          - string
+          - 'null'
           example: Doe
-          maxLength: 80
         email:
-          type: string
-          example: contact@email.com
-          maxLength: 100
+          type:
+          - string
+          - 'null'
+          example: test@example.com
         phone:
-          type: string
-          example: 123-123-1234
+          type:
+          - string
+          - 'null'
+          example: 122-223-3321
+        company_name:
+          type:
+          - string
+          - 'null'
+          example: test name Towne Inc
         address:
-          $ref: '#/components/schemas/facilityAddressInput'
+          $ref: '#/components/schemas/Address'
       type: object
   securitySchemes:
     BearerAuth:

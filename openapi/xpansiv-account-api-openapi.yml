@@ -221,6 +221,25 @@ paths:
       description: PROD
 components:
   schemas:
+    ODataEnvelopeWithTotalCountOfCounterparty:
+      required:
+      - countExceeded
+      - value
+      type: object
+      properties:
+        '@count':
+          type: integer
+          format: int32
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Counterparty'
+        totalCount:
+          type: integer
+          format: int32
+        countExceeded:
+          type: boolean
+      description: Container for OData-like rows of information with count
     ErrorItem:
       required:
       - message
@@ -287,223 +306,6 @@ components:
           type: boolean
           description: Indicates whether the account is eligible to buy certificates.
       description: Counterparty information
-    ODataEnvelopeWithTotalCountOfCounterparty:
-      required:
-      - countExceeded
-      - value
-      type: object
-      properties:
-        '@count':
-          type: integer
-          format: int32
-        value:
-          type: array
-          items:
-            $ref: '#/components/schemas/Counterparty'
-        totalCount:
-          type: integer
-          format: int32
-        countExceeded:
-          type: boolean
-      description: Container for OData-like rows of information with count
-    Ref.RegistryLinkStatus:
-      type: string
-      description: Ref.Data.REGISTRY_LINK_STATUS
-    CustodianAccountServiceAttributes:
-      title: CustodianAccountServiceAttributes
-      type: object
-      description: 'Attributes for account service with `type` CUSTODIAN_SERVICE.
-
-        '
-      required:
-      - custodianProgramCode
-      - manualReplicaMode
-      - externalTransferAutoApproval
-      properties:
-        custodianProgramCode:
-          $ref: '#/components/schemas/Ref.CustodianProgram'
-        manualReplicaMode:
-          type: boolean
-          description: if set true - manual replica mode will be enabled
-        ledgerCode:
-          type: string
-        ledgerIdentifier:
-          type: string
-        accountHoldingsIdentifier:
-          type: string
-          description: account identifier on custodian program
-        accountHoldingsName:
-          type: string
-          description: account name on custodian program
-        replicaTargetSubaccountIdentifier:
-          type: string
-          description: default subaccount identifier to propagate replicas to
-        externalTransferAutoApproval:
-          type: boolean
-        retirementOperationsNotificationEmails:
-          type: array
-          description: Optional addresses that receive a copy of retirement notifications, merged with user-supplied email.
-          items:
-            type: string
-    AccountService:
-      type: object
-      description: 'Canonical account service response (`id`, `status`, `type`, optional `attributes`). Used on `Account.services` and on standalone service-account endpoints. Polymorphism is on `attributes`, selected implicitly by `type`. If the service has no typed attributes (any `type` other than ACX, SUBACCOUNT_SERVICE, or CUSTODIAN_SERVICE), do not display `attributes` — omit the field, or return it as an empty object.
-
-        '
-      required:
-      - id
-      - status
-      - type
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        status:
-          type: string
-          description: Ref.Data.SERVICE_ACCOUNT_STATUS
-          example: APPROVED
-          readOnly: true
-        type:
-          type: string
-          example: ACX
-          description: Ref.Data.SERVICE_TYPE
-        attributes:
-          $ref: '#/components/schemas/AccountServiceAttributes'
-    SubaccountAccountServiceAttributes:
-      title: SubaccountAccountServiceAttributes
-      type: object
-      description: 'Attributes for account service with `type` SUBACCOUNT_SERVICE.
-
-        '
-      required:
-      - custodianEmaAccountIdentifier
-      - autoDeposit
-      properties:
-        custodianEmaAccountIdentifier:
-          type: string
-          description: The EMA account identifier of the custodian account
-        autoDeposit:
-          type: boolean
-          description: If set true - auto deposit mode will be enabled
-        retirementSubaccountCodes:
-          type: object
-          description: Mapping of a program code to a list of retirement subaccounts. Program codes are taken from ReferenceData.Program
-          additionalProperties:
-            type: array
-            items:
-              type: string
-          example:
-            ACR:
-            - '12345'
-            CAR: []
-            VCS:
-            - '43134'
-            - '32141'
-        linkedRegistryAccountIds:
-          type: object
-          description: Mapping of a program code to a registry account id. Program codes are taken from ReferenceData.Program
-          additionalProperties:
-            type: string
-            description: Registry account id
-          example:
-            ACR: 098765
-            CAR: null
-            VCS: '567890'
-    NotAuthorizedError:
-      type: object
-      properties:
-        message:
-          type: string
-    Ref.SubAccountType:
-      type: string
-      description: Type of registry sub-account. Ref.Data.SUBACCOUNT_REGISTRY_TYPE
-    Ref.OrganizationLegalStructure:
-      type: string
-      example: PRIVATELY_OWNED_CORP
-      description: Ref.Data.ORGANIZATION_LEGAL_STRUCTURE
-    Ref.ComplianceStatus:
-      type: string
-      description: Flag for whether sub-account is for compliance retirement activity. Ref.Data.COMPLIANCE_STATUS
-    Organization:
-      type: object
-      required:
-      - legalName
-      - structure
-      - type
-      properties:
-        iamOrgId:
-          type: string
-        legalName:
-          type: string
-          example: RVCMC Sub Default
-        structure:
-          $ref: '#/components/schemas/Ref.OrganizationLegalStructure'
-        type:
-          $ref: '#/components/schemas/Ref.OrganizationType'
-    InternalServerError:
-      type: object
-      properties:
-        message:
-          type: string
-    Ref.CustodianProgram:
-      type: string
-      description: Ref.Data.CUSTODIAN_PROGRAM
-    AcxAccountServiceAttributes:
-      title: AcxAccountServiceAttributes
-      type: object
-      description: 'Attributes for account service with `type` ACX.
-
-        '
-      required:
-      - acxAccountIdentifier
-      properties:
-        acxAccountIdentifier:
-          type: string
-    AccountRegistryLink:
-      type: object
-      required:
-      - id
-      - program
-      - registryAccountId
-      - status
-      properties:
-        id:
-          type: integer
-          format: int64
-        program:
-          $ref: '#/components/schemas/Ref.Program'
-        registryAccountId:
-          type: string
-        status:
-          $ref: '#/components/schemas/Ref.RegistryLinkStatus'
-        lastSyncDate:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          description: 'Incremental sync watermark (RFC 3339 date-time), equivalent to the server''s sync time identifier used for incremental sync. Omitted or null when the registry link has never been synced.
-
-            '
-    Ref.Program:
-      type: string
-      description: Ref.Data.PROGRAM
-    Ref.OrganizationType:
-      type: string
-      example: BROKER
-      description: Ref.Data.ORGANIZATION_TYPE
-    AccountServiceAttributes:
-      title: AccountServiceAttributes
-      description: 'Shape is determined by the parent service `type` (Ref.ServiceType), using mapping: ACX → AcxAccountServiceAttributes; SUBACCOUNT_SERVICE → SubaccountAccountServiceAttributes; CUSTODIAN_SERVICE → CustodianAccountServiceAttributes. If there are no service attributes (all other service types), do not display this object — omit `attributes`, or return `attributes` as an empty object.
-
-        '
-      oneOf:
-      - $ref: '#/components/schemas/AcxAccountServiceAttributes'
-      - $ref: '#/components/schemas/SubaccountAccountServiceAttributes'
-      - $ref: '#/components/schemas/CustodianAccountServiceAttributes'
-    Ref.AccountStatus:
-      type: string
-      example: APPROVED
-      description: Ref.Data.ACCOUNT_STATUS
     Account:
       type: object
       required:
@@ -549,19 +351,217 @@ components:
             '
           items:
             $ref: '#/components/schemas/AccountService'
+    Organization:
+      type: object
+      required:
+      - legalName
+      - structure
+      - type
+      properties:
+        iamOrgId:
+          type: string
+        legalName:
+          type: string
+          example: RVCMC Sub Default
+        structure:
+          $ref: '#/components/schemas/Ref.OrganizationLegalStructure'
+        type:
+          $ref: '#/components/schemas/Ref.OrganizationType'
+    Ref.CustodianProgram:
+      type: string
+      description: Ref.Data.CUSTODIAN_PROGRAM
+    SubaccountAccountServiceAttributes:
+      title: SubaccountAccountServiceAttributes
+      type: object
+      description: 'Attributes for account service with `type` SUBACCOUNT_SERVICE.
+
+        '
+      required:
+      - custodianEmaAccountIdentifier
+      - autoDeposit
+      properties:
+        custodianEmaAccountIdentifier:
+          type: string
+          description: The EMA account identifier of the custodian account
+        autoDeposit:
+          type: boolean
+          description: If set true - auto deposit mode will be enabled
+        retirementSubaccountCodes:
+          type: object
+          description: Mapping of a program code to a list of retirement subaccounts. Program codes are taken from ReferenceData.Program
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          example:
+            ACR:
+            - '12345'
+            CAR: []
+            VCS:
+            - '43134'
+            - '32141'
+        linkedRegistryAccountIds:
+          type: object
+          description: Mapping of a program code to a registry account id. Program codes are taken from ReferenceData.Program
+          additionalProperties:
+            type: string
+            description: Registry account id
+          example:
+            ACR: 098765
+            CAR: null
+            VCS: '567890'
+    AccountService:
+      type: object
+      description: 'Canonical account service response (`id`, `status`, `type`, optional `attributes`). Used on `Account.services` and on standalone service-account endpoints. Polymorphism is on `attributes`, selected implicitly by `type`. If the service has no typed attributes (any `type` other than ACX, SUBACCOUNT_SERVICE, or CUSTODIAN_SERVICE), do not display `attributes` — omit the field, or return it as an empty object.
+
+        '
+      required:
+      - id
+      - status
+      - type
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          type: string
+          description: Ref.Data.SERVICE_ACCOUNT_STATUS
+          example: APPROVED
+          readOnly: true
+        type:
+          type: string
+          example: ACX
+          description: Ref.Data.SERVICE_TYPE
+        attributes:
+          $ref: '#/components/schemas/AccountServiceAttributes'
+    CustodianAccountServiceAttributes:
+      title: CustodianAccountServiceAttributes
+      type: object
+      description: 'Attributes for account service with `type` CUSTODIAN_SERVICE.
+
+        '
+      required:
+      - custodianProgramCode
+      - manualReplicaMode
+      - externalTransferAutoApproval
+      properties:
+        custodianProgramCode:
+          $ref: '#/components/schemas/Ref.CustodianProgram'
+        manualReplicaMode:
+          type: boolean
+          description: if set true - manual replica mode will be enabled
+        ledgerCode:
+          type: string
+        ledgerIdentifier:
+          type: string
+        accountHoldingsIdentifier:
+          type: string
+          description: account identifier on custodian program
+        accountHoldingsName:
+          type: string
+          description: account name on custodian program
+        replicaTargetSubaccountIdentifier:
+          type: string
+          description: default subaccount identifier to propagate replicas to
+        externalTransferAutoApproval:
+          type: boolean
+        retirementOperationsNotificationEmails:
+          type: array
+          description: Optional addresses that receive a copy of retirement notifications, merged with user-supplied email.
+          items:
+            type: string
+    NotAuthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+    Ref.OrganizationLegalStructure:
+      type: string
+      example: PRIVATELY_OWNED_CORP
+      description: Ref.Data.ORGANIZATION_LEGAL_STRUCTURE
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+    Ref.RegistryLinkStatus:
+      type: string
+      description: Ref.Data.REGISTRY_LINK_STATUS
+    AccountRegistryLink:
+      type: object
+      required:
+      - id
+      - program
+      - registryAccountId
+      - status
+      properties:
+        id:
+          type: integer
+          format: int64
+        program:
+          $ref: '#/components/schemas/Ref.Program'
+        registryAccountId:
+          type: string
+        status:
+          $ref: '#/components/schemas/Ref.RegistryLinkStatus'
+        lastSyncDate:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: 'Incremental sync watermark (RFC 3339 date-time), equivalent to the server''s sync time identifier used for incremental sync. Omitted or null when the registry link has never been synced.
+
+            '
+    Ref.OrganizationType:
+      type: string
+      example: BROKER
+      description: Ref.Data.ORGANIZATION_TYPE
+    AcxAccountServiceAttributes:
+      title: AcxAccountServiceAttributes
+      type: object
+      description: 'Attributes for account service with `type` ACX.
+
+        '
+      required:
+      - acxAccountIdentifier
+      properties:
+        acxAccountIdentifier:
+          type: string
+    Ref.Program:
+      type: string
+      description: Ref.Data.PROGRAM
+    Ref.SubAccountType:
+      type: string
+      description: Type of registry sub-account. Ref.Data.SUBACCOUNT_REGISTRY_TYPE
+    Ref.ComplianceStatus:
+      type: string
+      description: Flag for whether sub-account is for compliance retirement activity. Ref.Data.COMPLIANCE_STATUS
+    AccountServiceAttributes:
+      title: AccountServiceAttributes
+      description: 'Shape is determined by the parent service `type` (Ref.ServiceType), using mapping: ACX → AcxAccountServiceAttributes; SUBACCOUNT_SERVICE → SubaccountAccountServiceAttributes; CUSTODIAN_SERVICE → CustodianAccountServiceAttributes. If there are no service attributes (all other service types), do not display this object — omit `attributes`, or return `attributes` as an empty object.
+
+        '
+      oneOf:
+      - $ref: '#/components/schemas/AcxAccountServiceAttributes'
+      - $ref: '#/components/schemas/SubaccountAccountServiceAttributes'
+      - $ref: '#/components/schemas/CustodianAccountServiceAttributes'
+    Ref.AccountStatus:
+      type: string
+      example: APPROVED
+      description: Ref.Data.ACCOUNT_STATUS
   responses:
-    '401':
-      description: Not authorized error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/NotAuthorizedError'
     '500':
       description: Internal server error
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/InternalServerError'
+    '401':
+      description: Not authorized error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotAuthorizedError'
   parameters:
     AccountIdentifier:
       description: Account identifier

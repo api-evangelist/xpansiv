@@ -112,11 +112,6 @@ components:
         generatorAccount:
           type: boolean
           description: True/False.
-    NotAuthorizedError:
-      type: object
-      properties:
-        message:
-          type: string
     Ref.Program:
       type: string
       description: Ref.Data.PROGRAM
@@ -141,6 +136,11 @@ components:
           type: integer
           format: int64
     InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+    NotAuthorizedError:
       type: object
       properties:
         message:

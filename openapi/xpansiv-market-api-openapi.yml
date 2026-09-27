@@ -123,6 +123,36 @@ paths:
                   type: object
 components:
   schemas:
+    MarketPricingItem:
+      description: One market pricing row in the API envelope `data` array for `searchMarket`.
+      required:
+      - product
+      - date
+      properties:
+        product:
+          type: string
+          example: PA2018
+        date:
+          type: string
+          example: '2017-10-20'
+        bid_price:
+          type:
+          - number
+          - 'null'
+          format: float
+          example: 5.5
+        offer_price:
+          type:
+          - number
+          - 'null'
+          format: float
+          example: 6.5
+      type: object
+    MarketPricingListResponse:
+      description: Market pricing rows returned in the API envelope `data` field.
+      type: array
+      items:
+        $ref: '#/components/schemas/MarketPricingItem'
     AuthError:
       required:
       - error
@@ -139,11 +169,26 @@ components:
             type: string
             example: Authentication error
         type: object
-    MarketPricingListResponse:
-      description: Market pricing rows returned in the API envelope `data` field.
-      type: array
-      items:
-        $ref: '#/components/schemas/MarketPricingItem'
+    Error:
+      description: 'Generic error payload when no more specific error schema applies.
+
+
+        Implements JsonSerializable so it can be passed directly to API_Controller::response().
+
+        Implements Countable returning 0 so the response size guard in API_Controller treats it
+
+        as an empty collection (error responses never trigger the size limit).'
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Error description
+      type: object
     ResponseEnvelope:
       description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
       required:
@@ -174,51 +219,6 @@ components:
             example: 1 of 1
           - type: integer
             example: 2
-      type: object
-    Error:
-      description: 'Generic error payload when no more specific error schema applies.
-
-
-        Implements JsonSerializable so it can be passed directly to API_Controller::response().
-
-        Implements Countable returning 0 so the response size guard in API_Controller treats it
-
-        as an empty collection (error responses never trigger the size limit).'
-      required:
-      - error
-      - message
-      properties:
-        error:
-          type: string
-          example: error
-        message:
-          type: string
-          example: Error description
-      type: object
-    MarketPricingItem:
-      description: One market pricing row in the API envelope `data` array for `searchMarket`.
-      required:
-      - product
-      - date
-      properties:
-        product:
-          type: string
-          example: PA2018
-        date:
-          type: string
-          example: '2017-10-20'
-        bid_price:
-          type:
-          - number
-          - 'null'
-          format: float
-          example: 5.5
-        offer_price:
-          type:
-          - number
-          - 'null'
-          format: float
-          example: 6.5
       type: object
   securitySchemes:
     BearerAuth:

@@ -78,16 +78,6 @@ paths:
                 $ref: '#/components/schemas/ValidationError'
 components:
   schemas:
-    ValidationError:
-      type: object
-      properties:
-        code:
-          type: integer
-          format: int32
-        parameter:
-          type: string
-        message:
-          type: string
     ODataEnvelopeOfExtResourcePublic:
       required:
       - value
@@ -103,6 +93,16 @@ components:
           items:
             $ref: '#/components/schemas/ExtResourcePublic'
       description: Container for OData-like rows of information
+    ValidationError:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        parameter:
+          type: string
+        message:
+          type: string
     ExtResourcePublic:
       type: object
       properties:

@@ -91,49 +91,31 @@ paths:
       tags:
       - Generators
 components:
-  parameters:
-    PageSize:
-      name: size
-      in: query
-      required: false
-      schema:
-        type: integer
-        format: int32
-    PageNumber:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        format: int32
-    Include:
-      name: include
-      description: Comma-separated values from optional response fields
-      in: query
-      required: false
-      schema:
-        type: string
+  responses:
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
+    '401':
+      description: Not authorized error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotAuthorizedError'
   schemas:
-    Page:
+    Ref.VoluntaryEligibilityType:
+      type: string
+      description: The type of the voluntary eligibility. Ref.Data.REC_VOLUNTARY_ELIGIBILITY
+    Ref.GeneratorStatus:
+      type: string
+      description: The status of the generator in the registry. Ref.Data.GENERATOR_STATUS
+    NotAuthorizedError:
       type: object
-      required:
-      - page
-      - size
-      - totalPages
-      - totalElements
       properties:
-        page:
-          type: integer
-          format: int32
-        size:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-        totalElements:
-          type: integer
-          format: int64
+        message:
+          type: string
     Generator:
       allOf:
       - $ref: '#/components/schemas/Resource'
@@ -212,39 +194,40 @@ components:
                   type: array
                   items:
                     $ref: '#/components/schemas/VoluntaryEligibility'
-    Ref.StateProvince:
+    Ref.StateEligibilityType:
       type: string
-      description: Ref.Data.STATE_PROVINCE
-    FuelType:
+      description: The type of the state eligibility. Ref.Data.REC_STATE_ELIGIBILITY
+    Page:
       type: object
+      required:
+      - page
+      - size
+      - totalPages
+      - totalElements
       properties:
-        name:
-          type: string
-          description: The fuel type associated with the underlying asset.
-        type:
-          $ref: '#/components/schemas/Ref.FuelType'
-        fuelSource:
-          type: string
-          description: The registry fuel source associated with the fuel type (registry-dependent).
-    NotAuthorizedError:
-      type: object
-      properties:
-        message:
-          type: string
-    Ref.RecProgram:
-      type: string
-      description: Ref.Data.REC_PROGRAM
-    Ref.GeneratorStatus:
-      type: string
-      description: The status of the generator in the registry. Ref.Data.GENERATOR_STATUS
-    Ref.Country:
-      type: string
-      description: Ref.Data.COUNTRY
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
     InternalServerError:
       type: object
       properties:
         message:
           type: string
+    Ref.FuelType:
+      type: string
+      description: Ref.Data.REC_FUEL_TYPE
+    Ref.RecProgram:
+      type: string
+      description: Ref.Data.REC_PROGRAM
     StateEligibility:
       type: object
       description: Object to hold full state eligibility information - type of eligibility, extendable with other information
@@ -257,12 +240,20 @@ components:
         stateIdentifier:
           type: string
           description: This is the identifier of the eligibility from the registry
-    Ref.VoluntaryEligibilityType:
+    FuelType:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The fuel type associated with the underlying asset.
+        type:
+          $ref: '#/components/schemas/Ref.FuelType'
+        fuelSource:
+          type: string
+          description: The registry fuel source associated with the fuel type (registry-dependent).
+    Ref.Country:
       type: string
-      description: The type of the voluntary eligibility. Ref.Data.REC_VOLUNTARY_ELIGIBILITY
-    Ref.FuelType:
-      type: string
-      description: Ref.Data.REC_FUEL_TYPE
+      description: Ref.Data.COUNTRY
     VoluntaryEligibility:
       type: object
       description: Object to hold full voluntary eligibility information - type of eligibility, effective date, expiration, extendable with other information
@@ -280,9 +271,9 @@ components:
           type: string
           format: date-time
           description: the expiration date of the eligibility.
-    Ref.StateEligibilityType:
+    Ref.StateProvince:
       type: string
-      description: The type of the state eligibility. Ref.Data.REC_STATE_ELIGIBILITY
+      description: Ref.Data.STATE_PROVINCE
     Resource:
       type: object
       required:
@@ -300,19 +291,28 @@ components:
         name:
           type: string
           description: The registry assigned name of the project or generator.
-  responses:
-    '401':
-      description: Not authorized error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/NotAuthorizedError'
-    '500':
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/InternalServerError'
+  parameters:
+    PageSize:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    Include:
+      name: include
+      description: Comma-separated values from optional response fields
+      in: query
+      required: false
+      schema:
+        type: string
+    PageNumber:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
   securitySchemes:
     bearerToken:
       type: http

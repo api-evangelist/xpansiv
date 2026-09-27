@@ -180,6 +180,27 @@ paths:
                   type: object
 components:
   schemas:
+    CompanyEntityList:
+      description: Company entity rows in the API envelope `data` field.
+      type: array
+      items:
+        $ref: '#/components/schemas/CompanyEntityItem'
+    AuthError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 401 when API authentication is missing or invalid.
+            type: string
+            example: connection_failed
+          message:
+            type: string
+            example: Authentication error
+        type: object
     CompanyEntityAddress:
       description: Address nested on a company entity returned by `getCompanyEntities`.
       properties:
@@ -202,46 +223,26 @@ components:
           type: string
           example: US
       type: object
-    AuthError:
+    Error:
+      description: 'Generic error payload when no more specific error schema applies.
+
+
+        Implements JsonSerializable so it can be passed directly to API_Controller::response().
+
+        Implements Countable returning 0 so the response size guard in API_Controller treats it
+
+        as an empty collection (error responses never trigger the size limit).'
       required:
       - error
       - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-      - properties:
-          error:
-            description: 401 when API authentication is missing or invalid.
-            type: string
-            example: connection_failed
-          message:
-            type: string
-            example: Authentication error
-        type: object
-    CompanyEntityContact:
-      description: Contact nested on a company entity returned by `getCompanyEntities`.
       properties:
-        contact_id:
+        error:
           type: string
-          example: '12345'
-        contact_name:
+          example: error
+        message:
           type: string
-          example: John Doe
-        contact_email:
-          type: string
-          example: test.address@example.com
-        contact_phone:
-          type: string
-          example: '123456789'
-        contact_date_created:
-          type: string
-          example: '2024-10-26 13:30:24'
+          example: Error description
       type: object
-    CompanyEntityList:
-      description: Company entity rows in the API envelope `data` field.
-      type: array
-      items:
-        $ref: '#/components/schemas/CompanyEntityItem'
     CreateAssetFieldErrors:
       description: Field-level validation messages in envelope `data` for `POST /ct/assets`.
       properties:
@@ -288,6 +289,22 @@ components:
         electricity_source_id:
           type: string
       type: object
+    ServerError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 500 when an unexpected server or infrastructure failure occurs.
+            type: string
+            example: internal_error
+          message:
+            type: string
+            example: Error description
+        type: object
     CompanyEntityItem:
       properties:
         address:
@@ -307,22 +324,34 @@ components:
           type: string
           example: 6363fac17cfaf0_1234567.pdf
       type: object
-    ServerError:
-      required:
-      - error
-      - message
+    CompanyEntityContact:
+      description: Contact nested on a company entity returned by `getCompanyEntities`.
+      properties:
+        contact_id:
+          type: string
+          example: '12345'
+        contact_name:
+          type: string
+          example: John Doe
+        contact_email:
+          type: string
+          example: test.address@example.com
+        contact_phone:
+          type: string
+          example: '123456789'
+        contact_date_created:
+          type: string
+          example: '2024-10-26 13:30:24'
       type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-      - properties:
-          error:
-            description: 500 when an unexpected server or infrastructure failure occurs.
-            type: string
-            example: internal_error
-          message:
-            type: string
-            example: Error description
-        type: object
+    CreateAssetSuccess:
+      description: Success payload in the API envelope `data` field for `createAsset` (`POST /ct/assets`).
+      required:
+      - status
+      properties:
+        status:
+          type: string
+          example: asset created
+      type: object
     postAssetCreate:
       description: Request body for `POST /ct/assets` (`createAsset`).
       required:
@@ -455,35 +484,6 @@ components:
           description: Reporting party or responsible person/entity name
           type: string
           example: test
-      type: object
-    Error:
-      description: 'Generic error payload when no more specific error schema applies.
-
-
-        Implements JsonSerializable so it can be passed directly to API_Controller::response().
-
-        Implements Countable returning 0 so the response size guard in API_Controller treats it
-
-        as an empty collection (error responses never trigger the size limit).'
-      required:
-      - error
-      - message
-      properties:
-        error:
-          type: string
-          example: error
-        message:
-          type: string
-          example: Error description
-      type: object
-    CreateAssetSuccess:
-      description: Success payload in the API envelope `data` field for `createAsset` (`POST /ct/assets`).
-      required:
-      - status
-      properties:
-        status:
-          type: string
-          example: asset created
       type: object
     ResponseEnvelope:
       description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.

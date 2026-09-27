@@ -143,53 +143,16 @@ paths:
                 $ref: '#/components/schemas/ValidationError'
 components:
   schemas:
-    FileReport:
+    ValidationError:
       type: object
       properties:
-        fileId:
-          type: string
-        fileSetId:
-          type: string
-        srcAcctId:
-          type: string
-        srcAcctIdentifier:
-          type: string
-        accountName:
-          type: string
-        srcResourceId:
-          type: string
-        srcResourceIdentifier:
-          type: string
-        resourceName:
-          type: string
-        fileName:
-          type: string
-        generatedFileName:
-          type: string
-        fileTypeCode:
-          type: string
-        fileTypeName:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        uploadedBy:
-          type: string
-        userId:
-          type: string
-        version:
+        code:
           type: integer
           format: int32
-        size:
-          type: integer
-          format: int64
-        displaySize:
+        parameter:
           type: string
-        publicFile:
-          type: boolean
-        allowPublicFile:
-          type: boolean
-      description: File Report
+        message:
+          type: string
     ODataEnvelopeOfFileReport:
       required:
       - value
@@ -205,16 +168,6 @@ components:
           items:
             $ref: '#/components/schemas/FileReport'
       description: Container for OData-like rows of information
-    ValidationError:
-      type: object
-      properties:
-        code:
-          type: integer
-          format: int32
-        parameter:
-          type: string
-        message:
-          type: string
     FileEntry:
       required:
       - fileName
@@ -296,6 +249,53 @@ components:
         allowPublicFile:
           type: boolean
       description: A file type
+    FileReport:
+      type: object
+      properties:
+        fileId:
+          type: string
+        fileSetId:
+          type: string
+        srcAcctId:
+          type: string
+        srcAcctIdentifier:
+          type: string
+        accountName:
+          type: string
+        srcResourceId:
+          type: string
+        srcResourceIdentifier:
+          type: string
+        resourceName:
+          type: string
+        fileName:
+          type: string
+        generatedFileName:
+          type: string
+        fileTypeCode:
+          type: string
+        fileTypeName:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        uploadedBy:
+          type: string
+        userId:
+          type: string
+        version:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int64
+        displaySize:
+          type: string
+        publicFile:
+          type: boolean
+        allowPublicFile:
+          type: boolean
+      description: File Report
   securitySchemes:
     JWT:
       type: http
