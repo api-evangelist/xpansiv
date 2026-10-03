@@ -91,27 +91,85 @@ paths:
       tags:
       - Generators
 components:
-  responses:
-    '500':
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/InternalServerError'
-    '401':
-      description: Not authorized error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/NotAuthorizedError'
   schemas:
-    Ref.VoluntaryEligibilityType:
-      type: string
-      description: The type of the voluntary eligibility. Ref.Data.REC_VOLUNTARY_ELIGIBILITY
-    Ref.GeneratorStatus:
-      type: string
-      description: The status of the generator in the registry. Ref.Data.GENERATOR_STATUS
+    StateEligibility:
+      type: object
+      description: Object to hold full state eligibility information - type of eligibility, extendable with other information
+      properties:
+        name:
+          type: string
+          description: Name of the state eligibility.
+        type:
+          $ref: '#/components/schemas/Ref.StateEligibilityType'
+        stateIdentifier:
+          type: string
+          description: This is the identifier of the eligibility from the registry
     NotAuthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+    Page:
+      type: object
+      required:
+      - page
+      - size
+      - totalPages
+      - totalElements
+      properties:
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+    Ref.FuelType:
+      type: string
+      description: Ref.Data.REC_FUEL_TYPE
+    Resource:
+      type: object
+      required:
+      - name
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: The unique XC db identifier for the project or generator.
+        upn:
+          type: string
+          description: 'Universal Project Identifier. The unique identifier assigned by Xpansiv Connect to every resource across all registries that  have integrated with the Xpansiv Connect platform.
+
+            '
+        name:
+          type: string
+          description: The registry assigned name of the project or generator.
+    Ref.RecProgram:
+      type: string
+      description: Ref.Data.REC_PROGRAM
+    Ref.Country:
+      type: string
+      description: Ref.Data.COUNTRY
+    Ref.StateEligibilityType:
+      type: string
+      description: The type of the state eligibility. Ref.Data.REC_STATE_ELIGIBILITY
+    FuelType:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The fuel type associated with the underlying asset.
+        type:
+          $ref: '#/components/schemas/Ref.FuelType'
+        fuelSource:
+          type: string
+          description: The registry fuel source associated with the fuel type (registry-dependent).
+    InternalServerError:
       type: object
       properties:
         message:
@@ -194,66 +252,15 @@ components:
                   type: array
                   items:
                     $ref: '#/components/schemas/VoluntaryEligibility'
-    Ref.StateEligibilityType:
+    Ref.StateProvince:
       type: string
-      description: The type of the state eligibility. Ref.Data.REC_STATE_ELIGIBILITY
-    Page:
-      type: object
-      required:
-      - page
-      - size
-      - totalPages
-      - totalElements
-      properties:
-        page:
-          type: integer
-          format: int32
-        size:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-        totalElements:
-          type: integer
-          format: int64
-    InternalServerError:
-      type: object
-      properties:
-        message:
-          type: string
-    Ref.FuelType:
+      description: Ref.Data.STATE_PROVINCE
+    Ref.VoluntaryEligibilityType:
       type: string
-      description: Ref.Data.REC_FUEL_TYPE
-    Ref.RecProgram:
+      description: The type of the voluntary eligibility. Ref.Data.REC_VOLUNTARY_ELIGIBILITY
+    Ref.GeneratorStatus:
       type: string
-      description: Ref.Data.REC_PROGRAM
-    StateEligibility:
-      type: object
-      description: Object to hold full state eligibility information - type of eligibility, extendable with other information
-      properties:
-        name:
-          type: string
-          description: Name of the state eligibility.
-        type:
-          $ref: '#/components/schemas/Ref.StateEligibilityType'
-        stateIdentifier:
-          type: string
-          description: This is the identifier of the eligibility from the registry
-    FuelType:
-      type: object
-      properties:
-        name:
-          type: string
-          description: The fuel type associated with the underlying asset.
-        type:
-          $ref: '#/components/schemas/Ref.FuelType'
-        fuelSource:
-          type: string
-          description: The registry fuel source associated with the fuel type (registry-dependent).
-    Ref.Country:
-      type: string
-      description: Ref.Data.COUNTRY
+      description: The status of the generator in the registry. Ref.Data.GENERATOR_STATUS
     VoluntaryEligibility:
       type: object
       description: Object to hold full voluntary eligibility information - type of eligibility, effective date, expiration, extendable with other information
@@ -271,34 +278,20 @@ components:
           type: string
           format: date-time
           description: the expiration date of the eligibility.
-    Ref.StateProvince:
-      type: string
-      description: Ref.Data.STATE_PROVINCE
-    Resource:
-      type: object
-      required:
-      - name
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: The unique XC db identifier for the project or generator.
-        upn:
-          type: string
-          description: 'Universal Project Identifier. The unique identifier assigned by Xpansiv Connect to every resource across all registries that  have integrated with the Xpansiv Connect platform.
-
-            '
-        name:
-          type: string
-          description: The registry assigned name of the project or generator.
+  responses:
+    '401':
+      description: Not authorized error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotAuthorizedError'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
   parameters:
-    PageSize:
-      name: size
-      in: query
-      required: false
-      schema:
-        type: integer
-        format: int32
     Include:
       name: include
       description: Comma-separated values from optional response fields
@@ -308,6 +301,13 @@ components:
         type: string
     PageNumber:
       name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    PageSize:
+      name: size
       in: query
       required: false
       schema:

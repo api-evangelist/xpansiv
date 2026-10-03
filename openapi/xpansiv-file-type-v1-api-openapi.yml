@@ -143,16 +143,6 @@ paths:
                 $ref: '#/components/schemas/ValidationError'
 components:
   schemas:
-    ValidationError:
-      type: object
-      properties:
-        code:
-          type: integer
-          format: int32
-        parameter:
-          type: string
-        message:
-          type: string
     ODataEnvelopeOfFileReport:
       required:
       - value
@@ -168,6 +158,16 @@ components:
           items:
             $ref: '#/components/schemas/FileReport'
       description: Container for OData-like rows of information
+    ValidationError:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        parameter:
+          type: string
+        message:
+          type: string
     FileEntry:
       required:
       - fileName
@@ -226,29 +226,6 @@ components:
           type: boolean
           description: File access flag
       description: A file entry
-    FileType:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        code:
-          type: string
-        name:
-          type: string
-        shortName:
-          type: string
-        fileTypeSpecificityCode:
-          type: string
-          enum:
-          - ACCOUNT
-          - RESOURCE
-          - ACCOUNT_OR_RESOURCE
-        singleInstance:
-          type: boolean
-        allowPublicFile:
-          type: boolean
-      description: A file type
     FileReport:
       type: object
       properties:
@@ -296,6 +273,29 @@ components:
         allowPublicFile:
           type: boolean
       description: File Report
+    FileType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        code:
+          type: string
+        name:
+          type: string
+        shortName:
+          type: string
+        fileTypeSpecificityCode:
+          type: string
+          enum:
+          - ACCOUNT
+          - RESOURCE
+          - ACCOUNT_OR_RESOURCE
+        singleInstance:
+          type: boolean
+        allowPublicFile:
+          type: boolean
+      description: A file type
   securitySchemes:
     JWT:
       type: http

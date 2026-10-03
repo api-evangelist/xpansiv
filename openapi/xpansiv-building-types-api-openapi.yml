@@ -126,63 +126,6 @@ components:
           type: object
           additionalProperties: true
       type: object
-    BuildingTypesListResponse:
-      description: Building type rows returned in the API envelope `data` field.
-      type: array
-      items:
-        $ref: '#/components/schemas/BuildingTypeItem'
-    Error:
-      description: 'Generic error payload when no more specific error schema applies.
-
-
-        Implements JsonSerializable so it can be passed directly to API_Controller::response().
-
-        Implements Countable returning 0 so the response size guard in API_Controller treats it
-
-        as an empty collection (error responses never trigger the size limit).'
-      required:
-      - error
-      - message
-      properties:
-        error:
-          type: string
-          example: error
-        message:
-          type: string
-          example: Error description
-      type: object
-    ServerError:
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-      - properties:
-          error:
-            description: 500 when an unexpected server or infrastructure failure occurs.
-            type: string
-            example: internal_error
-          message:
-            type: string
-            example: Error description
-        type: object
-    AccessForbiddenError:
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-      - properties:
-          error:
-            description: 403 when the caller lacks permission for the requested account or resource.
-            type: string
-            example: access_forbidden
-          message:
-            type: string
-            example: You do not have permission to access this resource
-        type: object
     BuildingTypeItem:
       description: 'One building type row in the API envelope `data` array for `getBuildingTypes`.
 
@@ -230,6 +173,63 @@ components:
           - type: integer
             example: 2
       type: object
+    BuildingTypesListResponse:
+      description: Building type rows returned in the API envelope `data` field.
+      type: array
+      items:
+        $ref: '#/components/schemas/BuildingTypeItem'
+    Error:
+      description: 'Generic error payload when no more specific error schema applies.
+
+
+        Implements JsonSerializable so it can be passed directly to API_Controller::response().
+
+        Implements Countable returning 0 so the response size guard in API_Controller treats it
+
+        as an empty collection (error responses never trigger the size limit).'
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Error description
+      type: object
+    AccessForbiddenError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 403 when the caller lacks permission for the requested account or resource.
+            type: string
+            example: access_forbidden
+          message:
+            type: string
+            example: You do not have permission to access this resource
+        type: object
+    ServerError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 500 when an unexpected server or infrastructure failure occurs.
+            type: string
+            example: internal_error
+          message:
+            type: string
+            example: Error description
+        type: object
   securitySchemes:
     BearerAuth:
       type: http

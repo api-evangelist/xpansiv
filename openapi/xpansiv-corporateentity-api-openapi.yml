@@ -100,32 +100,6 @@ paths:
       - JWT: []
 components:
   schemas:
-    ErrorItem:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: string
-          description: The error code
-        correlationId:
-          type: string
-          description: The correlation identifier from the input
-        field:
-          type: string
-          description: The field in error, if applicable
-        message:
-          type: string
-          description: The error message
-        parameter:
-          type: string
-          description: The parameter in error, if applicable
-        path:
-          type: string
-          description: The path to the field specifically in error, if applicable
-      title: ErrorItem
-      description: Describes a specific error
     CorporateEntities:
       type: object
       required:
@@ -172,6 +146,32 @@ components:
           description: Submission identifier for issue investigation
       title: ErrorContainer
       description: Container for errors
+    ErrorItem:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          description: The error code
+        correlationId:
+          type: string
+          description: The correlation identifier from the input
+        field:
+          type: string
+          description: The field in error, if applicable
+        message:
+          type: string
+          description: The error message
+        parameter:
+          type: string
+          description: The parameter in error, if applicable
+        path:
+          type: string
+          description: The path to the field specifically in error, if applicable
+      title: ErrorItem
+      description: Describes a specific error
     ODataEnvelopeOfCorporateEntities:
       type: object
       properties:

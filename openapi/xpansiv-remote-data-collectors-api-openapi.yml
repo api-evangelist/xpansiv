@@ -126,74 +126,6 @@ components:
           type: object
           additionalProperties: true
       type: object
-    Error:
-      description: 'Generic error payload when no more specific error schema applies.
-
-
-        Implements JsonSerializable so it can be passed directly to API_Controller::response().
-
-        Implements Countable returning 0 so the response size guard in API_Controller treats it
-
-        as an empty collection (error responses never trigger the size limit).'
-      required:
-      - error
-      - message
-      properties:
-        error:
-          type: string
-          example: error
-        message:
-          type: string
-          example: Error description
-      type: object
-    ServerError:
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-      - properties:
-          error:
-            description: 500 when an unexpected server or infrastructure failure occurs.
-            type: string
-            example: internal_error
-          message:
-            type: string
-            example: Error description
-        type: object
-    AccessForbiddenError:
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-      - properties:
-          error:
-            description: 403 when the caller lacks permission for the requested account or resource.
-            type: string
-            example: access_forbidden
-          message:
-            type: string
-            example: You do not have permission to access this resource
-        type: object
-    RemoteDataCollectorItem:
-      description: 'One remote data collector row in the API envelope `data` array for `getRemoteDataCollectors`.
-
-
-        Runtime: {@see \Reference_data_api::remote_data_collectors_get()} — `id`, `name` from autoreporters query.'
-      required:
-      - id
-      - name
-      properties:
-        id:
-          description: Remote data collector identifier (`remote_data_collectors_id`).
-          type: integer
-        name:
-          description: Display name of the remote data collector.
-          type: string
-      type: object
     ResponseEnvelope:
       description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
       required:
@@ -225,11 +157,79 @@ components:
           - type: integer
             example: 2
       type: object
+    Error:
+      description: 'Generic error payload when no more specific error schema applies.
+
+
+        Implements JsonSerializable so it can be passed directly to API_Controller::response().
+
+        Implements Countable returning 0 so the response size guard in API_Controller treats it
+
+        as an empty collection (error responses never trigger the size limit).'
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Error description
+      type: object
+    RemoteDataCollectorItem:
+      description: 'One remote data collector row in the API envelope `data` array for `getRemoteDataCollectors`.
+
+
+        Runtime: {@see \Reference_data_api::remote_data_collectors_get()} — `id`, `name` from autoreporters query.'
+      required:
+      - id
+      - name
+      properties:
+        id:
+          description: Remote data collector identifier (`remote_data_collectors_id`).
+          type: integer
+        name:
+          description: Display name of the remote data collector.
+          type: string
+      type: object
+    AccessForbiddenError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 403 when the caller lacks permission for the requested account or resource.
+            type: string
+            example: access_forbidden
+          message:
+            type: string
+            example: You do not have permission to access this resource
+        type: object
     RemoteDataCollectorsListResponse:
       description: Remote data collector rows returned in the API envelope `data` field.
       type: array
       items:
         $ref: '#/components/schemas/RemoteDataCollectorItem'
+    ServerError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 500 when an unexpected server or infrastructure failure occurs.
+            type: string
+            example: internal_error
+          message:
+            type: string
+            example: Error description
+        type: object
   securitySchemes:
     BearerAuth:
       type: http

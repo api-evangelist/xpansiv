@@ -154,17 +154,42 @@ paths:
                 $ref: '#/components/schemas/GeneralError'
 components:
   schemas:
-    RetirementResponse:
+    RetirementBatch:
       type: object
       properties:
-        correlationId:
+        identifier:
           type: string
-          description: Matches the correlationId provided in the retirement request.
-        retirementIdentifier:
+          description: The Retirement Batch's system-assigned identifier.
+        originalQuantity:
+          type: number
+          description: The total quantity of holdings included in the retirement batch.
+        liabilityIssuanceIdentifier:
           type: string
-          description: Identifier associated with the retirement batch initiated by the system
-          example: b24ad896-d899-478d-9513-7061375b637c
-      description: Response for the balk retirement request
+          description: System-assigned identifier of the liability issuance associated with the retirement
+        liabilityHoldingIdentifier:
+          type: string
+          description: System-assigned Identifier of the liability holding against which the retirement was performed.
+          example: '476022'
+        subaccount:
+          $ref: '#/components/schemas/Subaccount'
+        shadowedLedgerRetirementBatchIdentifier:
+          type: string
+          description: If shadowing = true, the corresponding Retirement Batch identifier from the external ledger.
+        positions:
+          type: array
+          description: Collection of the retirement batch's associated holdings.
+          items:
+            $ref: '#/components/schemas/Holding'
+        createdAt:
+          type: string
+          description: Created at timestamp for the Retirement Batch
+          format: date-time
+        lastUpdatedAt:
+          type: string
+          description: Last updated at timestamp for the Retirement Batch
+          format: date-time
+        retirementParameters:
+          $ref: '#/components/schemas/JsonNode'
     RetirementBatchRetrieveByIdentifierResponse:
       type: object
       properties:
@@ -173,108 +198,21 @@ components:
           description: Collection of retrieved retirement batches
           items:
             $ref: '#/components/schemas/RetirementBatch'
-    ReferenceDatum:
-      required:
-      - code
+    JsonNode:
       type: object
-      properties:
-        code:
-          type: string
-          description: The reference data's value.
-        name:
-          type: string
-          description: The reference data's name
-      description: A reference datum data object
-    Account:
-      type: object
-      properties:
-        srcAcctId:
-          type: string
-          description: The Account's unique system-assigned identifier used for programmatic (API) interactions.
-          example: 4edse581-b97a-11ef-ea69-b61606fd520c
-        identifier:
-          type: string
-          description: The Account's ID as displayed in the registry.
-          example: '15184192'
-        name:
-          type: string
-          description: The Account Operating Name on the registry.
-          example: APXOPCAR Project Manager
-      description: Account record
-    BulkRetirementResponse:
-      type: object
-      properties:
-        responses:
-          type: array
-          description: responses for the bulk retirement request
-          items:
-            $ref: '#/components/schemas/RetirementResponse'
-    RetirementRequest:
-      type: object
-      properties:
-        liabilityHoldingIdentifier:
-          type: string
-          description: Identifier of the liability holding against which this retirement will be associated. Available liability holdings returned by GET /api/ledger/{ledgerIdentifier}/holding with asset = false.
-          example: '476022'
-        retirementReasonCode:
-          type: string
-          description: Retirement reason code to be associated with retirement
-          example: COMPLIANCE_REQUIREMENTS
-        holdingCriteria:
-          type: array
-          description: Criteria for holdings associated with the retirement batch.
-          items:
-            $ref: '#/components/schemas/QuantifiedHolding'
-        correlationId:
-          type: string
-          description: Client system correlation Id – allows the caller to correlate between requests and responses
-        subaccountIdentifier:
-          type: string
-          description: Target subaccount identifier – required if performing a retirement against a ledger that has subaccounts enabled.
-        retirementParameters:
-          $ref: '#/components/schemas/JsonNode'
-    RetirementBatchRetrieveByIdentifierRequest:
+    BulkRetirementRequest:
       type: object
       properties:
         onBehalfOfSrcAcctId:
           type: string
-          description: If permitted, allows the caller to retrieve retirement batches on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
-        retirementBatchIdentifiers:
-          uniqueItems: true
+          description: If permitted, allows the caller to retire on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
+        requests:
           type: array
-          description: Identifiers associated with the retirement batch initiated by the system
-          example: 3574500f-6df3-400e-abc9-e6aeb64f03c7
+          description: retirement request
           items:
-            type: string
-    ExtShadowedLedgerRetirementOptionsDTO:
-      type: object
-      properties:
-        suppressShadowedLedgerInteraction:
-          type: boolean
-        shadowedLedgerRetirementIdentifiersByHoldingIdentifier:
-          type: object
-          additionalProperties:
-            $ref: '#/components/schemas/ExtShadowedLedgerEntityIdentifierMappingDTO'
-    ExternalPlatform:
-      type: object
-      properties:
-        externalPlatformIdentifier:
-          type: string
-          description: The managing external platform's system-assigned identifier.
-          format: uuid
-          example: a5f8c9fa-001b-4444-b966-17b1a7871bbf
-        code:
-          type: string
-          description: The External Platform's system code, if applicable.
-        name:
-          type: string
-          description: The External Platform's name.
-          example: Xpansiv Connect
-        account:
-          $ref: '#/components/schemas/Account'
-        metadataConfig:
-          type: string
-          description: Metadata configuration (JSON) for additional fields required by the External Platform.
+            $ref: '#/components/schemas/RetirementRequest'
+        shadowedLedgerRetirementOptions:
+          $ref: '#/components/schemas/ExtShadowedLedgerRetirementOptionsDTO'
     ErrorItem:
       type: object
       properties:
@@ -290,15 +228,83 @@ components:
           type: string
         message:
           type: string
-    ErrorContainer:
+    Subaccount:
+      required:
+      - name
       type: object
       properties:
-        submissionId:
+        identifier:
           type: string
-        errors:
+          description: The sub-account's system-assigned identifier.
+          readOnly: true
+          example: 6192c733-bbd2-11ef-acad-b63fd176813a
+        number:
+          type: string
+          description: Sub-account number
+          readOnly: true
+        account:
+          $ref: '#/components/schemas/Account'
+        name:
+          type: string
+          description: Sub-account name
+          example: Allocated
+        description:
+          type: string
+          description: Sub-account description
+          example: Holdings to retired & retired
+        _default:
+          type: boolean
+          description: If true, this is the default sub-account
+          writeOnly: true
+          example: true
+        status:
+          $ref: '#/components/schemas/ReferenceDatum'
+        viableStatusTransitions:
+          uniqueItems: true
           type: array
+          description: Viable Sub-account transitions
+          readOnly: true
           items:
-            $ref: '#/components/schemas/ErrorItem'
+            type: string
+            description: Subaccount Transition
+            enum:
+            - edit
+            - activate
+            - deactivate
+        managingExternalPlatform:
+          $ref: '#/components/schemas/ExternalPlatform'
+        managingExternalPlatformAccountId:
+          type: string
+          description: If this is a managed sub-account, the relevant account ID in the external platform for the account associated with this sub-account.
+        managingExternalPlatformSubaccountMetadata:
+          type: string
+          description: Optional JSON payload of managing external platform subaccount metadata.
+        default:
+          type: boolean
+          description: If true, this is the default sub-account
+          readOnly: true
+          example: true
+      description: This class contains caller-visible set of sub-accounts for either the calling account or the account identified by onBehalfOfSrcAcctId
+    ReferenceDatum:
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: The reference data's value.
+        name:
+          type: string
+          description: The reference data's name
+      description: A reference datum data object
+    BulkRetirementResponse:
+      type: object
+      properties:
+        responses:
+          type: array
+          description: responses for the bulk retirement request
+          items:
+            $ref: '#/components/schemas/RetirementResponse'
     NamedProtocolVersion:
       type: object
       properties:
@@ -325,6 +331,187 @@ components:
           type: string
           description: Protocol's short name
           example: AMS-I.D.
+    ProgramVersion:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Program code
+          example: GHG_MEASUREMENT_PROGRAM
+        version:
+          type: string
+          description: Version of Program.
+          example: 5.0.0
+        shortName:
+          type: string
+          description: Program short name
+          example: Carbon Measurement
+        protocolVersions:
+          type: array
+          description: A list of Protocols associated with Program.
+          items:
+            $ref: '#/components/schemas/NamedProtocolVersion'
+    RetirementRequest:
+      type: object
+      properties:
+        liabilityHoldingIdentifier:
+          type: string
+          description: Identifier of the liability holding against which this retirement will be associated. Available liability holdings returned by GET /api/ledger/{ledgerIdentifier}/holding with asset = false.
+          example: '476022'
+        retirementReasonCode:
+          type: string
+          description: Retirement reason code to be associated with retirement
+          example: COMPLIANCE_REQUIREMENTS
+        holdingCriteria:
+          type: array
+          description: Criteria for holdings associated with the retirement batch.
+          items:
+            $ref: '#/components/schemas/QuantifiedHolding'
+        correlationId:
+          type: string
+          description: Client system correlation Id – allows the caller to correlate between requests and responses
+        subaccountIdentifier:
+          type: string
+          description: Target subaccount identifier – required if performing a retirement against a ledger that has subaccounts enabled.
+        retirementParameters:
+          $ref: '#/components/schemas/JsonNode'
+    ProtocolVersion:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Protocol code
+          example: AMS-I.D.
+        version:
+          type: string
+          description: Version of Protocol
+          example: 1.0.0
+        effectiveAt:
+          type: string
+          description: Start date of the Protocol Version
+          format: date-time
+        expiresAt:
+          type: string
+          description: End date of the Protocol Version
+          format: date-time
+        issuing:
+          type: boolean
+          description: Issuing/Adorning flag
+    AbstractRestError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
+    ExtShadowedLedgerEntityIdentifierMappingDTO:
+      type: object
+      properties:
+        holdingIdentifier:
+          type: string
+        shadowedLedgerEntityIdentifier:
+          type: string
+    GeneralError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
+    ErrorContainer:
+      type: object
+      properties:
+        submissionId:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+    ExternalPlatform:
+      type: object
+      properties:
+        externalPlatformIdentifier:
+          type: string
+          description: The managing external platform's system-assigned identifier.
+          format: uuid
+          example: a5f8c9fa-001b-4444-b966-17b1a7871bbf
+        code:
+          type: string
+          description: The External Platform's system code, if applicable.
+        name:
+          type: string
+          description: The External Platform's name.
+          example: Xpansiv Connect
+        account:
+          $ref: '#/components/schemas/Account'
+        metadataConfig:
+          type: string
+          description: Metadata configuration (JSON) for additional fields required by the External Platform.
+    ExtShadowedLedgerRetirementOptionsDTO:
+      type: object
+      properties:
+        suppressShadowedLedgerInteraction:
+          type: boolean
+        shadowedLedgerRetirementIdentifiersByHoldingIdentifier:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ExtShadowedLedgerEntityIdentifierMappingDTO'
+    Account:
+      type: object
+      properties:
+        srcAcctId:
+          type: string
+          description: The Account's unique system-assigned identifier used for programmatic (API) interactions.
+          example: 4edse581-b97a-11ef-ea69-b61606fd520c
+        identifier:
+          type: string
+          description: The Account's ID as displayed in the registry.
+          example: '15184192'
+        name:
+          type: string
+          description: The Account Operating Name on the registry.
+          example: APXOPCAR Project Manager
+      description: Account record
+    RetirementBatchRetrieveByIdentifierRequest:
+      type: object
+      properties:
+        onBehalfOfSrcAcctId:
+          type: string
+          description: If permitted, allows the caller to retrieve retirement batches on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
+        retirementBatchIdentifiers:
+          uniqueItems: true
+          type: array
+          description: Identifiers associated with the retirement batch initiated by the system
+          example: 3574500f-6df3-400e-abc9-e6aeb64f03c7
+          items:
+            type: string
+    RetirementResponse:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: Matches the correlationId provided in the retirement request.
+        retirementIdentifier:
+          type: string
+          description: Identifier associated with the retirement batch initiated by the system
+          example: b24ad896-d899-478d-9513-7061375b637c
+      description: Response for the balk retirement request
+    QuantifiedHolding:
+      type: object
+      properties:
+        holdingIdentifier:
+          type: string
+          description: Holding Identifier, as returned by the holdings API
+          example: '476099'
+        quantity:
+          type: number
+          description: Quantity of holding to be used in this operation
+          example: 3
+      description: Quantified Holding
     Holding:
       type: object
       properties:
@@ -427,190 +614,3 @@ components:
           description: Identifier for grouped holdings in transfer operations, if applicable.
         certificateType:
           $ref: '#/components/schemas/ReferenceDatum'
-    RetirementBatch:
-      type: object
-      properties:
-        identifier:
-          type: string
-          description: The Retirement Batch's system-assigned identifier.
-        originalQuantity:
-          type: number
-          description: The total quantity of holdings included in the retirement batch.
-        liabilityIssuanceIdentifier:
-          type: string
-          description: System-assigned identifier of the liability issuance associated with the retirement
-        liabilityHoldingIdentifier:
-          type: string
-          description: System-assigned Identifier of the liability holding against which the retirement was performed.
-          example: '476022'
-        subaccount:
-          $ref: '#/components/schemas/Subaccount'
-        shadowedLedgerRetirementBatchIdentifier:
-          type: string
-          description: If shadowing = true, the corresponding Retirement Batch identifier from the external ledger.
-        positions:
-          type: array
-          description: Collection of the retirement batch's associated holdings.
-          items:
-            $ref: '#/components/schemas/Holding'
-        createdAt:
-          type: string
-          description: Created at timestamp for the Retirement Batch
-          format: date-time
-        lastUpdatedAt:
-          type: string
-          description: Last updated at timestamp for the Retirement Batch
-          format: date-time
-        retirementParameters:
-          $ref: '#/components/schemas/JsonNode'
-    ExtShadowedLedgerEntityIdentifierMappingDTO:
-      type: object
-      properties:
-        holdingIdentifier:
-          type: string
-        shadowedLedgerEntityIdentifier:
-          type: string
-    QuantifiedHolding:
-      type: object
-      properties:
-        holdingIdentifier:
-          type: string
-          description: Holding Identifier, as returned by the holdings API
-          example: '476099'
-        quantity:
-          type: number
-          description: Quantity of holding to be used in this operation
-          example: 3
-      description: Quantified Holding
-    ProgramVersion:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Program code
-          example: GHG_MEASUREMENT_PROGRAM
-        version:
-          type: string
-          description: Version of Program.
-          example: 5.0.0
-        shortName:
-          type: string
-          description: Program short name
-          example: Carbon Measurement
-        protocolVersions:
-          type: array
-          description: A list of Protocols associated with Program.
-          items:
-            $ref: '#/components/schemas/NamedProtocolVersion'
-    AbstractRestError:
-      type: object
-      properties:
-        code:
-          type: string
-        ticket:
-          type: string
-        message:
-          type: string
-    GeneralError:
-      type: object
-      properties:
-        code:
-          type: string
-        ticket:
-          type: string
-        message:
-          type: string
-    BulkRetirementRequest:
-      type: object
-      properties:
-        onBehalfOfSrcAcctId:
-          type: string
-          description: If permitted, allows the caller to retire on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
-        requests:
-          type: array
-          description: retirement request
-          items:
-            $ref: '#/components/schemas/RetirementRequest'
-        shadowedLedgerRetirementOptions:
-          $ref: '#/components/schemas/ExtShadowedLedgerRetirementOptionsDTO'
-    JsonNode:
-      type: object
-    ProtocolVersion:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Protocol code
-          example: AMS-I.D.
-        version:
-          type: string
-          description: Version of Protocol
-          example: 1.0.0
-        effectiveAt:
-          type: string
-          description: Start date of the Protocol Version
-          format: date-time
-        expiresAt:
-          type: string
-          description: End date of the Protocol Version
-          format: date-time
-        issuing:
-          type: boolean
-          description: Issuing/Adorning flag
-    Subaccount:
-      required:
-      - name
-      type: object
-      properties:
-        identifier:
-          type: string
-          description: The sub-account's system-assigned identifier.
-          readOnly: true
-          example: 6192c733-bbd2-11ef-acad-b63fd176813a
-        number:
-          type: string
-          description: Sub-account number
-          readOnly: true
-        account:
-          $ref: '#/components/schemas/Account'
-        name:
-          type: string
-          description: Sub-account name
-          example: Allocated
-        description:
-          type: string
-          description: Sub-account description
-          example: Holdings to retired & retired
-        _default:
-          type: boolean
-          description: If true, this is the default sub-account
-          writeOnly: true
-          example: true
-        status:
-          $ref: '#/components/schemas/ReferenceDatum'
-        viableStatusTransitions:
-          uniqueItems: true
-          type: array
-          description: Viable Sub-account transitions
-          readOnly: true
-          items:
-            type: string
-            description: Subaccount Transition
-            enum:
-            - edit
-            - activate
-            - deactivate
-        managingExternalPlatform:
-          $ref: '#/components/schemas/ExternalPlatform'
-        managingExternalPlatformAccountId:
-          type: string
-          description: If this is a managed sub-account, the relevant account ID in the external platform for the account associated with this sub-account.
-        managingExternalPlatformSubaccountMetadata:
-          type: string
-          description: Optional JSON payload of managing external platform subaccount metadata.
-        default:
-          type: boolean
-          description: If true, this is the default sub-account
-          readOnly: true
-          example: true
-      description: This class contains caller-visible set of sub-accounts for either the calling account or the account identified by onBehalfOfSrcAcctId

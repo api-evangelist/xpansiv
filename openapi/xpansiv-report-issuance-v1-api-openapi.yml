@@ -78,6 +78,21 @@ paths:
                 $ref: '#/components/schemas/ValidationError'
 components:
   schemas:
+    ODataEnvelopeOfExtIssuancePublic:
+      required:
+      - value
+      type: object
+      properties:
+        '@count':
+          type: integer
+          description: The total number of results (only present if requested)
+          format: int32
+        value:
+          type: array
+          description: Rows of information
+          items:
+            $ref: '#/components/schemas/ExtIssuancePublic'
+      description: Container for OData-like rows of information
     ValidationError:
       type: object
       properties:
@@ -175,21 +190,6 @@ components:
           items:
             type: string
       description: Rows of information
-    ODataEnvelopeOfExtIssuancePublic:
-      required:
-      - value
-      type: object
-      properties:
-        '@count':
-          type: integer
-          description: The total number of results (only present if requested)
-          format: int32
-        value:
-          type: array
-          description: Rows of information
-          items:
-            $ref: '#/components/schemas/ExtIssuancePublic'
-      description: Container for OData-like rows of information
   securitySchemes:
     JWT:
       type: http

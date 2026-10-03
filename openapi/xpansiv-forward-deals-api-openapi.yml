@@ -259,6 +259,86 @@ paths:
           $ref: '#/components/responses/500'
 components:
   schemas:
+    NotAuthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+    Ref.FuelType:
+      type: string
+      description: Ref.Data.REC_FUEL_TYPE
+    ForwardStatusEvent:
+      type: object
+      properties:
+        action:
+          type: string
+          description: Action for the statusEvent.
+        notes:
+          type: string
+          description: Notes for the statusEvent.
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp for the statusEvent.
+        user:
+          type: string
+          description: User for the statusEvent.
+    Page:
+      type: object
+      required:
+      - page
+      - size
+      - totalPages
+      - totalElements
+      properties:
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+    Ref.ForwardDealType:
+      type: string
+      default: PHYSICAL
+      description: Type of deal as either Market or Project Specific. Ref.Data.FORWARD_DEAL_TYPE
+    Ref.ForwardTransactionStatus:
+      type: string
+      description: Delivery status. Ref.Data.FORWARD_DEAL_TRANSACTION_STATUS
+    Ref.ForwardTransactionQuantityType:
+      type: string
+      description: Quantity type. Ref.Data.FORWARD_DEAL_QUANTITY_TYPE
+    Ref.VintageType:
+      type: string
+      description: Ref.Data.FORWARD_DEAL_VINTAGE_TYPE
+    ForwardFuelType:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/Ref.FuelType'
+        registryCode:
+          type: string
+          description: Registry fuel type code.
+    Ref.UnitOfMeasure:
+      type: string
+      description: Unit of measure. Ref.Data.UNIT_OF_MEASURE
+    Price:
+      type: object
+      required:
+      - currency
+      - amount
+      properties:
+        currency:
+          $ref: '#/components/schemas/Ref.Currency'
+        amount:
+          type: number
+          description: The numeric value of the price
+          minimum: 0
     ForwardDateRange:
       type: object
       properties:
@@ -278,29 +358,53 @@ components:
           type: integer
           format: int32
           description: Year of delivery end.
+    Ref.Program:
+      type: string
+      description: Ref.Data.PROGRAM
     Ref.TransactionSideType:
       type: string
       description: Buy or Sell. Ref.Data.FORWARD_DEAL_TRANSACTION_TYPE
-    Ref.ForwardTransactionQuantityType:
+    Ref.Currency:
+      description: Ref.Data.CURRENCY
       type: string
-      description: Quantity type. Ref.Data.FORWARD_DEAL_QUANTITY_TYPE
-    Price:
+      minLength: 3
+      example: USD
+    Ref.ForwardDeliveryScheduleType:
+      type: string
+      description: Delivery schedule type. Ref.Data.FORWARD_DEAL_DELIVERY_SCHEDULE_TYPE
+    ForwardInstrumentMarketModelInstrument:
       type: object
-      required:
-      - currency
-      - amount
       properties:
-        currency:
-          $ref: '#/components/schemas/Ref.Currency'
-        amount:
-          type: number
-          description: The numeric value of the price
-          minimum: 0
-    NotAuthorizedError:
+        type:
+          type: string
+          default: MMI
+        marketModelInstrument:
+          type: object
+          properties:
+            dateRange:
+              $ref: '#/components/schemas/ForwardDateRange'
+            market:
+              $ref: '#/components/schemas/ForwardMarket'
+    InternalServerError:
       type: object
       properties:
         message:
           type: string
+    ForwardContract:
+      type: object
+      properties:
+        volume:
+          type: integer
+          format: int64
+          description: Delivered volume.
+        unitPrice:
+          allOf:
+          - $ref: '#/components/schemas/Price'
+          description: Delivered price.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/Price'
+          description: Delivered value.
     ForwardInstrumentAttributeBundle:
       type: object
       properties:
@@ -329,47 +433,9 @@ components:
                       '
                   fuelType:
                     $ref: '#/components/schemas/ForwardFuelType'
-    Ref.ForwardTransactionStatus:
+    Ref.ForwardDealStatus:
       type: string
-      description: Delivery status. Ref.Data.FORWARD_DEAL_TRANSACTION_STATUS
-    Page:
-      type: object
-      required:
-      - page
-      - size
-      - totalPages
-      - totalElements
-      properties:
-        page:
-          type: integer
-          format: int32
-        size:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-        totalElements:
-          type: integer
-          format: int64
-    ForwardContract:
-      type: object
-      properties:
-        volume:
-          type: integer
-          format: int64
-          description: Delivered volume.
-        unitPrice:
-          allOf:
-          - $ref: '#/components/schemas/Price'
-          description: Delivered price.
-        value:
-          allOf:
-          - $ref: '#/components/schemas/Price'
-          description: Delivered value.
-    Ref.VintageType:
-      type: string
-      description: Ref.Data.FORWARD_DEAL_VINTAGE_TYPE
+      description: Ref.Data.FORWARD_DEAL_STATUS
     ForwardMarket:
       type: object
       properties:
@@ -379,85 +445,19 @@ components:
         name:
           type: string
           description: Instrument name.
-    Ref.FuelType:
-      type: string
-      description: Ref.Data.REC_FUEL_TYPE
-    InternalServerError:
-      type: object
-      properties:
-        message:
-          type: string
-    Ref.ForwardDeliveryScheduleType:
-      type: string
-      description: Delivery schedule type. Ref.Data.FORWARD_DEAL_DELIVERY_SCHEDULE_TYPE
-    ForwardInstrumentMarketModelInstrument:
-      type: object
-      properties:
-        type:
-          type: string
-          default: MMI
-        marketModelInstrument:
-          type: object
-          properties:
-            dateRange:
-              $ref: '#/components/schemas/ForwardDateRange'
-            market:
-              $ref: '#/components/schemas/ForwardMarket'
-    Ref.ForwardDealType:
-      type: string
-      default: PHYSICAL
-      description: Type of deal as either Market or Project Specific. Ref.Data.FORWARD_DEAL_TYPE
-    ForwardStatusEvent:
-      type: object
-      properties:
-        action:
-          type: string
-          description: Action for the statusEvent.
-        notes:
-          type: string
-          description: Notes for the statusEvent.
-        timestamp:
-          type: string
-          format: date-time
-          description: Timestamp for the statusEvent.
-        user:
-          type: string
-          description: User for the statusEvent.
-    Ref.ForwardDealStatus:
-      type: string
-      description: Ref.Data.FORWARD_DEAL_STATUS
-    ForwardFuelType:
-      type: object
-      properties:
-        code:
-          $ref: '#/components/schemas/Ref.FuelType'
-        registryCode:
-          type: string
-          description: Registry fuel type code.
-    Ref.Program:
-      type: string
-      description: Ref.Data.PROGRAM
-    Ref.Currency:
-      description: Ref.Data.CURRENCY
-      type: string
-      minLength: 3
-      example: USD
-    Ref.UnitOfMeasure:
-      type: string
-      description: Unit of measure. Ref.Data.UNIT_OF_MEASURE
   responses:
-    '500':
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/InternalServerError'
     '401':
       description: Not authorized error
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/NotAuthorizedError'
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
   parameters:
     AccountIdentifier:
       description: Account identifier
@@ -467,13 +467,6 @@ components:
       required: true
       schema:
         type: string
-    PageSize:
-      name: size
-      in: query
-      required: false
-      schema:
-        type: integer
-        format: int32
     Include:
       name: include
       description: Comma-separated values from optional response fields
@@ -483,6 +476,13 @@ components:
         type: string
     PageNumber:
       name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    PageSize:
+      name: size
       in: query
       required: false
       schema:

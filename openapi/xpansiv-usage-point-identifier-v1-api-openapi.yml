@@ -40,6 +40,74 @@ paths:
                 $ref: '#/components/schemas/UsagePointIdentifierResponse'
 components:
   schemas:
+    IUsagePointIdentifier:
+      type: object
+    UsagePointIdentifierResourceProgram:
+      type: object
+      properties:
+        programCode:
+          type: string
+        programVersion:
+          type: string
+        programAssignedIdentifier:
+          type: string
+        resourceName:
+          type: string
+        resourceTypeCode:
+          type: string
+      description: The program-specific resource information
+    UsagePointIdentifierResourceInputOutputStream:
+      type: object
+      properties:
+        streamTypeCode:
+          type: string
+        usagePointIdentifiers:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/InternalUsagePointCodeUsagePointIdentifier'
+            - $ref: '#/components/schemas/ReportingEntityStreamIdentifierUsagePointIdentifier'
+      description: A container for a resource's usage point identifiers for a given input/output usage point
+    InternalUsagePointCodeUsagePointIdentifier:
+      required:
+      - internalUsagePointCode
+      type: object
+      description: A usage point identifier that employs the internal usage point code (sometimes referred to as the stream identifier)
+      allOf:
+      - $ref: '#/components/schemas/IUsagePointIdentifier'
+      - type: object
+        properties:
+          internalUsagePointCode:
+            type: string
+    UsagePointIdentifierProtocol:
+      type: object
+      properties:
+        protocolCode:
+          type: string
+        protocolVersion:
+          type: string
+      description: Indicates a protocol code and version related to a usage point identifier
+    UsagePointIdentifierResponse:
+      type: object
+      properties:
+        resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsagePointIdentifierResource'
+        isLastPage:
+          type: boolean
+      description: The response to a retrieval of resource usage points
+    ReportingEntityStreamIdentifierUsagePointIdentifier:
+      required:
+      - reportingEntityStreamIdentifier
+      type: object
+      description: A usage point identifier that employs the reporting entity stream identifier
+      allOf:
+      - $ref: '#/components/schemas/IUsagePointIdentifier'
+      - type: object
+        properties:
+          reportingEntityStreamIdentifier:
+            type: string
     UsagePointIdentifierResourceInputOutput:
       type: object
       properties:
@@ -56,63 +124,6 @@ components:
         isInput:
           type: boolean
       description: A container for a resource's usage point identifiers for a given input/output
-    UsagePointIdentifierResponse:
-      type: object
-      properties:
-        resources:
-          type: array
-          items:
-            $ref: '#/components/schemas/UsagePointIdentifierResource'
-        isLastPage:
-          type: boolean
-      description: The response to a retrieval of resource usage points
-    UsagePointIdentifierProtocol:
-      type: object
-      properties:
-        protocolCode:
-          type: string
-        protocolVersion:
-          type: string
-      description: Indicates a protocol code and version related to a usage point identifier
-    UsagePointIdentifierResourceProgram:
-      type: object
-      properties:
-        programCode:
-          type: string
-        programVersion:
-          type: string
-        programAssignedIdentifier:
-          type: string
-        resourceName:
-          type: string
-        resourceTypeCode:
-          type: string
-      description: The program-specific resource information
-    ReportingEntityStreamIdentifierUsagePointIdentifier:
-      required:
-      - reportingEntityStreamIdentifier
-      type: object
-      description: A usage point identifier that employs the reporting entity stream identifier
-      allOf:
-      - $ref: '#/components/schemas/IUsagePointIdentifier'
-      - type: object
-        properties:
-          reportingEntityStreamIdentifier:
-            type: string
-    UsagePointIdentifierResourceInputOutputStream:
-      type: object
-      properties:
-        streamTypeCode:
-          type: string
-        usagePointIdentifiers:
-          type: array
-          items:
-            oneOf:
-            - $ref: '#/components/schemas/InternalUsagePointCodeUsagePointIdentifier'
-            - $ref: '#/components/schemas/ReportingEntityStreamIdentifierUsagePointIdentifier'
-      description: A container for a resource's usage point identifiers for a given input/output usage point
-    IUsagePointIdentifier:
-      type: object
     UsagePointIdentifierResource:
       type: object
       properties:
@@ -125,17 +136,6 @@ components:
           items:
             $ref: '#/components/schemas/UsagePointIdentifierResourceInputOutput'
       description: A container for a resource's usage point identifiers and input/outputs
-    InternalUsagePointCodeUsagePointIdentifier:
-      required:
-      - internalUsagePointCode
-      type: object
-      description: A usage point identifier that employs the internal usage point code (sometimes referred to as the stream identifier)
-      allOf:
-      - $ref: '#/components/schemas/IUsagePointIdentifier'
-      - type: object
-        properties:
-          internalUsagePointCode:
-            type: string
   securitySchemes:
     JWT:
       type: http

@@ -498,7 +498,95 @@ paths:
       description: Generated server url
 components:
   schemas:
-    PendingTransferActionResponse:
+    SubaccountTransferRequest:
+      required:
+      - certificateSerialNumberRange
+      - quantity
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: An opaque value that will be returned in the responses and error messages to correlate the response or error with the corresponding request
+          example: '1'
+        certificateSerialNumberRange:
+          type: string
+          description: Certificate serial number ranges as returned by the holdings call, may not be combined with other ranges, even if contiguous
+          example: NAR-REC-1234-CA-06-2024-555555-1 to 66
+        quantity:
+          type: number
+          description: The quantity of the transaction
+          example: '55'
+        subaccountId:
+          type: string
+          description: The subaccount identifier. If not specified, indicates a transfer to the primary account
+          example: '77'
+      description: Request to transfer credits between active subaccounts
+    InteraccountTransferResponse:
+      required:
+      - certificateSerialNumberRange
+      - quantity
+      - transferId
+      - transfereeId
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: 'Correlation identifier: an opaque value that will be returned in the responses and error messages to correlate the response or error with the corresponding request'
+          example: '1'
+        certificateSerialNumberRange:
+          type: string
+          description: 'The certificate serial number range: certificate ranges as returned by the holdings call, may not be combined with other ranges, even if contiguous'
+          example: NAR-REC-1234-CA-06-2024-555555-1 to 66
+        quantity:
+          type: number
+          description: The quantity of the transaction
+          example: 55
+        transfereeId:
+          type: string
+          description: The transferee (buyer) account identifier
+          example: '77'
+        transferId:
+          type: string
+          description: The transfer identifier
+          example: '5678'
+        remainingCertificateSerialNumberRange:
+          type: string
+          description: The certificate serial number range remaining in the account after the operation
+          example: NAR-REC-1234-CA-06-2024-555555-56 to 66
+      description: Response to a transfer request to another account
+    SubaccountTransferResponse:
+      required:
+      - certificateSerialNumberRange
+      - quantity
+      - transferId
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: An opaque value that will be returned in the responses and error messages to correlate the response or error with the corresponding request
+          example: '1'
+        certificateSerialNumberRange:
+          type: string
+          description: Certificate serial number ranges as returned by the holdings call, may not be combined with other ranges, even if contiguous
+          example: NAR-REC-1234-CA-06-2024-555555-1 to 66
+        quantity:
+          type: number
+          description: The quantity of the transaction
+          example: '55'
+        subaccountId:
+          type: string
+          description: The subaccount identifier. If not specified, indicates a transfer to the primary account
+          example: '77'
+        transferId:
+          type: string
+          description: The transfer identifier
+          example: '5678'
+        remainingCertificateSerialNumberRange:
+          type: string
+          description: The certificate serial number range remaining in the account after the operation
+          example: NAR-REC-1234-CA-06-2024-555555-56 to 66
+      description: Response to a transfer request between active subaccounts
+    PendingTransferActionRequest:
       required:
       - action
       - transferId
@@ -522,79 +610,56 @@ components:
           example: CONFIRM
         subaccountId:
           type: string
-          description: 'ID of the subaccount into which Confirmed transfers will be deposited. '
+          description: ID of the subaccount into which Confirmed transfers will be deposited.
           example: '77'
-      description: Response to a pending transfer action request
-    RetireResponse:
+      description: Request to take action on a pending transfer
+    InteraccountTransferRequest:
       required:
       - certificateSerialNumberRange
       - quantity
-      - retirementTypeCode
-      - subaccountId
-      - transferId
+      - transfereeId
       type: object
       properties:
         correlationId:
           type: string
-          description: An opaque value that will be returned in the responses and error messages to correlate the response or error with the corresponding request
+          description: 'Correlation identifier: an opaque value that will be returned in the responses and error messages to correlate the response or error with the corresponding request'
           example: '1'
         certificateSerialNumberRange:
           type: string
-          description: Certificate serial number ranges as returned by the holdings call, may not be combined with other ranges, even if contiguous
+          description: 'The certificate serial number range: certificate ranges as returned by the holdings call, may not be combined with other ranges, even if contiguous'
           example: NAR-REC-1234-CA-06-2024-555555-1 to 66
         quantity:
           type: number
           description: The quantity of the transaction
-          example: '55'
-        subaccountId:
+          example: 55
+        transfereeId:
           type: string
-          description: The subaccount identifier
+          description: The transferee (buyer) account identifier
           example: '77'
-        isPublic:
-          type: boolean
-          description: Whether the retirement will be public
-        retirementTypeCode:
+      description: Request to transfer credits to another account
+    ErrorItem:
+      required:
+      - message
+      type: object
+      properties:
+        parameter:
           type: string
-          description: 'The retirement type code: see documentation for allowed values'
-          example: GRN
-        retirementReasonCode:
+          description: The parameter in error, if applicable
+        correlationId:
           type: string
-          description: 'The retirement reason code: see documentation for allowed values'
-          example: '22'
-        countrySubdivisionCode:
+          description: The correlation identifier from the input
+        path:
           type: string
-          description: The retirement state, ISO-3166-2 for US states
-          example: CA
-        retirementYear:
-          type: integer
-          description: The retirement/compliance year
-          format: int32
-          example: 2024
-        notificationName:
+          description: The path to the field specifically in error, if applicable
+        field:
           type: string
-          description: The name of the notification recipient (e.g, beneficial owner)
-          example: John Doe
-        notificationEmail:
+        code:
           type: string
-          description: The e-mail address(es) of the notification recipient (e.g, beneficial owner)
-          example: jdoe@acmecorp.com
-        additionalDetails:
+          description: The field in error, if applicable
+        message:
           type: string
-          description: 'Additional details text, may be required in some cases: see documentation for more information'
-          example: Voluntary Green-e retirement
-        retirementCertificateType:
-          type: string
-          description: '''SINGLE''. Only used for retirementTypeCodes GRN and  BBO '
-          example: SINGLE
-        transferId:
-          type: string
-          description: The transfer identifier
-          example: '5678'
-        remainingCertificateSerialNumberRange:
-          type: string
-          description: The certificate serial number range remaining in the account after the operation
-          example: NAR-REC-1234-CA-06-2024-555555-56 to 66
-      description: Response to an retire request
+          description: The error code
+      description: Describes a specific error
     PendingTransfer:
       required:
       - accountId
@@ -685,98 +750,27 @@ components:
           items:
             $ref: '#/components/schemas/PendingTransferActionRequest'
       description: Transfer action requests
-    InteraccountTransferResponse:
+    ResponseContainerPendingTransferActionResponse:
       required:
-      - certificateSerialNumberRange
-      - quantity
-      - transferId
-      - transfereeId
+      - submissionId
       type: object
       properties:
-        correlationId:
+        submissionId:
           type: string
-          description: 'Correlation identifier: an opaque value that will be returned in the responses and error messages to correlate the response or error with the corresponding request'
+          description: Submission identifier for issue investigation
           example: '1'
-        certificateSerialNumberRange:
-          type: string
-          description: 'The certificate serial number range: certificate ranges as returned by the holdings call, may not be combined with other ranges, even if contiguous'
-          example: NAR-REC-1234-CA-06-2024-555555-1 to 66
-        quantity:
-          type: number
-          description: The quantity of the transaction
-          example: 55
-        transfereeId:
-          type: string
-          description: The transferee (buyer) account identifier
-          example: '77'
-        transferId:
-          type: string
-          description: The transfer identifier
-          example: '5678'
-        remainingCertificateSerialNumberRange:
-          type: string
-          description: The certificate serial number range remaining in the account after the operation
-          example: NAR-REC-1234-CA-06-2024-555555-56 to 66
-      description: Response to a transfer request to another account
-    RetireRequestDto:
-      type: object
-      properties:
-        requests:
+        responses:
           type: array
-          description: List of requests
+          description: List of responses
           items:
-            $ref: '#/components/schemas/RetireRequest'
-      description: Retire requests
-    SubaccountTransferRequest:
+            $ref: '#/components/schemas/PendingTransferActionResponse'
+      description: Container for responses
+    RetireResponse:
       required:
       - certificateSerialNumberRange
       - quantity
-      type: object
-      properties:
-        correlationId:
-          type: string
-          description: An opaque value that will be returned in the responses and error messages to correlate the response or error with the corresponding request
-          example: '1'
-        certificateSerialNumberRange:
-          type: string
-          description: Certificate serial number ranges as returned by the holdings call, may not be combined with other ranges, even if contiguous
-          example: NAR-REC-1234-CA-06-2024-555555-1 to 66
-        quantity:
-          type: number
-          description: The quantity of the transaction
-          example: '55'
-        subaccountId:
-          type: string
-          description: The subaccount identifier. If not specified, indicates a transfer to the primary account
-          example: '77'
-      description: Request to transfer credits between active subaccounts
-    ErrorItem:
-      required:
-      - message
-      type: object
-      properties:
-        parameter:
-          type: string
-          description: The parameter in error, if applicable
-        correlationId:
-          type: string
-          description: The correlation identifier from the input
-        path:
-          type: string
-          description: The path to the field specifically in error, if applicable
-        field:
-          type: string
-        code:
-          type: string
-          description: The field in error, if applicable
-        message:
-          type: string
-          description: The error code
-      description: Describes a specific error
-    SubaccountTransferResponse:
-      required:
-      - certificateSerialNumberRange
-      - quantity
+      - retirementTypeCode
+      - subaccountId
       - transferId
       type: object
       properties:
@@ -794,8 +788,44 @@ components:
           example: '55'
         subaccountId:
           type: string
-          description: The subaccount identifier. If not specified, indicates a transfer to the primary account
+          description: The subaccount identifier
           example: '77'
+        isPublic:
+          type: boolean
+          description: Whether the retirement will be public
+        retirementTypeCode:
+          type: string
+          description: 'The retirement type code: see documentation for allowed values'
+          example: GRN
+        retirementReasonCode:
+          type: string
+          description: 'The retirement reason code: see documentation for allowed values'
+          example: '22'
+        countrySubdivisionCode:
+          type: string
+          description: The retirement state, ISO-3166-2 for US states
+          example: CA
+        retirementYear:
+          type: integer
+          description: The retirement/compliance year
+          format: int32
+          example: 2024
+        notificationName:
+          type: string
+          description: The name of the notification recipient (e.g, beneficial owner)
+          example: John Doe
+        notificationEmail:
+          type: string
+          description: The e-mail address(es) of the notification recipient (e.g, beneficial owner)
+          example: jdoe@acmecorp.com
+        additionalDetails:
+          type: string
+          description: 'Additional details text, may be required in some cases: see documentation for more information'
+          example: Voluntary Green-e retirement
+        retirementCertificateType:
+          type: string
+          description: '''SINGLE''. Only used for retirementTypeCodes GRN and  BBO '
+          example: SINGLE
         transferId:
           type: string
           description: The transfer identifier
@@ -804,7 +834,34 @@ components:
           type: string
           description: The certificate serial number range remaining in the account after the operation
           example: NAR-REC-1234-CA-06-2024-555555-56 to 66
-      description: Response to a transfer request between active subaccounts
+      description: Response to an retire request
+    ResponseContainerSubaccountTransferResponse:
+      required:
+      - submissionId
+      type: object
+      properties:
+        submissionId:
+          type: string
+          description: Submission identifier for issue investigation
+          example: '1'
+        responses:
+          type: array
+          description: List of responses
+          items:
+            $ref: '#/components/schemas/SubaccountTransferResponse'
+      description: Container for responses
+    ErrorContainer:
+      type: object
+      properties:
+        submissionId:
+          type: string
+          description: Submission identifier for issue investigation
+        errors:
+          type: array
+          description: List of errors
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+      description: Container for errors
     ResponseContainerRetireResponse:
       required:
       - submissionId
@@ -820,6 +877,15 @@ components:
           items:
             $ref: '#/components/schemas/RetireResponse'
       description: Container for responses
+    SubaccountTransferRequestDTO:
+      type: object
+      properties:
+        requests:
+          type: array
+          description: List of requests
+          items:
+            $ref: '#/components/schemas/SubaccountTransferRequest'
+      description: Subaccount transfer requests
     InteraccountTransferRequestDto:
       type: object
       properties:
@@ -829,7 +895,7 @@ components:
           items:
             $ref: '#/components/schemas/InteraccountTransferRequest'
       description: Transfer requests
-    PendingTransferActionRequest:
+    PendingTransferActionResponse:
       required:
       - action
       - transferId
@@ -853,22 +919,38 @@ components:
           example: CONFIRM
         subaccountId:
           type: string
-          description: ID of the subaccount into which Confirmed transfers will be deposited.
+          description: 'ID of the subaccount into which Confirmed transfers will be deposited. '
           example: '77'
-      description: Request to take action on a pending transfer
-    ErrorContainer:
+      description: Response to a pending transfer action request
+    RetireRequestDto:
       type: object
       properties:
-        submissionId:
-          type: string
-          description: Submission identifier for issue investigation
-        errors:
+        requests:
           type: array
-          description: List of errors
+          description: List of requests
           items:
-            $ref: '#/components/schemas/ErrorItem'
-      description: Container for errors
-    ResponseContainerPendingTransferActionResponse:
+            $ref: '#/components/schemas/RetireRequest'
+      description: Retire requests
+    ODataEnvelopeWithTotalCountOfHolding:
+      required:
+      - countExceeded
+      - value
+      type: object
+      properties:
+        '@count':
+          type: integer
+          format: int32
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Holding'
+        totalCount:
+          type: integer
+          format: int32
+        countExceeded:
+          type: boolean
+      description: Container for OData-like rows of information with count
+    ResponseContainerInteraccountTransferResponse:
       required:
       - submissionId
       type: object
@@ -881,8 +963,69 @@ components:
           type: array
           description: List of responses
           items:
-            $ref: '#/components/schemas/PendingTransferActionResponse'
+            $ref: '#/components/schemas/InteraccountTransferResponse'
       description: Container for responses
+    RetireRequest:
+      required:
+      - certificateSerialNumberRange
+      - quantity
+      - retirementTypeCode
+      - subaccountId
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: An opaque value that will be returned in the responses and error messages to correlate the response or error with the corresponding request
+          example: '1'
+        certificateSerialNumberRange:
+          type: string
+          description: Certificate serial number ranges as returned by the holdings call, may not be combined with other ranges, even if contiguous
+          example: NAR-REC-1234-CA-06-2024-555555-1 to 66
+        quantity:
+          type: number
+          description: The quantity of the transaction
+          example: '55'
+        subaccountId:
+          type: string
+          description: The subaccount identifier
+          example: '77'
+        isPublic:
+          type: boolean
+          description: Whether the retirement will be public
+        retirementTypeCode:
+          type: string
+          description: 'The retirement type code: see documentation for allowed values'
+          example: GRN
+        retirementReasonCode:
+          type: string
+          description: 'The retirement reason code: see documentation for allowed values'
+          example: '22'
+        countrySubdivisionCode:
+          type: string
+          description: The retirement state, ISO-3166-2 for US states
+          example: CA
+        retirementYear:
+          type: integer
+          description: The retirement/compliance year
+          format: int32
+          example: 2024
+        notificationName:
+          type: string
+          description: The name of the notification recipient (e.g, beneficial owner)
+          example: John Doe
+        notificationEmail:
+          type: string
+          description: The e-mail address(es) of the notification recipient (e.g, beneficial owner)
+          example: jdoe@acmecorp.com
+        additionalDetails:
+          type: string
+          description: 'Additional details text, may be required in some cases: see documentation for more information'
+          example: Voluntary Retirement for Acme Corp.
+        retirementCertificateType:
+          type: string
+          description: '''SINGLE''. Only used for retirementTypeCodes GRN and  BBO'
+          example: SINGLE
+      description: Request to retire credits
     Holding:
       required:
       - accountId
@@ -997,149 +1140,6 @@ components:
           description: 'a comma-delimited list of eligibility codes: see documentation for possible values'
           example: CRS Listed
       description: Holding information
-    ResponseContainerInteraccountTransferResponse:
-      required:
-      - submissionId
-      type: object
-      properties:
-        submissionId:
-          type: string
-          description: Submission identifier for issue investigation
-          example: '1'
-        responses:
-          type: array
-          description: List of responses
-          items:
-            $ref: '#/components/schemas/InteraccountTransferResponse'
-      description: Container for responses
-    SubaccountTransferRequestDTO:
-      type: object
-      properties:
-        requests:
-          type: array
-          description: List of requests
-          items:
-            $ref: '#/components/schemas/SubaccountTransferRequest'
-      description: Subaccount transfer requests
-    InteraccountTransferRequest:
-      required:
-      - certificateSerialNumberRange
-      - quantity
-      - transfereeId
-      type: object
-      properties:
-        correlationId:
-          type: string
-          description: 'Correlation identifier: an opaque value that will be returned in the responses and error messages to correlate the response or error with the corresponding request'
-          example: '1'
-        certificateSerialNumberRange:
-          type: string
-          description: 'The certificate serial number range: certificate ranges as returned by the holdings call, may not be combined with other ranges, even if contiguous'
-          example: NAR-REC-1234-CA-06-2024-555555-1 to 66
-        quantity:
-          type: number
-          description: The quantity of the transaction
-          example: 55
-        transfereeId:
-          type: string
-          description: The transferee (buyer) account identifier
-          example: '77'
-      description: Request to transfer credits to another account
-    ODataEnvelopeWithTotalCountOfHolding:
-      required:
-      - countExceeded
-      - value
-      type: object
-      properties:
-        '@count':
-          type: integer
-          format: int32
-        value:
-          type: array
-          items:
-            $ref: '#/components/schemas/Holding'
-        totalCount:
-          type: integer
-          format: int32
-        countExceeded:
-          type: boolean
-      description: Container for OData-like rows of information with count
-    RetireRequest:
-      required:
-      - certificateSerialNumberRange
-      - quantity
-      - retirementTypeCode
-      - subaccountId
-      type: object
-      properties:
-        correlationId:
-          type: string
-          description: An opaque value that will be returned in the responses and error messages to correlate the response or error with the corresponding request
-          example: '1'
-        certificateSerialNumberRange:
-          type: string
-          description: Certificate serial number ranges as returned by the holdings call, may not be combined with other ranges, even if contiguous
-          example: NAR-REC-1234-CA-06-2024-555555-1 to 66
-        quantity:
-          type: number
-          description: The quantity of the transaction
-          example: '55'
-        subaccountId:
-          type: string
-          description: The subaccount identifier
-          example: '77'
-        isPublic:
-          type: boolean
-          description: Whether the retirement will be public
-        retirementTypeCode:
-          type: string
-          description: 'The retirement type code: see documentation for allowed values'
-          example: GRN
-        retirementReasonCode:
-          type: string
-          description: 'The retirement reason code: see documentation for allowed values'
-          example: '22'
-        countrySubdivisionCode:
-          type: string
-          description: The retirement state, ISO-3166-2 for US states
-          example: CA
-        retirementYear:
-          type: integer
-          description: The retirement/compliance year
-          format: int32
-          example: 2024
-        notificationName:
-          type: string
-          description: The name of the notification recipient (e.g, beneficial owner)
-          example: John Doe
-        notificationEmail:
-          type: string
-          description: The e-mail address(es) of the notification recipient (e.g, beneficial owner)
-          example: jdoe@acmecorp.com
-        additionalDetails:
-          type: string
-          description: 'Additional details text, may be required in some cases: see documentation for more information'
-          example: Voluntary Retirement for Acme Corp.
-        retirementCertificateType:
-          type: string
-          description: '''SINGLE''. Only used for retirementTypeCodes GRN and  BBO'
-          example: SINGLE
-      description: Request to retire credits
-    ResponseContainerSubaccountTransferResponse:
-      required:
-      - submissionId
-      type: object
-      properties:
-        submissionId:
-          type: string
-          description: Submission identifier for issue investigation
-          example: '1'
-        responses:
-          type: array
-          description: List of responses
-          items:
-            $ref: '#/components/schemas/SubaccountTransferResponse'
-      description: Container for responses
     ODataEnvelopeWithTotalCountOfPendingTransfer:
       required:
       - countExceeded
@@ -1159,6 +1159,187 @@ components:
         countExceeded:
           type: boolean
       description: Container for OData-like rows of information with count
+    ResponseContainerOfRetireResponse:
+      type: object
+      required:
+      - submissionId
+      properties:
+        responses:
+          type: array
+          description: List of responses
+          items:
+            $ref: '#/components/schemas/RetireResponse_2'
+        submissionId:
+          type: string
+          description: Submission identifier for issue investigation
+      title: ResponseContainerOfRetireResponse
+      description: Container for responses
+    ODataEnvelopeWithTotalCountOfHolding_2:
+      type: object
+      required:
+      - countExceeded
+      - value
+      properties:
+        '@count':
+          type: integer
+          format: int32
+        countExceeded:
+          type: boolean
+        totalCount:
+          type: integer
+          format: int32
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Holding_2'
+      title: ODataEnvelopeWithTotalCountOfHolding
+    RetireResponse_2:
+      type: object
+      required:
+      - certificateSerialNumberRange
+      - quantity
+      - reasonCode
+      - retirementTypeCode
+      - subaccountId
+      - transferId
+      - year
+      properties:
+        certificateSerialNumberRange:
+          type: string
+          description: 'The certificate serial number range: certificate ranges as returned by the holdings call, may not be combined with other ranges, even if contiguous'
+          example: TIGR-1234-GT-SM-08-2024-321-1 to 55
+        correlationId:
+          type: string
+          description: 'Correlation identifier: an opaque value that will be returned in the responses and error messages to correlate the response or error with the corresponding request'
+          example: '1'
+        details:
+          type: string
+          description: 'Additional details, may be required in some cases: see documentation for more information'
+          example: Retired for Green Energy Program
+        emailNotification:
+          type: string
+          description: The e-mail address for notification
+          example: jdoe@acmecorp.com
+        onBehalfOfCorporateEntityId:
+          type: integer
+          format: int32
+          description: 'On Behalf Of Corporate Entity Id: see documentation for allowed values'
+          example: '55'
+        quantity:
+          type: number
+          description: The quantity of the transaction
+          example: '55'
+        reasonCode:
+          type: string
+          description: 'The retire reason code: see documentation for allowed values'
+          example: '7'
+        retirementCertificateType:
+          type: string
+          description: 'Retirement certificate type: see documentation for allowed values'
+          example: TIGR
+        retirementTypeCode:
+          type: string
+          description: 'The retirement type code: GRN, BBO, OTH'
+          example: OTH
+        subaccountId:
+          type: string
+          description: The subaccount identifier
+          example: '99'
+        transferId:
+          type: string
+          description: The transfer identifier
+          example: '7654'
+        year:
+          type: integer
+          format: int32
+          description: 'The year attribute: see documentation for allowed values'
+          example: '2024'
+      title: RetireResponse
+      description: Response to an retire request
+    RetireRequest_2:
+      type: object
+      required:
+      - certificateSerialNumberRange
+      - quantity
+      - reasonCode
+      - retirementTypeCode
+      - subaccountId
+      - year
+      properties:
+        certificateSerialNumberRange:
+          type: string
+          description: 'The certificate serial number range: certificate ranges as returned by the holdings call, may not be combined with other ranges, even if contiguous'
+          example: TIGR-1234-GT-SM-08-2024-321-1 to 55
+        correlationId:
+          type: string
+          description: 'Correlation identifier: an opaque value that will be returned in the responses and error messages to correlate the response or error with the corresponding request'
+          example: '1'
+        details:
+          type: string
+          description: 'Additional details, may be required in some cases: see documentation for more information'
+          example: Retired for Green Energy Program
+        emailNotification:
+          type: string
+          description: The e-mail address for notification
+          example: jdoe@acmecorp.com
+        onBehalfOfCorporateEntityId:
+          type: integer
+          format: int32
+          description: 'On Behalf Of Corporate Entity Id: see documentation for allowed values'
+          example: '99'
+        quantity:
+          type: number
+          description: The quantity of the transaction
+          example: '55'
+        reasonCode:
+          type: string
+          description: 'The retire reason code: see documentation for allowed values'
+          example: '7'
+        retirementCertificateType:
+          type: string
+          description: 'Retirement certificate type: see documentation for allowed values'
+          example: TIGR
+        retirementTypeCode:
+          type: string
+          description: 'The retirement type code: GRN, BBO, OTH'
+          example: OTH
+        subaccountId:
+          type: string
+          description: The subaccount identifier
+          example: '99'
+        year:
+          type: integer
+          format: int32
+          description: 'The year attribute: see documentation for allowed values'
+          example: '2024'
+      title: RetireRequest
+      description: Request to retire credits
+    ErrorItem_2:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          description: The error code
+        correlationId:
+          type: string
+          description: The correlation identifier from the input
+        field:
+          type: string
+          description: The field in error, if applicable
+        message:
+          type: string
+          description: The error message
+        parameter:
+          type: string
+          description: The parameter in error, if applicable
+        path:
+          type: string
+          description: The path to the field specifically in error, if applicable
+      title: ErrorItem
+      description: Describes a specific error
     Holding_2:
       type: object
       required:
@@ -1278,187 +1459,6 @@ components:
             $ref: '#/components/schemas/RetireRequest_2'
       title: RequestContainerOfRetireRequest
       description: Container for requests
-    RetireResponse_2:
-      type: object
-      required:
-      - certificateSerialNumberRange
-      - quantity
-      - reasonCode
-      - retirementTypeCode
-      - subaccountId
-      - transferId
-      - year
-      properties:
-        certificateSerialNumberRange:
-          type: string
-          description: 'The certificate serial number range: certificate ranges as returned by the holdings call, may not be combined with other ranges, even if contiguous'
-          example: TIGR-1234-GT-SM-08-2024-321-1 to 55
-        correlationId:
-          type: string
-          description: 'Correlation identifier: an opaque value that will be returned in the responses and error messages to correlate the response or error with the corresponding request'
-          example: '1'
-        details:
-          type: string
-          description: 'Additional details, may be required in some cases: see documentation for more information'
-          example: Retired for Green Energy Program
-        emailNotification:
-          type: string
-          description: The e-mail address for notification
-          example: jdoe@acmecorp.com
-        onBehalfOfCorporateEntityId:
-          type: integer
-          format: int32
-          description: 'On Behalf Of Corporate Entity Id: see documentation for allowed values'
-          example: '55'
-        quantity:
-          type: number
-          description: The quantity of the transaction
-          example: '55'
-        reasonCode:
-          type: string
-          description: 'The retire reason code: see documentation for allowed values'
-          example: '7'
-        retirementCertificateType:
-          type: string
-          description: 'Retirement certificate type: see documentation for allowed values'
-          example: TIGR
-        retirementTypeCode:
-          type: string
-          description: 'The retirement type code: GRN, BBO, OTH'
-          example: OTH
-        subaccountId:
-          type: string
-          description: The subaccount identifier
-          example: '99'
-        transferId:
-          type: string
-          description: The transfer identifier
-          example: '7654'
-        year:
-          type: integer
-          format: int32
-          description: 'The year attribute: see documentation for allowed values'
-          example: '2024'
-      title: RetireResponse
-      description: Response to an retire request
-    ODataEnvelopeWithTotalCountOfHolding_2:
-      type: object
-      required:
-      - countExceeded
-      - value
-      properties:
-        '@count':
-          type: integer
-          format: int32
-        countExceeded:
-          type: boolean
-        totalCount:
-          type: integer
-          format: int32
-        value:
-          type: array
-          items:
-            $ref: '#/components/schemas/Holding_2'
-      title: ODataEnvelopeWithTotalCountOfHolding
-    RetireRequest_2:
-      type: object
-      required:
-      - certificateSerialNumberRange
-      - quantity
-      - reasonCode
-      - retirementTypeCode
-      - subaccountId
-      - year
-      properties:
-        certificateSerialNumberRange:
-          type: string
-          description: 'The certificate serial number range: certificate ranges as returned by the holdings call, may not be combined with other ranges, even if contiguous'
-          example: TIGR-1234-GT-SM-08-2024-321-1 to 55
-        correlationId:
-          type: string
-          description: 'Correlation identifier: an opaque value that will be returned in the responses and error messages to correlate the response or error with the corresponding request'
-          example: '1'
-        details:
-          type: string
-          description: 'Additional details, may be required in some cases: see documentation for more information'
-          example: Retired for Green Energy Program
-        emailNotification:
-          type: string
-          description: The e-mail address for notification
-          example: jdoe@acmecorp.com
-        onBehalfOfCorporateEntityId:
-          type: integer
-          format: int32
-          description: 'On Behalf Of Corporate Entity Id: see documentation for allowed values'
-          example: '99'
-        quantity:
-          type: number
-          description: The quantity of the transaction
-          example: '55'
-        reasonCode:
-          type: string
-          description: 'The retire reason code: see documentation for allowed values'
-          example: '7'
-        retirementCertificateType:
-          type: string
-          description: 'Retirement certificate type: see documentation for allowed values'
-          example: TIGR
-        retirementTypeCode:
-          type: string
-          description: 'The retirement type code: GRN, BBO, OTH'
-          example: OTH
-        subaccountId:
-          type: string
-          description: The subaccount identifier
-          example: '99'
-        year:
-          type: integer
-          format: int32
-          description: 'The year attribute: see documentation for allowed values'
-          example: '2024'
-      title: RetireRequest
-      description: Request to retire credits
-    ErrorItem_2:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: string
-          description: The error code
-        correlationId:
-          type: string
-          description: The correlation identifier from the input
-        field:
-          type: string
-          description: The field in error, if applicable
-        message:
-          type: string
-          description: The error message
-        parameter:
-          type: string
-          description: The parameter in error, if applicable
-        path:
-          type: string
-          description: The path to the field specifically in error, if applicable
-      title: ErrorItem
-      description: Describes a specific error
-    ResponseContainerOfRetireResponse:
-      type: object
-      required:
-      - submissionId
-      properties:
-        responses:
-          type: array
-          description: List of responses
-          items:
-            $ref: '#/components/schemas/RetireResponse_2'
-        submissionId:
-          type: string
-          description: Submission identifier for issue investigation
-      title: ResponseContainerOfRetireResponse
-      description: Container for responses
     ErrorContainer_2:
       type: object
       properties:

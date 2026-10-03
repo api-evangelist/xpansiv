@@ -108,6 +108,42 @@ paths:
       - BearerAuth: []
 components:
   schemas:
+    QualifiedReportingEntitiesListResponse:
+      description: QRE rows returned in the API envelope `data` field.
+      type: array
+      items:
+        $ref: '#/components/schemas/QualifiedReportingEntityItem'
+    ResponseEnvelope:
+      description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
+      required:
+      - url
+      - date
+      - code
+      - elements
+      - page
+      properties:
+        url:
+          description: Request URL including query string.
+          type: string
+          example: /app/api/v1/facilities
+        date:
+          description: Response timestamp.
+          type: string
+          example: 2024-09-17 04:26:39 EDT
+        code:
+          description: HTTP status code, mirrored in the JSON body (same as the response status).
+          type: integer
+        elements:
+          description: Number of items in `data` on HTTP 200; 0 for other status codes.
+          type: integer
+        page:
+          description: Page label (`1 of 1` when not paginated) or numeric page when listing with pagination.
+          oneOf:
+          - type: string
+            example: 1 of 1
+          - type: integer
+            example: 2
+      type: object
     ValidationError:
       description: 'Error payload for validation failures (400, 422) on request bodies and business rules.
 
@@ -125,6 +161,22 @@ components:
         data:
           type: object
           additionalProperties: true
+      type: object
+    QualifiedReportingEntityItem:
+      description: 'One QRE row in the API envelope `data` array for `getQualifiedReportingEntities`.
+
+
+        Runtime: {@see \Qualified_reporting_entity_lib::get_qualified_reporting_entities()} — `id`, `name` (name equals id).'
+      required:
+      - id
+      - name
+      properties:
+        id:
+          description: Qualified reporting entity identifier (`qre_id`).
+          type: string
+        name:
+          description: Same as `id` in the current implementation.
+          type: string
       type: object
     Error:
       description: 'Generic error payload when no more specific error schema applies.
@@ -162,58 +214,6 @@ components:
             type: string
             example: Error description
         type: object
-    QualifiedReportingEntityItem:
-      description: 'One QRE row in the API envelope `data` array for `getQualifiedReportingEntities`.
-
-
-        Runtime: {@see \Qualified_reporting_entity_lib::get_qualified_reporting_entities()} — `id`, `name` (name equals id).'
-      required:
-      - id
-      - name
-      properties:
-        id:
-          description: Qualified reporting entity identifier (`qre_id`).
-          type: string
-        name:
-          description: Same as `id` in the current implementation.
-          type: string
-      type: object
-    QualifiedReportingEntitiesListResponse:
-      description: QRE rows returned in the API envelope `data` field.
-      type: array
-      items:
-        $ref: '#/components/schemas/QualifiedReportingEntityItem'
-    ResponseEnvelope:
-      description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
-      required:
-      - url
-      - date
-      - code
-      - elements
-      - page
-      properties:
-        url:
-          description: Request URL including query string.
-          type: string
-          example: /app/api/v1/facilities
-        date:
-          description: Response timestamp.
-          type: string
-          example: 2024-09-17 04:26:39 EDT
-        code:
-          description: HTTP status code, mirrored in the JSON body (same as the response status).
-          type: integer
-        elements:
-          description: Number of items in `data` on HTTP 200; 0 for other status codes.
-          type: integer
-        page:
-          description: Page label (`1 of 1` when not paginated) or numeric page when listing with pagination.
-          oneOf:
-          - type: string
-            example: 1 of 1
-          - type: integer
-            example: 2
-      type: object
   securitySchemes:
     BearerAuth:
       type: http

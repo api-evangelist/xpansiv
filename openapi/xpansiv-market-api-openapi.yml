@@ -123,36 +123,42 @@ paths:
                   type: object
 components:
   schemas:
-    MarketPricingItem:
-      description: One market pricing row in the API envelope `data` array for `searchMarket`.
-      required:
-      - product
-      - date
-      properties:
-        product:
-          type: string
-          example: PA2018
-        date:
-          type: string
-          example: '2017-10-20'
-        bid_price:
-          type:
-          - number
-          - 'null'
-          format: float
-          example: 5.5
-        offer_price:
-          type:
-          - number
-          - 'null'
-          format: float
-          example: 6.5
-      type: object
     MarketPricingListResponse:
       description: Market pricing rows returned in the API envelope `data` field.
       type: array
       items:
         $ref: '#/components/schemas/MarketPricingItem'
+    ResponseEnvelope:
+      description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
+      required:
+      - url
+      - date
+      - code
+      - elements
+      - page
+      properties:
+        url:
+          description: Request URL including query string.
+          type: string
+          example: /app/api/v1/facilities
+        date:
+          description: Response timestamp.
+          type: string
+          example: 2024-09-17 04:26:39 EDT
+        code:
+          description: HTTP status code, mirrored in the JSON body (same as the response status).
+          type: integer
+        elements:
+          description: Number of items in `data` on HTTP 200; 0 for other status codes.
+          type: integer
+        page:
+          description: Page label (`1 of 1` when not paginated) or numeric page when listing with pagination.
+          oneOf:
+          - type: string
+            example: 1 of 1
+          - type: integer
+            example: 2
+      type: object
     AuthError:
       required:
       - error
@@ -189,36 +195,30 @@ components:
           type: string
           example: Error description
       type: object
-    ResponseEnvelope:
-      description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
+    MarketPricingItem:
+      description: One market pricing row in the API envelope `data` array for `searchMarket`.
       required:
-      - url
+      - product
       - date
-      - code
-      - elements
-      - page
       properties:
-        url:
-          description: Request URL including query string.
+        product:
           type: string
-          example: /app/api/v1/facilities
+          example: PA2018
         date:
-          description: Response timestamp.
           type: string
-          example: 2024-09-17 04:26:39 EDT
-        code:
-          description: HTTP status code, mirrored in the JSON body (same as the response status).
-          type: integer
-        elements:
-          description: Number of items in `data` on HTTP 200; 0 for other status codes.
-          type: integer
-        page:
-          description: Page label (`1 of 1` when not paginated) or numeric page when listing with pagination.
-          oneOf:
-          - type: string
-            example: 1 of 1
-          - type: integer
-            example: 2
+          example: '2017-10-20'
+        bid_price:
+          type:
+          - number
+          - 'null'
+          format: float
+          example: 5.5
+        offer_price:
+          type:
+          - number
+          - 'null'
+          format: float
+          example: 6.5
       type: object
   securitySchemes:
     BearerAuth:

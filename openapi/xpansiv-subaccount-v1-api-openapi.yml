@@ -154,43 +154,6 @@ paths:
                 $ref: '#/components/schemas/GeneralError'
 components:
   schemas:
-    GeneralError:
-      type: object
-      properties:
-        code:
-          type: string
-        ticket:
-          type: string
-        message:
-          type: string
-    ReferenceDatum:
-      required:
-      - code
-      type: object
-      properties:
-        code:
-          type: string
-          description: The reference data's value.
-        name:
-          type: string
-          description: The reference data's name
-      description: A reference datum data object
-    Account:
-      type: object
-      properties:
-        srcAcctId:
-          type: string
-          description: The Account's unique system-assigned identifier used for programmatic (API) interactions.
-          example: 4edse581-b97a-11ef-ea69-b61606fd520c
-        identifier:
-          type: string
-          description: The Account's ID as displayed in the registry.
-          example: '15184192'
-        name:
-          type: string
-          description: The Account Operating Name on the registry.
-          example: APXOPCAR Project Manager
-      description: Account record
     Subaccounts:
       type: object
       properties:
@@ -220,6 +183,31 @@ components:
         metadataConfig:
           type: string
           description: Metadata configuration (JSON) for additional fields required by the External Platform.
+    Account:
+      type: object
+      properties:
+        srcAcctId:
+          type: string
+          description: The Account's unique system-assigned identifier used for programmatic (API) interactions.
+          example: 4edse581-b97a-11ef-ea69-b61606fd520c
+        identifier:
+          type: string
+          description: The Account's ID as displayed in the registry.
+          example: '15184192'
+        name:
+          type: string
+          description: The Account Operating Name on the registry.
+          example: APXOPCAR Project Manager
+      description: Account record
+    AbstractRestError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
     ErrorItem:
       type: object
       properties:
@@ -235,15 +223,15 @@ components:
           type: string
         message:
           type: string
-    ErrorContainer:
+    GeneralError:
       type: object
       properties:
-        submissionId:
+        code:
           type: string
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ErrorItem'
+        ticket:
+          type: string
+        message:
+          type: string
     Subaccount:
       required:
       - name
@@ -301,12 +289,24 @@ components:
           readOnly: true
           example: true
       description: This class contains caller-visible set of sub-accounts for either the calling account or the account identified by onBehalfOfSrcAcctId
-    AbstractRestError:
+    ErrorContainer:
+      type: object
+      properties:
+        submissionId:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+    ReferenceDatum:
+      required:
+      - code
       type: object
       properties:
         code:
           type: string
-        ticket:
+          description: The reference data's value.
+        name:
           type: string
-        message:
-          type: string
+          description: The reference data's name
+      description: A reference datum data object
