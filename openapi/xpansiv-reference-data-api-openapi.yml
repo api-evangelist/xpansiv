@@ -53,6 +53,17 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 components:
+  schemas:
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+    NotAuthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
   responses:
     '401':
       description: Not authorized error
@@ -66,17 +77,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/InternalServerError'
-  schemas:
-    InternalServerError:
-      type: object
-      properties:
-        message:
-          type: string
-    NotAuthorizedError:
-      type: object
-      properties:
-        message:
-          type: string
   securitySchemes:
     bearerToken:
       type: http

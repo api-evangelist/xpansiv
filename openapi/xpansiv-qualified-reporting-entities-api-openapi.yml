@@ -108,6 +108,56 @@ paths:
       - BearerAuth: []
 components:
   schemas:
+    ValidationError:
+      description: 'Error payload for validation failures (400, 422) on request bodies and business rules.
+
+
+        For query/path validation, see {@see \Trade\CodeIgniter\dtos\shared\responses\errors\QueryValidationErrorResponse}
+
+        (`details` keyed by parameter name; this class uses `data` for the same purpose).'
+      properties:
+        error:
+          type: string
+          example: validation_error
+        message:
+          type: string
+          example: Errors when validating data
+        data:
+          type: object
+          additionalProperties: true
+      type: object
+    ServerError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 500 when an unexpected server or infrastructure failure occurs.
+            type: string
+            example: internal_error
+          message:
+            type: string
+            example: Error description
+        type: object
+    QualifiedReportingEntityItem:
+      description: 'One QRE row in the API envelope `data` array for `getQualifiedReportingEntities`.
+
+
+        Runtime: {@see \Qualified_reporting_entity_lib::get_qualified_reporting_entities()} — `id`, `name` (name equals id).'
+      required:
+      - id
+      - name
+      properties:
+        id:
+          description: Qualified reporting entity identifier (`qre_id`).
+          type: string
+        name:
+          description: Same as `id` in the current implementation.
+          type: string
+      type: object
     QualifiedReportingEntitiesListResponse:
       description: QRE rows returned in the API envelope `data` field.
       type: array
@@ -144,40 +194,6 @@ components:
           - type: integer
             example: 2
       type: object
-    ValidationError:
-      description: 'Error payload for validation failures (400, 422) on request bodies and business rules.
-
-
-        For query/path validation, see {@see \Trade\CodeIgniter\dtos\shared\responses\errors\QueryValidationErrorResponse}
-
-        (`details` keyed by parameter name; this class uses `data` for the same purpose).'
-      properties:
-        error:
-          type: string
-          example: validation_error
-        message:
-          type: string
-          example: Errors when validating data
-        data:
-          type: object
-          additionalProperties: true
-      type: object
-    QualifiedReportingEntityItem:
-      description: 'One QRE row in the API envelope `data` array for `getQualifiedReportingEntities`.
-
-
-        Runtime: {@see \Qualified_reporting_entity_lib::get_qualified_reporting_entities()} — `id`, `name` (name equals id).'
-      required:
-      - id
-      - name
-      properties:
-        id:
-          description: Qualified reporting entity identifier (`qre_id`).
-          type: string
-        name:
-          description: Same as `id` in the current implementation.
-          type: string
-      type: object
     Error:
       description: 'Generic error payload when no more specific error schema applies.
 
@@ -198,22 +214,6 @@ components:
           type: string
           example: Error description
       type: object
-    ServerError:
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-      - properties:
-          error:
-            description: 500 when an unexpected server or infrastructure failure occurs.
-            type: string
-            example: internal_error
-          message:
-            type: string
-            example: Error description
-        type: object
   securitySchemes:
     BearerAuth:
       type: http

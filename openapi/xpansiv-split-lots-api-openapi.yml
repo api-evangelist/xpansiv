@@ -133,17 +133,35 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 components:
+  parameters:
+    PageNumber:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    AccountIdentifier:
+      description: Account identifier
+      name: AccountIdentifier
+      example: 098B0A25
+      in: path
+      required: true
+      schema:
+        type: string
+    PageSize:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
   schemas:
-    InternalServerError:
-      type: object
-      properties:
-        message:
-          type: string
-    NotAuthorizedError:
-      type: object
-      properties:
-        message:
-          type: string
+    Ref.Currency:
+      description: Ref.Data.CURRENCY
+      type: string
+      minLength: 3
+      example: USD
     Price:
       type: object
       required:
@@ -156,6 +174,19 @@ components:
           type: number
           description: The numeric value of the price
           minimum: 0
+    NotAuthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+    Ref.Program:
+      type: string
+      description: Ref.Data.PROGRAM
     Page:
       type: object
       required:
@@ -176,37 +207,6 @@ components:
         totalElements:
           type: integer
           format: int64
-    Ref.Program:
-      type: string
-      description: Ref.Data.PROGRAM
-    Ref.Currency:
-      description: Ref.Data.CURRENCY
-      type: string
-      minLength: 3
-      example: USD
-  parameters:
-    PageSize:
-      name: size
-      in: query
-      required: false
-      schema:
-        type: integer
-        format: int32
-    PageNumber:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        format: int32
-    AccountIdentifier:
-      description: Account identifier
-      name: AccountIdentifier
-      example: 098B0A25
-      in: path
-      required: true
-      schema:
-        type: string
   responses:
     '401':
       description: Not authorized error

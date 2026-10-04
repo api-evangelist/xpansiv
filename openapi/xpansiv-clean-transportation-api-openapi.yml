@@ -180,103 +180,51 @@ paths:
                   type: object
 components:
   schemas:
-    CompanyEntityAddress:
-      description: Address nested on a company entity returned by `getCompanyEntities`.
+    CreateAssetFieldErrors:
+      description: Field-level validation messages in envelope `data` for `POST /ct/assets`.
       properties:
-        address_id:
-          type: integer
-          example: 18353
+        asset_fse_id:
+          type: string
+          example: The asset_fse_id FSE12345EE6 already exists.
+        reporting_method_id:
+          type: string
+          example: The reporting_method_id field is required.
+        address_latitude:
+          type: string
+          example: The address_latitude value is not valid within United States limits. It should be within the range of 7.2 and 83.7.
+        asset_serial_number:
+          type: string
+          example: The asset_serial_number field is required.
+        entity_id:
+          type: string
+        asset_name:
+          type: string
         address_street:
           type: string
-          example: 1234 Shattuck Avenue
         address_city:
           type: string
-          example: Berkeley
         address_zip:
           type: string
-          example: '94704'
         address_state:
           type: string
-          example: CA
         address_country:
           type: string
-          example: US
-      type: object
-    ResponseEnvelope:
-      description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
-      required:
-      - url
-      - date
-      - code
-      - elements
-      - page
-      properties:
-        url:
-          description: Request URL including query string.
+        address_longitude:
           type: string
-          example: /app/api/v1/facilities
-        date:
-          description: Response timestamp.
+        class_type_id:
           type: string
-          example: 2024-09-17 04:26:39 EDT
-        code:
-          description: HTTP status code, mirrored in the JSON body (same as the response status).
-          type: integer
-        elements:
-          description: Number of items in `data` on HTTP 200; 0 for other status codes.
-          type: integer
-        page:
-          description: Page label (`1 of 1` when not paginated) or numeric page when listing with pagination.
-          oneOf:
-          - type: string
-            example: 1 of 1
-          - type: integer
-            example: 2
-      type: object
-    AuthError:
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-      - properties:
-          error:
-            description: 401 when API authentication is missing or invalid.
-            type: string
-            example: connection_failed
-          message:
-            type: string
-            example: Authentication error
-        type: object
-    CreateAssetSuccess:
-      description: Success payload in the API envelope `data` field for `createAsset` (`POST /ct/assets`).
-      required:
-      - status
-      properties:
-        status:
+        charging_type_id:
           type: string
-          example: asset created
-      type: object
-    Error:
-      description: 'Generic error payload when no more specific error schema applies.
-
-
-        Implements JsonSerializable so it can be passed directly to API_Controller::response().
-
-        Implements Countable returning 0 so the response size guard in API_Controller treats it
-
-        as an empty collection (error responses never trigger the size limit).'
-      required:
-      - error
-      - message
-      properties:
-        error:
+        manufacturer_name:
           type: string
-          example: error
-        message:
+        asset_registration_upload_id:
           type: string
-          example: Error description
+        asset_start_date:
+          type: string
+        asset_end_date:
+          type: string
+        electricity_source_id:
+          type: string
       type: object
     postAssetCreate:
       description: Request body for `POST /ct/assets` (`createAsset`).
@@ -411,52 +359,38 @@ components:
           type: string
           example: test
       type: object
-    CreateAssetFieldErrors:
-      description: Field-level validation messages in envelope `data` for `POST /ct/assets`.
-      properties:
-        asset_fse_id:
-          type: string
-          example: The asset_fse_id FSE12345EE6 already exists.
-        reporting_method_id:
-          type: string
-          example: The reporting_method_id field is required.
-        address_latitude:
-          type: string
-          example: The address_latitude value is not valid within United States limits. It should be within the range of 7.2 and 83.7.
-        asset_serial_number:
-          type: string
-          example: The asset_serial_number field is required.
-        entity_id:
-          type: string
-        asset_name:
-          type: string
-        address_street:
-          type: string
-        address_city:
-          type: string
-        address_zip:
-          type: string
-        address_state:
-          type: string
-        address_country:
-          type: string
-        address_longitude:
-          type: string
-        class_type_id:
-          type: string
-        charging_type_id:
-          type: string
-        manufacturer_name:
-          type: string
-        asset_registration_upload_id:
-          type: string
-        asset_start_date:
-          type: string
-        asset_end_date:
-          type: string
-        electricity_source_id:
-          type: string
+    ServerError:
+      required:
+      - error
+      - message
       type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 500 when an unexpected server or infrastructure failure occurs.
+            type: string
+            example: internal_error
+          message:
+            type: string
+            example: Error description
+        type: object
+    AuthError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 401 when API authentication is missing or invalid.
+            type: string
+            example: connection_failed
+          message:
+            type: string
+            example: Authentication error
+        type: object
     CompanyEntityList:
       description: Company entity rows in the API envelope `data` field.
       type: array
@@ -481,6 +415,88 @@ components:
           type: string
           example: 6363fac17cfaf0_1234567.pdf
       type: object
+    CompanyEntityAddress:
+      description: Address nested on a company entity returned by `getCompanyEntities`.
+      properties:
+        address_id:
+          type: integer
+          example: 18353
+        address_street:
+          type: string
+          example: 1234 Shattuck Avenue
+        address_city:
+          type: string
+          example: Berkeley
+        address_zip:
+          type: string
+          example: '94704'
+        address_state:
+          type: string
+          example: CA
+        address_country:
+          type: string
+          example: US
+      type: object
+    ResponseEnvelope:
+      description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
+      required:
+      - url
+      - date
+      - code
+      - elements
+      - page
+      properties:
+        url:
+          description: Request URL including query string.
+          type: string
+          example: /app/api/v1/facilities
+        date:
+          description: Response timestamp.
+          type: string
+          example: 2024-09-17 04:26:39 EDT
+        code:
+          description: HTTP status code, mirrored in the JSON body (same as the response status).
+          type: integer
+        elements:
+          description: Number of items in `data` on HTTP 200; 0 for other status codes.
+          type: integer
+        page:
+          description: Page label (`1 of 1` when not paginated) or numeric page when listing with pagination.
+          oneOf:
+          - type: string
+            example: 1 of 1
+          - type: integer
+            example: 2
+      type: object
+    Error:
+      description: 'Generic error payload when no more specific error schema applies.
+
+
+        Implements JsonSerializable so it can be passed directly to API_Controller::response().
+
+        Implements Countable returning 0 so the response size guard in API_Controller treats it
+
+        as an empty collection (error responses never trigger the size limit).'
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Error description
+      type: object
+    CreateAssetSuccess:
+      description: Success payload in the API envelope `data` field for `createAsset` (`POST /ct/assets`).
+      required:
+      - status
+      properties:
+        status:
+          type: string
+          example: asset created
+      type: object
     CompanyEntityContact:
       description: Contact nested on a company entity returned by `getCompanyEntities`.
       properties:
@@ -500,22 +516,6 @@ components:
           type: string
           example: '2024-10-26 13:30:24'
       type: object
-    ServerError:
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-      - properties:
-          error:
-            description: 500 when an unexpected server or infrastructure failure occurs.
-            type: string
-            example: internal_error
-          message:
-            type: string
-            example: Error description
-        type: object
   securitySchemes:
     BearerAuth:
       type: http

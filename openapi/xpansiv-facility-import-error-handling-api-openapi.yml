@@ -469,6 +469,87 @@ paths:
                   type: object
 components:
   schemas:
+    PreviewChangeRow:
+      description: One proposed change row in a fix preview (`FixPreviewPayload.changes[]`).
+      required:
+      - row_index
+      - old_value
+      - new_value
+      properties:
+        row_index:
+          description: Upload row identifier (internal row id)
+          type: integer
+          example: 7050928
+        old_value:
+          description: Current value before fix (type may vary by field)
+          type:
+          - string
+          - 'null'
+        new_value:
+          description: Value after applying the proposed fix
+          type:
+          - string
+          - 'null'
+      type: object
+    ForbiddenResponse:
+      properties:
+        success:
+          type: boolean
+          enum:
+          - false
+        error:
+          type: string
+          example: You do not have permission to access this upload.
+      type: object
+    ValidationErrorsMap:
+      description: Map of row identifier to validation error detail.
+      type: object
+      additionalProperties: true
+    UploadErrorPreviewForbiddenError:
+      description: 403 `data` payload when the caller cannot access the upload.
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/UploadErrorPreviewClientError'
+      - properties:
+          success:
+            type: boolean
+            enum:
+            - false
+          error:
+            type: string
+            example: You do not have permission to access this upload.
+        type: object
+    FixPreviewPayload:
+      required:
+      - fixer_key
+      - field
+      - changes
+      properties:
+        changes:
+          description: One entry per affected upload row
+          type: array
+          items:
+            $ref: '#/components/schemas/PreviewChangeRow'
+        fixer_key:
+          description: Identifier of the fixer used for this preview
+          type: string
+          example: manual_correction
+        field:
+          description: Logical field name being corrected
+          type: string
+          example: street
+        scope:
+          type:
+          - string
+          - 'null'
+          example: facilities
+        field_path:
+          description: Dot-path of the field within the scope
+          type:
+          - string
+          - 'null'
+          example: facilities.street
+      type: object
     ApplyFixValidationErrorResponse:
       required:
       - success
@@ -489,16 +570,6 @@ components:
           items:
             type: object
       type: object
-    ForbiddenResponse:
-      properties:
-        success:
-          type: boolean
-          enum:
-          - false
-        error:
-          type: string
-          example: You do not have permission to access this upload.
-      type: object
     SingleFixSuccessResponse:
       required:
       - success
@@ -512,12 +583,21 @@ components:
           type: object
           additionalProperties: true
       type: object
-    ValidationErrorsMap:
-      description: Map of row identifier to validation error detail.
+    ApplyFixFieldErrorResponse:
+      properties:
+        success:
+          type: boolean
+          enum:
+          - false
+        error:
+          type: string
+          enum:
+          - The error_type field is required.
+          - The field field is required.
+          - Invalid error_index value.
       type: object
-      additionalProperties: true
-    UploadErrorPreviewForbiddenError:
-      description: 403 `data` payload when the caller cannot access the upload.
+    UploadErrorPreviewInvalidErrorIndexError:
+      description: 400 `data` payload when `error_index` query parameter is not a valid integer.
       type: object
       allOf:
       - $ref: '#/components/schemas/UploadErrorPreviewClientError'
@@ -528,7 +608,7 @@ components:
             - false
           error:
             type: string
-            example: You do not have permission to access this upload.
+            example: Invalid error_index value.
         type: object
     UploadBulkErrorPreviewSuccess:
       required:
@@ -542,55 +622,6 @@ components:
           enum:
           - true
       type: object
-    BulkFixSuccessResponse:
-      required:
-      - success
-      - facility_creation_attempt
-      - validation
-      properties:
-        success:
-          type: boolean
-          enum:
-          - true
-        facility_creation_attempt:
-          type: object
-          additionalProperties: true
-        validation:
-          description: May be an empty array [] or a ValidationErrorsMap object.
-          oneOf:
-          - type: array
-            items:
-              type: object
-          - $ref: '#/components/schemas/ValidationErrorsMap'
-      type: object
-    UploadErrorPreviewClientError:
-      description: Shared `{success, error}` shape for upload error preview client failures (400/403).
-      properties:
-        success:
-          type: boolean
-          enum:
-          - false
-        error:
-          type: string
-      type: object
-    ApplyFixRequestBody:
-      required:
-      - error_type
-      - field
-      properties:
-        error_type:
-          type: string
-        field:
-          type: string
-        fix_value:
-          type:
-          - string
-          - 'null'
-        error_index:
-          type:
-          - integer
-          - 'null'
-      type: object
     UploadSingleRowErrorPreviewSuccess:
       required:
       - success
@@ -603,22 +634,15 @@ components:
           enum:
           - true
       type: object
-    UploadErrorPreviewNotFoundError:
-      description: 404 `data` payload when no error group or fixer matches the request.
+    UploadErrorPreviewClientError:
+      description: Shared `{success, error}` shape for upload error preview client failures (400/403).
       properties:
         success:
           type: boolean
           enum:
           - false
-        message:
-          type: string
-          example: Error fix or error fixer not found
         error:
-          description: Machine-readable error code when present.
-          type:
-          - string
-          - 'null'
-          example: not_found
+          type: string
       type: object
     ResponseEnvelope:
       description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
@@ -651,85 +675,61 @@ components:
           - type: integer
             example: 2
       type: object
-    ApplyFixFieldErrorResponse:
+    BulkFixSuccessResponse:
+      required:
+      - success
+      - facility_creation_attempt
+      - validation
+      properties:
+        success:
+          type: boolean
+          enum:
+          - true
+        facility_creation_attempt:
+          type: object
+          additionalProperties: true
+        validation:
+          description: May be an empty array [] or a ValidationErrorsMap object.
+          oneOf:
+          - type: array
+            items:
+              type: object
+          - $ref: '#/components/schemas/ValidationErrorsMap'
+      type: object
+    UploadErrorPreviewNotFoundError:
+      description: 404 `data` payload when no error group or fixer matches the request.
       properties:
         success:
           type: boolean
           enum:
           - false
+        message:
+          type: string
+          example: Error fix or error fixer not found
         error:
-          type: string
-          enum:
-          - The error_type field is required.
-          - The field field is required.
-          - Invalid error_index value.
-      type: object
-    UploadErrorPreviewInvalidErrorIndexError:
-      description: 400 `data` payload when `error_index` query parameter is not a valid integer.
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/UploadErrorPreviewClientError'
-      - properties:
-          success:
-            type: boolean
-            enum:
-            - false
-          error:
-            type: string
-            example: Invalid error_index value.
-        type: object
-    PreviewChangeRow:
-      description: One proposed change row in a fix preview (`FixPreviewPayload.changes[]`).
-      required:
-      - row_index
-      - old_value
-      - new_value
-      properties:
-        row_index:
-          description: Upload row identifier (internal row id)
-          type: integer
-          example: 7050928
-        old_value:
-          description: Current value before fix (type may vary by field)
+          description: Machine-readable error code when present.
           type:
           - string
           - 'null'
-        new_value:
-          description: Value after applying the proposed fix
-          type:
-          - string
-          - 'null'
+          example: not_found
       type: object
-    FixPreviewPayload:
+    ApplyFixRequestBody:
       required:
-      - fixer_key
+      - error_type
       - field
-      - changes
       properties:
-        changes:
-          description: One entry per affected upload row
-          type: array
-          items:
-            $ref: '#/components/schemas/PreviewChangeRow'
-        fixer_key:
-          description: Identifier of the fixer used for this preview
+        error_type:
           type: string
-          example: manual_correction
         field:
-          description: Logical field name being corrected
           type: string
-          example: street
-        scope:
+        fix_value:
           type:
           - string
           - 'null'
-          example: facilities
-        field_path:
-          description: Dot-path of the field within the scope
+        error_index:
           type:
-          - string
+          - integer
           - 'null'
-          example: facilities.street
       type: object
   securitySchemes:
     BearerAuth:

@@ -235,303 +235,6 @@ paths:
                   type: object
 components:
   schemas:
-    ResponseEnvelope:
-      description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
-      required:
-      - url
-      - date
-      - code
-      - elements
-      - page
-      properties:
-        url:
-          description: Request URL including query string.
-          type: string
-          example: /app/api/v1/facilities
-        date:
-          description: Response timestamp.
-          type: string
-          example: 2024-09-17 04:26:39 EDT
-        code:
-          description: HTTP status code, mirrored in the JSON body (same as the response status).
-          type: integer
-        elements:
-          description: Number of items in `data` on HTTP 200; 0 for other status codes.
-          type: integer
-        page:
-          description: Page label (`1 of 1` when not paginated) or numeric page when listing with pagination.
-          oneOf:
-          - type: string
-            example: 1 of 1
-          - type: integer
-            example: 2
-      type: object
-    TransactionItem:
-      description: Single transaction row in `TransactionReportData.transactions`.
-      required:
-      - date
-      - net_sales
-      - status
-      - quantity
-      - product
-      properties:
-        date:
-          description: Transaction date in YYYY-MM-DD format
-          type: string
-          example: '2025-07-24'
-        net_sales:
-          description: Net sales amount for the transaction
-          type: number
-          format: float
-          example: 123.45
-        status:
-          description: Payment status of the transaction
-          type: string
-          example: Not yet initiated
-        quantity:
-          description: Quantity of RECs/SRECs sold
-          type: number
-          format: float
-          example: 5
-        generation:
-          description: Month of generation for the transaction in YYYY/MM format
-          type:
-          - string
-          - 'null'
-          example: 2025/05
-        product:
-          description: Product name/type
-          type: string
-          example: VA2025-SREC
-      type: object
-    AuthError:
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-      - properties:
-          error:
-            description: 401 when API authentication is missing or invalid.
-            type: string
-            example: connection_failed
-          message:
-            type: string
-            example: Authentication error
-        type: object
-    ProductionHistoryPaginatedResponse:
-      properties:
-        data:
-          $ref: '#/components/schemas/ProductionHistoryData'
-      type: object
-    FacilityGetError:
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-      - properties:
-          error:
-            description: GET `/facilities/{facility_id}` when the facility is missing or not visible to the account.
-            type: string
-            example: error
-          message:
-            type: string
-            example: Wrong facility_id parameter
-        type: object
-    TransactionsNotFoundError:
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-      - properties:
-          error:
-            description: '`GET .../transactions` when the facility is missing or transaction data cannot be loaded.'
-            type: string
-            example: error
-            enum:
-            - error
-            - facility_not_found
-          message:
-            type: string
-            example: Facility not found
-        type: object
-    Error:
-      description: 'Generic error payload when no more specific error schema applies.
-
-
-        Implements JsonSerializable so it can be passed directly to API_Controller::response().
-
-        Implements Countable returning 0 so the response size guard in API_Controller treats it
-
-        as an empty collection (error responses never trigger the size limit).'
-      required:
-      - error
-      - message
-      properties:
-        error:
-          type: string
-          example: error
-        message:
-          type: string
-          example: Error description
-      type: object
-    TransactionReportData:
-      description: Transaction report payload in the API envelope `data` field for `getTransactionsHistory`.
-      required:
-      - total_earned
-      - available_recs
-      - transactions
-      properties:
-        total_earned:
-          description: Total amount earned from all transactions
-          type: number
-          format: float
-          example: 369.65
-        last_payment_date:
-          description: Date of the most recent payment
-          type:
-          - string
-          - 'null'
-          format: date
-          example: '2025-07-24'
-        available_recs:
-          description: Number of available RECs/SRECs
-          type: integer
-          example: 3
-        transactions:
-          description: List of transactions for the current page
-          type: array
-          items:
-            $ref: '#/components/schemas/TransactionItem'
-      type: object
-    TransactionsForbiddenError:
-      description: '`GET .../transactions` when access is denied or the facility is closed/lost (manual 403).'
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-    TransactionsInvalidFacilityIdError:
-      description: '`GET .../transactions` when `facility_id` is not numeric (manual contract).'
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-    Pagination:
-      properties:
-        total:
-          description: Total number of items
-          type: integer
-          example: 100
-        per_page:
-          description: Items per page
-          type: integer
-          example: 20
-        current_page:
-          description: Current page number
-          type: integer
-          example: 1
-        last_page:
-          description: Last page number
-          type: integer
-          example: 5
-      type: object
-    FacilityTransactionsPaginatedResponse:
-      properties:
-        data:
-          $ref: '#/components/schemas/TransactionReportData'
-      type: object
-    ProductionHistoryBadRequestError:
-      description: '`GET .../generation/history` when generation data cannot be loaded (runtime returns 400).'
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-    ProductionHistoryData:
-      description: Production history payload in the API envelope `data` field for `getProductionHistory`.
-      required:
-      - meter_id
-      - meter_reading_style
-      - current_reading_value
-      - current_reading_status
-      - current_reading_period
-      - last_approved_photo_url
-      - last_approved_photo_description
-      - last_approved_photo_date
-      - history
-      properties:
-        meter_id:
-          description: ID of the meter
-          type: integer
-          example: 73059
-        meter_reading_style:
-          description: Style of meter reading (cumulative, actual, etc.)
-          type: string
-          example: cumulative
-        current_reading_value:
-          description: Current meter reading value
-          type: integer
-          example: 73332
-        current_reading_status:
-          description: Status of the current reading
-          type:
-          - string
-          - 'null'
-          example: srectrade_approved
-          enum:
-          - srectrade_approved
-          - high
-          - low
-          - reading_less_than_previous
-          - pending_review
-          - srectrade_disapproved
-          - setup_incomplete
-          - date_outside_expected
-          - wrong_held_gen_id
-          - missing_previous_verified
-          - extrapolation_off
-          - invalid_meter_style
-          - already_processed
-        current_reading_period:
-          description: Period of the current reading in YYYY-MM-DD format
-          type:
-          - string
-          - 'null'
-          example: '2025-10-01'
-        last_approved_photo_url:
-          description: URL of the last approved photo submission
-          type:
-          - string
-          - 'null'
-        last_approved_photo_description:
-          description: Description of the last approved photo submission
-          type:
-          - string
-          - 'null'
-          example: First time reading
-        last_approved_photo_date:
-          description: Date of the last approved photo submission in YYYY-MM-DD format
-          type:
-          - string
-          - 'null'
-          format: date
-          example: '2025-02-01'
-        history:
-          description: Array of production history records
-          type: array
-          items:
-            $ref: '#/components/schemas/ProductionHistoryItem'
-      type: object
     PaginatedResponseEnvelope:
       description: Standard API response envelope for paginated endpoints.
       type: object
@@ -613,6 +316,303 @@ components:
           - string
           - 'null'
           example: First time reading
+      type: object
+    ProductionHistoryData:
+      description: Production history payload in the API envelope `data` field for `getProductionHistory`.
+      required:
+      - meter_id
+      - meter_reading_style
+      - current_reading_value
+      - current_reading_status
+      - current_reading_period
+      - last_approved_photo_url
+      - last_approved_photo_description
+      - last_approved_photo_date
+      - history
+      properties:
+        meter_id:
+          description: ID of the meter
+          type: integer
+          example: 73059
+        meter_reading_style:
+          description: Style of meter reading (cumulative, actual, etc.)
+          type: string
+          example: cumulative
+        current_reading_value:
+          description: Current meter reading value
+          type: integer
+          example: 73332
+        current_reading_status:
+          description: Status of the current reading
+          type:
+          - string
+          - 'null'
+          example: srectrade_approved
+          enum:
+          - srectrade_approved
+          - high
+          - low
+          - reading_less_than_previous
+          - pending_review
+          - srectrade_disapproved
+          - setup_incomplete
+          - date_outside_expected
+          - wrong_held_gen_id
+          - missing_previous_verified
+          - extrapolation_off
+          - invalid_meter_style
+          - already_processed
+        current_reading_period:
+          description: Period of the current reading in YYYY-MM-DD format
+          type:
+          - string
+          - 'null'
+          example: '2025-10-01'
+        last_approved_photo_url:
+          description: URL of the last approved photo submission
+          type:
+          - string
+          - 'null'
+        last_approved_photo_description:
+          description: Description of the last approved photo submission
+          type:
+          - string
+          - 'null'
+          example: First time reading
+        last_approved_photo_date:
+          description: Date of the last approved photo submission in YYYY-MM-DD format
+          type:
+          - string
+          - 'null'
+          format: date
+          example: '2025-02-01'
+        history:
+          description: Array of production history records
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductionHistoryItem'
+      type: object
+    AuthError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 401 when API authentication is missing or invalid.
+            type: string
+            example: connection_failed
+          message:
+            type: string
+            example: Authentication error
+        type: object
+    ProductionHistoryPaginatedResponse:
+      properties:
+        data:
+          $ref: '#/components/schemas/ProductionHistoryData'
+      type: object
+    TransactionReportData:
+      description: Transaction report payload in the API envelope `data` field for `getTransactionsHistory`.
+      required:
+      - total_earned
+      - available_recs
+      - transactions
+      properties:
+        total_earned:
+          description: Total amount earned from all transactions
+          type: number
+          format: float
+          example: 369.65
+        last_payment_date:
+          description: Date of the most recent payment
+          type:
+          - string
+          - 'null'
+          format: date
+          example: '2025-07-24'
+        available_recs:
+          description: Number of available RECs/SRECs
+          type: integer
+          example: 3
+        transactions:
+          description: List of transactions for the current page
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionItem'
+      type: object
+    TransactionsInvalidFacilityIdError:
+      description: '`GET .../transactions` when `facility_id` is not numeric (manual contract).'
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+    TransactionsNotFoundError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: '`GET .../transactions` when the facility is missing or transaction data cannot be loaded.'
+            type: string
+            example: error
+            enum:
+            - error
+            - facility_not_found
+          message:
+            type: string
+            example: Facility not found
+        type: object
+    TransactionsForbiddenError:
+      description: '`GET .../transactions` when access is denied or the facility is closed/lost (manual 403).'
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+    Pagination:
+      properties:
+        total:
+          description: Total number of items
+          type: integer
+          example: 100
+        per_page:
+          description: Items per page
+          type: integer
+          example: 20
+        current_page:
+          description: Current page number
+          type: integer
+          example: 1
+        last_page:
+          description: Last page number
+          type: integer
+          example: 5
+      type: object
+    FacilityTransactionsPaginatedResponse:
+      properties:
+        data:
+          $ref: '#/components/schemas/TransactionReportData'
+      type: object
+    FacilityGetError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: GET `/facilities/{facility_id}` when the facility is missing or not visible to the account.
+            type: string
+            example: error
+          message:
+            type: string
+            example: Wrong facility_id parameter
+        type: object
+    ProductionHistoryBadRequestError:
+      description: '`GET .../generation/history` when generation data cannot be loaded (runtime returns 400).'
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+    ResponseEnvelope:
+      description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
+      required:
+      - url
+      - date
+      - code
+      - elements
+      - page
+      properties:
+        url:
+          description: Request URL including query string.
+          type: string
+          example: /app/api/v1/facilities
+        date:
+          description: Response timestamp.
+          type: string
+          example: 2024-09-17 04:26:39 EDT
+        code:
+          description: HTTP status code, mirrored in the JSON body (same as the response status).
+          type: integer
+        elements:
+          description: Number of items in `data` on HTTP 200; 0 for other status codes.
+          type: integer
+        page:
+          description: Page label (`1 of 1` when not paginated) or numeric page when listing with pagination.
+          oneOf:
+          - type: string
+            example: 1 of 1
+          - type: integer
+            example: 2
+      type: object
+    Error:
+      description: 'Generic error payload when no more specific error schema applies.
+
+
+        Implements JsonSerializable so it can be passed directly to API_Controller::response().
+
+        Implements Countable returning 0 so the response size guard in API_Controller treats it
+
+        as an empty collection (error responses never trigger the size limit).'
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Error description
+      type: object
+    TransactionItem:
+      description: Single transaction row in `TransactionReportData.transactions`.
+      required:
+      - date
+      - net_sales
+      - status
+      - quantity
+      - product
+      properties:
+        date:
+          description: Transaction date in YYYY-MM-DD format
+          type: string
+          example: '2025-07-24'
+        net_sales:
+          description: Net sales amount for the transaction
+          type: number
+          format: float
+          example: 123.45
+        status:
+          description: Payment status of the transaction
+          type: string
+          example: Not yet initiated
+        quantity:
+          description: Quantity of RECs/SRECs sold
+          type: number
+          format: float
+          example: 5
+        generation:
+          description: Month of generation for the transaction in YYYY/MM format
+          type:
+          - string
+          - 'null'
+          example: 2025/05
+        product:
+          description: Product name/type
+          type: string
+          example: VA2025-SREC
       type: object
   securitySchemes:
     BearerAuth:

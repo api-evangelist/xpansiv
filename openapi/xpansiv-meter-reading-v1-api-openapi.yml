@@ -110,8 +110,74 @@ paths:
                 $ref: '#/components/schemas/StructuredMeterReadings'
 components:
   schemas:
-    IUsagePointIdentifier:
+    ReadingOutcome:
       type: object
+      properties:
+        correlationId:
+          type: string
+        level:
+          type: string
+          enum:
+          - ERROR
+          - WARNING
+          - OTHER
+        fieldReference:
+          type: string
+        code:
+          type: string
+        message:
+          type: string
+        usagePointCode:
+          type: string
+        readingType:
+          type: string
+    StructuredMeterReadings:
+      type: object
+      properties:
+        discriminatedUsagePoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifiedDiscriminatedUsagePoint'
+        readings:
+          type: array
+          items:
+            $ref: '#/components/schemas/InteractiveMeterReading'
+        stagedReadings:
+          type: array
+          items:
+            $ref: '#/components/schemas/InteractiveMeterReading'
+      description: A structured meter readings data object
+    MeterDataSubmissionReading:
+      required:
+      - intervalEnd
+      - intervalStart
+      - reading
+      type: object
+      properties:
+        intervalStart:
+          type: string
+          format: date-time
+        intervalEnd:
+          type: string
+          format: date-time
+        reading:
+          type: number
+        externalId:
+          type: string
+      description: A submitted meter reading
+    MeterDataSubmission:
+      required:
+      - streams
+      - timeZone
+      type: object
+      properties:
+        timeZone:
+          type: string
+        streams:
+          type: array
+          items:
+            $ref: '#/components/schemas/MeterDataSubmissionStream'
+      description: A submission of meter readings
     InteractiveMeterReading:
       required:
       - discriminatedUsagePointIdentifier
@@ -176,6 +242,52 @@ components:
           type: string
           format: uuid
       description: A interactive meter readings data object
+    ReadingStructureRelationship:
+      type: object
+      properties:
+        sourceStructureKey:
+          type: string
+        targetStructureKey:
+          type: string
+        relationshipTypeCode:
+          type: string
+        uiHint:
+          $ref: '#/components/schemas/RelationshipUiHint'
+      description: A reading structure relationship data object
+    ReadingOutcomes:
+      type: object
+      properties:
+        readingOutcomes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReadingOutcome'
+    MeterReadingsByStructureRequest:
+      required:
+      - readingStructure
+      type: object
+      properties:
+        readingStructure:
+          $ref: '#/components/schemas/CoreReadingStructure'
+      description: A meter readings by structure data object
+    RelationshipUiHint:
+      type: object
+      properties:
+        inline:
+          type: boolean
+    InteractiveMeterReadingSubmission:
+      type: object
+      properties:
+        timeZone:
+          type: string
+        discriminatedUsagePoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifiedDiscriminatedUsagePoint'
+        readings:
+          type: array
+          items:
+            $ref: '#/components/schemas/InteractiveMeterReading'
+      description: A interactive meter readings submission
     IdentifiedDiscriminatedUsagePoint:
       type: object
       properties:
@@ -211,34 +323,83 @@ components:
         discriminatedUsagePointIdentifier:
           type: string
       description: An identified discriminated usage point data object
-    ReadingOutcomes:
+    TemplatedDiscriminatedUsagePoint:
       type: object
       properties:
-        readingOutcomes:
+        structureKey:
+          type: string
+        label:
+          type: string
+        internalUsagePointCode:
+          type: string
+        usagePointInput:
+          type: boolean
+        inputTypeCodes:
+          uniqueItems: true
           type: array
           items:
-            $ref: '#/components/schemas/ReadingOutcome'
-    ReadingOutcome:
+            type: string
+        outputTypeCodes:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        resourceProcessIdentifier:
+          type: string
+          format: uuid
+        resourceProcessName:
+          type: string
+        reportingEntityStreamIdentifier:
+          type: string
+        inputOutputStreamTypeCode:
+          type: string
+        unitOfMeasureCode:
+          type: string
+        template:
+          type: array
+          items:
+            $ref: '#/components/schemas/InteractiveMeterReadingDTO'
+      description: A templated discriminated usage point data object
+    IUsagePointIdentifier:
+      type: object
+    MeterDataSubmissionStream:
+      required:
+      - readings
+      - usagePoint
       type: object
       properties:
-        correlationId:
-          type: string
-        level:
-          type: string
-          enum:
-          - ERROR
-          - WARNING
-          - OTHER
-        fieldReference:
-          type: string
-        code:
-          type: string
-        message:
-          type: string
-        usagePointCode:
-          type: string
-        readingType:
-          type: string
+        usagePoint:
+          oneOf:
+          - $ref: '#/components/schemas/InternalUsagePointCodeUsagePointIdentifier'
+          - $ref: '#/components/schemas/ReportingEntityStreamIdentifierUsagePointIdentifier'
+        readings:
+          type: array
+          items:
+            $ref: '#/components/schemas/MeterDataSubmissionReading'
+      description: A set of meter readings for a specific usage point
+    ReportingEntityStreamIdentifierUsagePointIdentifier:
+      required:
+      - reportingEntityStreamIdentifier
+      type: object
+      description: A usage point identifier that employs the reporting entity stream identifier
+      allOf:
+      - $ref: '#/components/schemas/IUsagePointIdentifier'
+      - type: object
+        properties:
+          reportingEntityStreamIdentifier:
+            type: string
+    CoreReadingStructure:
+      type: object
+      properties:
+        discriminatedUsagePoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/TemplatedDiscriminatedUsagePoint'
+        relationships:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReadingStructureRelationship'
+      description: A core reading structure data object
     InteractiveMeterReadingDTO:
       required:
       - discriminatedUsagePointIdentifier
@@ -307,63 +468,6 @@ components:
           format: uuid
         hasHistory:
           type: boolean
-    ReadingStructureRelationship:
-      type: object
-      properties:
-        sourceStructureKey:
-          type: string
-        targetStructureKey:
-          type: string
-        relationshipTypeCode:
-          type: string
-        uiHint:
-          $ref: '#/components/schemas/RelationshipUiHint'
-      description: A reading structure relationship data object
-    MeterDataSubmissionReading:
-      required:
-      - intervalEnd
-      - intervalStart
-      - reading
-      type: object
-      properties:
-        intervalStart:
-          type: string
-          format: date-time
-        intervalEnd:
-          type: string
-          format: date-time
-        reading:
-          type: number
-        externalId:
-          type: string
-      description: A submitted meter reading
-    CoreReadingStructure:
-      type: object
-      properties:
-        discriminatedUsagePoints:
-          type: array
-          items:
-            $ref: '#/components/schemas/TemplatedDiscriminatedUsagePoint'
-        relationships:
-          type: array
-          items:
-            $ref: '#/components/schemas/ReadingStructureRelationship'
-      description: A core reading structure data object
-    MeterDataSubmissionStream:
-      required:
-      - readings
-      - usagePoint
-      type: object
-      properties:
-        usagePoint:
-          oneOf:
-          - $ref: '#/components/schemas/InternalUsagePointCodeUsagePointIdentifier'
-          - $ref: '#/components/schemas/ReportingEntityStreamIdentifierUsagePointIdentifier'
-        readings:
-          type: array
-          items:
-            $ref: '#/components/schemas/MeterDataSubmissionReading'
-      description: A set of meter readings for a specific usage point
     InternalUsagePointCodeUsagePointIdentifier:
       required:
       - internalUsagePointCode
@@ -375,110 +479,6 @@ components:
         properties:
           internalUsagePointCode:
             type: string
-    MeterReadingsByStructureRequest:
-      required:
-      - readingStructure
-      type: object
-      properties:
-        readingStructure:
-          $ref: '#/components/schemas/CoreReadingStructure'
-      description: A meter readings by structure data object
-    InteractiveMeterReadingSubmission:
-      type: object
-      properties:
-        timeZone:
-          type: string
-        discriminatedUsagePoints:
-          type: array
-          items:
-            $ref: '#/components/schemas/IdentifiedDiscriminatedUsagePoint'
-        readings:
-          type: array
-          items:
-            $ref: '#/components/schemas/InteractiveMeterReading'
-      description: A interactive meter readings submission
-    MeterDataSubmission:
-      required:
-      - streams
-      - timeZone
-      type: object
-      properties:
-        timeZone:
-          type: string
-        streams:
-          type: array
-          items:
-            $ref: '#/components/schemas/MeterDataSubmissionStream'
-      description: A submission of meter readings
-    ReportingEntityStreamIdentifierUsagePointIdentifier:
-      required:
-      - reportingEntityStreamIdentifier
-      type: object
-      description: A usage point identifier that employs the reporting entity stream identifier
-      allOf:
-      - $ref: '#/components/schemas/IUsagePointIdentifier'
-      - type: object
-        properties:
-          reportingEntityStreamIdentifier:
-            type: string
-    StructuredMeterReadings:
-      type: object
-      properties:
-        discriminatedUsagePoints:
-          type: array
-          items:
-            $ref: '#/components/schemas/IdentifiedDiscriminatedUsagePoint'
-        readings:
-          type: array
-          items:
-            $ref: '#/components/schemas/InteractiveMeterReading'
-        stagedReadings:
-          type: array
-          items:
-            $ref: '#/components/schemas/InteractiveMeterReading'
-      description: A structured meter readings data object
-    TemplatedDiscriminatedUsagePoint:
-      type: object
-      properties:
-        structureKey:
-          type: string
-        label:
-          type: string
-        internalUsagePointCode:
-          type: string
-        usagePointInput:
-          type: boolean
-        inputTypeCodes:
-          uniqueItems: true
-          type: array
-          items:
-            type: string
-        outputTypeCodes:
-          uniqueItems: true
-          type: array
-          items:
-            type: string
-        resourceProcessIdentifier:
-          type: string
-          format: uuid
-        resourceProcessName:
-          type: string
-        reportingEntityStreamIdentifier:
-          type: string
-        inputOutputStreamTypeCode:
-          type: string
-        unitOfMeasureCode:
-          type: string
-        template:
-          type: array
-          items:
-            $ref: '#/components/schemas/InteractiveMeterReadingDTO'
-      description: A templated discriminated usage point data object
-    RelationshipUiHint:
-      type: object
-      properties:
-        inline:
-          type: boolean
   securitySchemes:
     JWT:
       type: http

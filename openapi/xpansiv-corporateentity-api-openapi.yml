@@ -133,19 +133,20 @@ components:
           example: DUNS
       title: CorporateEntities
       description: Corporate entities information
-    ErrorContainer:
+    ODataEnvelopeOfCorporateEntities:
       type: object
       properties:
-        errors:
+        '@count':
+          type: integer
+          format: int32
+          description: The total number of results (only present if requested)
+        value:
           type: array
-          description: List of errors
+          description: Rows of information
           items:
-            $ref: '#/components/schemas/ErrorItem'
-        submissionId:
-          type: string
-          description: Submission identifier for issue investigation
-      title: ErrorContainer
-      description: Container for errors
+            $ref: '#/components/schemas/CorporateEntities'
+      title: ODataEnvelopeOfCorporateEntities
+      description: Container for OData-like rows of information
     ErrorItem:
       type: object
       required:
@@ -172,20 +173,19 @@ components:
           description: The path to the field specifically in error, if applicable
       title: ErrorItem
       description: Describes a specific error
-    ODataEnvelopeOfCorporateEntities:
+    ErrorContainer:
       type: object
       properties:
-        '@count':
-          type: integer
-          format: int32
-          description: The total number of results (only present if requested)
-        value:
+        errors:
           type: array
-          description: Rows of information
+          description: List of errors
           items:
-            $ref: '#/components/schemas/CorporateEntities'
-      title: ODataEnvelopeOfCorporateEntities
-      description: Container for OData-like rows of information
+            $ref: '#/components/schemas/ErrorItem'
+        submissionId:
+          type: string
+          description: Submission identifier for issue investigation
+      title: ErrorContainer
+      description: Container for errors
   securitySchemes:
     JWT:
       type: apiKey

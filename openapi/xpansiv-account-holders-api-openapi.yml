@@ -83,40 +83,22 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 components:
+  parameters:
+    PageNumber:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    PageSize:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
   schemas:
-    InternalServerError:
-      type: object
-      properties:
-        message:
-          type: string
-    NotAuthorizedError:
-      type: object
-      properties:
-        message:
-          type: string
-    Page:
-      type: object
-      required:
-      - page
-      - size
-      - totalPages
-      - totalElements
-      properties:
-        page:
-          type: integer
-          format: int32
-        size:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-        totalElements:
-          type: integer
-          format: int64
-    Ref.Program:
-      type: string
-      description: Ref.Data.PROGRAM
     AccountHolder:
       type: object
       required:
@@ -145,21 +127,39 @@ components:
         generatorAccount:
           type: boolean
           description: True/False.
-  parameters:
-    PageSize:
-      name: size
-      in: query
-      required: false
-      schema:
-        type: integer
-        format: int32
-    PageNumber:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        format: int32
+    NotAuthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+    Ref.Program:
+      type: string
+      description: Ref.Data.PROGRAM
+    Page:
+      type: object
+      required:
+      - page
+      - size
+      - totalPages
+      - totalElements
+      properties:
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
   responses:
     '401':
       description: Not authorized error

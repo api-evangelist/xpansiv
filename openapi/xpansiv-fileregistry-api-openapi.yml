@@ -285,70 +285,39 @@ paths:
                 $ref: '#/components/schemas/ServiceException'
 components:
   schemas:
-    ScheduleFileParam:
-      required:
-      - applications
-      - marketParticipants
-      - marketStage
-      - marketStatus
-      - region
-      type: object
-      properties:
-        region:
-          type: string
-        marketParticipants:
-          type: array
-          items:
-            type: string
-        marketStage:
-          type: string
-        marketStatus:
-          type: string
-        firstIntervalBegin:
-          type: string
-          format: date-time
-        lastIntervalEnd:
-          type: string
-          format: date-time
-        applications:
-          type: array
-          items:
-            type: string
-        format:
-          type: string
-          enum:
-          - xml
-          - csv
-      xml:
-        name: ParameterSet
-    DownloadFileDescriptor:
+    UploadFileDescription:
       required:
       - fileType
-      - latestVersionOnly
+      - location
       - participant
-      - region
       - rendition
       - source
       type: object
       properties:
-        region:
+        location:
           type: string
-          description: 'ISO code '
+          description: Location associated with the file. Generally refers to the ISO or region
         participant:
           type: string
           description: APX MarketSuite participant code
+        intervalBegin:
+          type: string
+          description: DateTime value of interval_begin that was specified when the file was uploaded or otherwise registered. This is not necessarily true for the content of the file.
+          format: date-time
+        intervalEnd:
+          type: string
+          description: Datetime value of interval_end that was specified when the file was uploaded or otherwise registered. This is not necessarily true for the content of the file
+          format: date-time
         fileType:
           type: string
           description: APX MarketSuite File Type Name
         source:
           type: string
-          description: Data source system
+          description: Data source system.
         rendition:
           type: string
           description: Type of data in the file, such as DA or RT
-        latestVersionOnly:
-          type: boolean
-          description: Flag indicating whether or not to list the most recent version of a file.  True means list the most recent version only.  False means list all versions.  The default is true.
+      description: UploadFileDescription
     MultiRequest:
       type: object
       properties:
@@ -357,6 +326,46 @@ components:
         file:
           type: string
           format: binary
+    FileItem:
+      type: object
+      properties:
+        location:
+          type: string
+          description: Location associated with the file. Generally refers to the ISO or region
+        participant:
+          type: string
+          description: APX MarketSuite participant code
+        intervalBegin:
+          type: string
+          description: DateTime value of interval_begin that was specified when the file was uploaded or otherwise registered. This is not necessarily true for the content of the file. Format - yyyy-mm-ddThh:mm:ss
+        intervalEnd:
+          type: string
+          description: Datetime value of interval_end that was specified when the file was uploaded or otherwise registered. This is not necessarily true for the content of the file. Format - yyyy-mm-ddThh:mm:ss
+        source:
+          type: string
+          description: Data source system
+        rendition:
+          type: string
+          description: Type of data in the file, such as DA or RT
+        fileType:
+          type: string
+          description: APX MarketSuite File Type Name
+        fileVersion:
+          type: integer
+          description: Version of the file instance within the APX MarketSuite for the same business keys
+          format: int32
+        fileStructureVersion:
+          type: number
+          description: The version of the structure of the file
+        fileFormat:
+          type: string
+          description: The format of the file (CSV, XML, etc.)
+        fileHandle:
+          type: string
+          description: Unique identifier for the file within the APX MarketSuite
+        createDate:
+          type: string
+          description: Datetime the file was created in the APX MarketSuite
     ServiceException:
       type: object
       properties:
@@ -551,79 +560,70 @@ components:
                 type: string
               localizedMessage:
                 type: string
-    UploadFileDescription:
+    DownloadFileDescriptor:
       required:
       - fileType
-      - location
+      - latestVersionOnly
       - participant
+      - region
       - rendition
       - source
       type: object
       properties:
-        location:
+        region:
           type: string
-          description: Location associated with the file. Generally refers to the ISO or region
+          description: 'ISO code '
         participant:
           type: string
           description: APX MarketSuite participant code
-        intervalBegin:
-          type: string
-          description: DateTime value of interval_begin that was specified when the file was uploaded or otherwise registered. This is not necessarily true for the content of the file.
-          format: date-time
-        intervalEnd:
-          type: string
-          description: Datetime value of interval_end that was specified when the file was uploaded or otherwise registered. This is not necessarily true for the content of the file
-          format: date-time
         fileType:
           type: string
           description: APX MarketSuite File Type Name
-        source:
-          type: string
-          description: Data source system.
-        rendition:
-          type: string
-          description: Type of data in the file, such as DA or RT
-      description: UploadFileDescription
-    FileItem:
-      type: object
-      properties:
-        location:
-          type: string
-          description: Location associated with the file. Generally refers to the ISO or region
-        participant:
-          type: string
-          description: APX MarketSuite participant code
-        intervalBegin:
-          type: string
-          description: DateTime value of interval_begin that was specified when the file was uploaded or otherwise registered. This is not necessarily true for the content of the file. Format - yyyy-mm-ddThh:mm:ss
-        intervalEnd:
-          type: string
-          description: Datetime value of interval_end that was specified when the file was uploaded or otherwise registered. This is not necessarily true for the content of the file. Format - yyyy-mm-ddThh:mm:ss
         source:
           type: string
           description: Data source system
         rendition:
           type: string
           description: Type of data in the file, such as DA or RT
-        fileType:
+        latestVersionOnly:
+          type: boolean
+          description: Flag indicating whether or not to list the most recent version of a file.  True means list the most recent version only.  False means list all versions.  The default is true.
+    ScheduleFileParam:
+      required:
+      - applications
+      - marketParticipants
+      - marketStage
+      - marketStatus
+      - region
+      type: object
+      properties:
+        region:
           type: string
-          description: APX MarketSuite File Type Name
-        fileVersion:
-          type: integer
-          description: Version of the file instance within the APX MarketSuite for the same business keys
-          format: int32
-        fileStructureVersion:
-          type: number
-          description: The version of the structure of the file
-        fileFormat:
+        marketParticipants:
+          type: array
+          items:
+            type: string
+        marketStage:
           type: string
-          description: The format of the file (CSV, XML, etc.)
-        fileHandle:
+        marketStatus:
           type: string
-          description: Unique identifier for the file within the APX MarketSuite
-        createDate:
+        firstIntervalBegin:
           type: string
-          description: Datetime the file was created in the APX MarketSuite
+          format: date-time
+        lastIntervalEnd:
+          type: string
+          format: date-time
+        applications:
+          type: array
+          items:
+            type: string
+        format:
+          type: string
+          enum:
+          - xml
+          - csv
+      xml:
+        name: ParameterSet
   securitySchemes:
     basicScheme:
       type: http

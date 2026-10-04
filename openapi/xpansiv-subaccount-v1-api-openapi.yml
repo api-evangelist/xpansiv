@@ -154,15 +154,18 @@ paths:
                 $ref: '#/components/schemas/GeneralError'
 components:
   schemas:
-    Subaccounts:
+    ReferenceDatum:
+      required:
+      - code
       type: object
       properties:
-        subaccounts:
-          type: array
-          description: Subaccounts
-          items:
-            $ref: '#/components/schemas/Subaccount'
-      description: Subaccounts
+        code:
+          type: string
+          description: The reference data's value.
+        name:
+          type: string
+          description: The reference data's name
+      description: A reference datum data object
     ExternalPlatform:
       type: object
       properties:
@@ -183,6 +186,42 @@ components:
         metadataConfig:
           type: string
           description: Metadata configuration (JSON) for additional fields required by the External Platform.
+    GeneralError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
+    AbstractRestError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
+    ErrorContainer:
+      type: object
+      properties:
+        submissionId:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+    Subaccounts:
+      type: object
+      properties:
+        subaccounts:
+          type: array
+          description: Subaccounts
+          items:
+            $ref: '#/components/schemas/Subaccount'
+      description: Subaccounts
     Account:
       type: object
       properties:
@@ -199,15 +238,6 @@ components:
           description: The Account Operating Name on the registry.
           example: APXOPCAR Project Manager
       description: Account record
-    AbstractRestError:
-      type: object
-      properties:
-        code:
-          type: string
-        ticket:
-          type: string
-        message:
-          type: string
     ErrorItem:
       type: object
       properties:
@@ -220,15 +250,6 @@ components:
         field:
           type: string
         code:
-          type: string
-        message:
-          type: string
-    GeneralError:
-      type: object
-      properties:
-        code:
-          type: string
-        ticket:
           type: string
         message:
           type: string
@@ -289,24 +310,3 @@ components:
           readOnly: true
           example: true
       description: This class contains caller-visible set of sub-accounts for either the calling account or the account identified by onBehalfOfSrcAcctId
-    ErrorContainer:
-      type: object
-      properties:
-        submissionId:
-          type: string
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ErrorItem'
-    ReferenceDatum:
-      required:
-      - code
-      type: object
-      properties:
-        code:
-          type: string
-          description: The reference data's value.
-        name:
-          type: string
-          description: The reference data's name
-      description: A reference datum data object

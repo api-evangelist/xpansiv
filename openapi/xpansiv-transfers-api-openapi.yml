@@ -514,23 +514,12 @@ paths:
           $ref: '#/components/responses/500'
 components:
   schemas:
-    StateEligibility:
-      type: object
-      description: Object to hold full state eligibility information - type of eligibility, extendable with other information
+    InstrumentMarket:
       properties:
-        name:
-          type: string
-          description: Name of the state eligibility.
-        type:
-          $ref: '#/components/schemas/Ref.StateEligibilityType'
-        stateIdentifier:
-          type: string
-          description: This is the identifier of the eligibility from the registry
-    NotAuthorizedError:
-      type: object
-      properties:
-        message:
-          type: string
+        market:
+          $ref: '#/components/schemas/Market'
+        marketModelInstrument:
+          $ref: '#/components/schemas/MarketModelInstrument'
     Market:
       properties:
         name:
@@ -547,120 +536,18 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Ref.Program'
-    Ref.ProjectStatus:
-      type: string
-      description: Ref.Data.PROJECT_STATUS
-    CarbonInstrument:
-      allOf:
-      - $ref: '#/components/schemas/BaseInstrument'
-      - type: object
-        required:
-        - project
-        properties:
-          serialNumber:
-            type: string
-          issuanceCertifications:
-            type: array
-            description: Optional property. Use `include` param.
-            items:
-              $ref: '#/components/schemas/IssuanceCertification'
-          projectCertifications:
-            type: array
-            description: Optional property. Use `include` param.
-            items:
-              $ref: '#/components/schemas/ProjectCertification'
-          reportingPeriodStart:
-            type: string
-            format: date-time
-            description: Reporting period start date.
-          reportingPeriodEnd:
-            type: string
-            format: date-time
-            description: Reporting period end date.
-          project:
-            $ref: '#/components/schemas/Project'
-    Ref.FuelType:
-      type: string
-      description: Ref.Data.REC_FUEL_TYPE
-    IssuanceCertification:
+    Location:
+      title: Resource location
       type: object
       properties:
-        code:
-          $ref: '#/components/schemas/Ref.Certification'
-        vintageYears:
-          type: array
-          description: Vintage years.
-          items:
-            type: integer
-            format: int32
-    Page:
-      type: object
-      required:
-      - page
-      - size
-      - totalPages
-      - totalElements
-      properties:
-        page:
-          type: integer
-          format: int32
-        size:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-        totalElements:
-          type: integer
-          format: int64
-    Resource:
-      type: object
-      required:
-      - name
-      properties:
-        id:
-          type: integer
-          format: int64
-          description: The unique XC db identifier for the project or generator.
-        upn:
-          type: string
-          description: 'Universal Project Identifier. The unique identifier assigned by Xpansiv Connect to every resource across all registries that  have integrated with the Xpansiv Connect platform.
-
-            '
-        name:
-          type: string
-          description: The registry assigned name of the project or generator.
-    RecInstrument:
-      allOf:
-      - $ref: '#/components/schemas/BaseInstrument'
-      - type: object
-        required:
-        - generator
-        properties:
-          fuelType:
-            $ref: '#/components/schemas/FuelType'
-          stateEligibilities:
-            type: array
-            description: Optional property. Use `include` param.
-            items:
-              type: object
-              description: Object to hold full state eligibility information - type of eligibility and name
-              properties:
-                name:
-                  type: string
-                  description: Name of the state eligibility.
-                type:
-                  $ref: '#/components/schemas/Ref.StateEligibilityType'
-          voluntaryEligibilities:
-            type: array
-            description: Optional property. Use `include` param.
-            items:
-              $ref: '#/components/schemas/VoluntaryEligibility'
-          generator:
-            $ref: '#/components/schemas/Generator'
-    Ref.RecProgram:
-      type: string
-      description: Ref.Data.REC_PROGRAM
+        latitude:
+          type: number
+          format: double
+          description: Latitude.
+        longitude:
+          type: number
+          format: double
+          description: Longitude.
     Project:
       allOf:
       - $ref: '#/components/schemas/Resource'
@@ -738,163 +625,30 @@ components:
             description: Optional property. Use `include` param.
             items:
               $ref: '#/components/schemas/IssuanceCertification'
-    Ref.BaselineMethodology:
-      type: string
-      description: Ref.Data.BASELINE_METHODOLOGY
-    BaseInstrument:
-      type: object
-      required:
-      - type
-      - ein
-      - program
-      - vintage
-      - creditType
-      properties:
-        type:
-          $ref: '#/components/schemas/Ref.InstrumentType'
-        id:
-          type: integer
-          format: int64
-          description: Unique Xpansiv Connect identifier.
-        ein:
-          type: string
-          description: 'Environment Instrument Number. Unique identifier associated with an issuance of credits from a given project,  vintage, technology/fuel type and associated certification(s)/eligibility(s). An EIN is associated with a  position and a position will never be associated with more than 1 EIN.
-
-            '
-        description:
-          type: string
-          description: 'The Xpansiv Connect description associated with the instrument providing information regarding location,  vintage, fuel type and certifications.
-
-            '
-        program:
-          $ref: '#/components/schemas/Ref.Program'
-        vintage:
-          $ref: '#/components/schemas/Vintage'
-        markets:
-          type: array
-          description: Optional property. Use `include` param.
-          items:
-            $ref: '#/components/schemas/InstrumentMarket'
-        creditType:
-          type: string
-          description: The type of the credit.
-      discriminator:
-        propertyName: type
-        mapping:
-          CARBON: '#/components/schemas/CarbonInstrument'
-          REC: '#/components/schemas/RecInstrument'
-          RESOURCE_PROJECT: '#/components/schemas/ResourceInstrument'
-    TransferDataStrategy:
-      type: object
-      required:
-      - transferDataType
-      - taxLotSelectionStrategy
-      - quantity
-      properties:
-        transferDataType:
-          type: string
-          default: STRATEGY
-        taxLotSelectionStrategy:
-          $ref: '#/components/schemas/Ref.TaxLotSelectionStrategy'
-        quantity:
-          type: integer
-          format: int64
-          minimum: 1
-    Ref.Country:
-      type: string
-      description: Ref.Data.COUNTRY
-    Ref.ResourceOutType:
-      type: string
-      description: Ref.Data.RESOURCE_OUTPUT_TYPE
-    Price:
-      type: object
-      required:
-      - currency
-      - amount
-      properties:
-        currency:
-          $ref: '#/components/schemas/Ref.Currency'
-        amount:
-          type: number
-          description: The numeric value of the price
-          minimum: 0
-    Ref.TaxLotSelectionStrategy:
-      type: string
-      description: Ref.Data.TAX_LOT_SELECTION_STRATEGY
-    Ref.TransferType:
-      type: string
-      description: Ref.Data.TRANSFER_ACTION_TYPE
     Ref.ProjectType:
       type: string
       description: The project type. Ref.Data.CARBON_PROJECT_TYPE
-    Ref.ResourceInType:
+    Ref.RegistryTransferStatus:
       type: string
-      description: Ref.Data.RESOURCE_INPUT_TYPE
+      description: Ref.Data.TRANSFER_REGISTRY_STATUS
+    Ref.ResourceProjectStatus:
+      type: string
+      description: Ref.Data.RESOURCE_PROJECT_STATUS
+    Ref.Program:
+      type: string
+      description: Ref.Data.PROGRAM
     Instrument:
       oneOf:
       - $ref: '#/components/schemas/CarbonInstrument'
       - $ref: '#/components/schemas/RecInstrument'
       - $ref: '#/components/schemas/ResourceInstrument'
-    Ref.Program:
-      type: string
-      description: Ref.Data.PROGRAM
-    Ref.Currency:
-      description: Ref.Data.CURRENCY
-      type: string
-      minLength: 3
-      example: USD
-    Vintage:
-      type: object
-      required:
-      - year
-      properties:
-        year:
-          type: integer
-          format: int32
-          description: Vintage year.
-        month:
-          type: integer
-          format: int32
-          description: Vintage month.
-    Ref.StateEligibilityType:
-      type: string
-      description: The type of the state eligibility. Ref.Data.REC_STATE_ELIGIBILITY
-    ResourceProject:
+    ChildResourceProject:
       allOf:
       - $ref: '#/components/schemas/Resource'
       - type: object
-        required:
-        - programs
         properties:
-          programs:
-            type: array
-            items:
-              type: object
-              title: ResourceProjectProgram
-              required:
-              - program
-              - registryAssignedId
-              properties:
-                program:
-                  $ref: '#/components/schemas/Ref.ResourceProgram'
-                programName:
-                  type: string
-                registryAssignedId:
-                  type: string
-          status:
-            $ref: '#/components/schemas/Ref.ResourceProjectStatus'
-          country:
-            $ref: '#/components/schemas/Ref.Country'
           accountName:
             type: string
-          classification1:
-            type: string
-          classification2:
-            type: string
-          classification3:
-            type: string
-          childResourceProject:
-            $ref: '#/components/schemas/ChildResourceProject'
           inOutTypes:
             type: array
             items:
@@ -907,60 +661,78 @@ components:
                   $ref: '#/components/schemas/Ref.ResourceInType'
                 outType:
                   $ref: '#/components/schemas/Ref.ResourceOutType'
-          typeName:
-            type: string
-    Ref.ResourceProgram:
-      type: string
-      description: Ref.Data.RESOURCE_PROGRAM
-    Ref.TransferStatus:
-      type: string
-      description: Ref.Data.TRANSFER_STATUS
-    FuelType:
-      type: object
-      properties:
-        name:
-          type: string
-          description: The fuel type associated with the underlying asset.
-        type:
-          $ref: '#/components/schemas/Ref.FuelType'
-        fuelSource:
-          type: string
-          description: The registry fuel source associated with the fuel type (registry-dependent).
-    InternalServerError:
-      type: object
-      properties:
-        message:
-          type: string
-    ResourceInstrument:
+          programs:
+            type: array
+            items:
+              type: object
+              title: ChildResourceProjectProgram
+              required:
+              - program
+              - registryAssignedId
+              properties:
+                program:
+                  $ref: '#/components/schemas/Ref.ResourceProgram'
+                programName:
+                  type: string
+                registryAssignedId:
+                  type: string
+    RecInstrument:
       allOf:
       - $ref: '#/components/schemas/BaseInstrument'
       - type: object
         required:
-        - resourceProject
+        - generator
         properties:
-          serialNumber:
-            type: string
-          inType:
-            $ref: '#/components/schemas/Ref.ResourceInType'
-          outType:
-            $ref: '#/components/schemas/Ref.ResourceOutType'
-          resourceProject:
-            $ref: '#/components/schemas/ResourceProject'
-    MarketModelInstrument:
+          fuelType:
+            $ref: '#/components/schemas/FuelType'
+          stateEligibilities:
+            type: array
+            description: Optional property. Use `include` param.
+            items:
+              type: object
+              description: Object to hold full state eligibility information - type of eligibility and name
+              properties:
+                name:
+                  type: string
+                  description: Name of the state eligibility.
+                type:
+                  $ref: '#/components/schemas/Ref.StateEligibilityType'
+          voluntaryEligibilities:
+            type: array
+            description: Optional property. Use `include` param.
+            items:
+              $ref: '#/components/schemas/VoluntaryEligibility'
+          generator:
+            $ref: '#/components/schemas/Generator'
+    ProjectCertification:
+      type: object
       properties:
-        ein:
-          type: string
-          description: 'Environment Instrument Number. Unique identifier associated with an issuance of credits from a given project,  vintage, technology/fuel type and associated certification(s)/eligibility(s).  An EIN is associated with a position and a position will never be associated with more than 1 EIN.
-
-            '
-        description:
-          type: string
-          description: Description.
-        price:
-          $ref: '#/components/schemas/MarketModelInstrumentPrice'
-    Ref.ProjectRegistryStatus:
+        code:
+          $ref: '#/components/schemas/Ref.Certification'
+        projectCertificationDateRanges:
+          type: array
+          items:
+            type: object
+            properties:
+              certificationStart:
+                type: string
+                format: date-time
+                description: The project certification start date.
+              certificationEnd:
+                type: string
+                format: date-time
+                description: The project certification end date.
+    Ref.CreditType:
       type: string
-      description: The registry status of the project. Ref.Data.PROJECT_REGISTRY_STATUS
+      description: The type of the credit. Ref.Data.CARBON_CREDIT_TYPE
+    Ref.StateEligibilityType:
+      type: string
+      description: The type of the state eligibility. Ref.Data.REC_STATE_ELIGIBILITY
+    Ref.Currency:
+      description: Ref.Data.CURRENCY
+      type: string
+      minLength: 3
+      example: USD
     TaxLot:
       type: object
       description: A Tax Lot represents the incoming activity that resulted in the creation or increase of a position against an EIN. The types of activities represented by Tax Lots are; imported positions (at account linking); incoming settled bilateral transfers; or credit issuance. Tax Lot is associated with a Position, where 1 or more Tax Lots make up the available quantity for a single Position
@@ -1012,9 +784,113 @@ components:
         dealId:
           type: string
           description: A deal Identifier as provided by the XC client for this position if associated with a forward deal delivery. Optional property. Use `include` param.
-    Ref.CarbonProgram:
+    Ref.TransferStatus:
       type: string
-      description: Ref.Data.CARBON_PROGRAM
+      description: Ref.Data.TRANSFER_STATUS
+    VoluntaryEligibility:
+      type: object
+      description: Object to hold full voluntary eligibility information - type of eligibility, effective date, expiration, extendable with other information
+      properties:
+        name:
+          type: string
+          description: The name of the registry voluntary eligibility.
+        type:
+          $ref: '#/components/schemas/Ref.VoluntaryEligibilityType'
+        effectiveDate:
+          type: string
+          format: date-time
+          description: The effective date of the eligibility.
+        expirationDate:
+          type: string
+          format: date-time
+          description: the expiration date of the eligibility.
+    Vintage:
+      type: object
+      required:
+      - year
+      properties:
+        year:
+          type: integer
+          format: int32
+          description: Vintage year.
+        month:
+          type: integer
+          format: int32
+          description: Vintage month.
+    IssuanceCertification:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/Ref.Certification'
+        vintageYears:
+          type: array
+          description: Vintage years.
+          items:
+            type: integer
+            format: int32
+    Resource:
+      type: object
+      required:
+      - name
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: The unique XC db identifier for the project or generator.
+        upn:
+          type: string
+          description: 'Universal Project Identifier. The unique identifier assigned by Xpansiv Connect to every resource across all registries that  have integrated with the Xpansiv Connect platform.
+
+            '
+        name:
+          type: string
+          description: The registry assigned name of the project or generator.
+    Ref.FuelType:
+      type: string
+      description: Ref.Data.REC_FUEL_TYPE
+    Ref.ProjectRegistryStatus:
+      type: string
+      description: The registry status of the project. Ref.Data.PROJECT_REGISTRY_STATUS
+    Page:
+      type: object
+      required:
+      - page
+      - size
+      - totalPages
+      - totalElements
+      properties:
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+    Ref.ResourceProgram:
+      type: string
+      description: Ref.Data.RESOURCE_PROGRAM
+    Ref.ExecutionVenue:
+      type: string
+      description: Ref.Data.EXECUTION_VENUE
+    FuelType:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The fuel type associated with the underlying asset.
+        type:
+          $ref: '#/components/schemas/Ref.FuelType'
+        fuelSource:
+          type: string
+          description: The registry fuel source associated with the fuel type (registry-dependent).
+    Ref.BaselineMethodology:
+      type: string
+      description: Ref.Data.BASELINE_METHODOLOGY
     Generator:
       allOf:
       - $ref: '#/components/schemas/Resource'
@@ -1093,45 +969,24 @@ components:
                   type: array
                   items:
                     $ref: '#/components/schemas/VoluntaryEligibility'
-    Ref.StateProvince:
+    Ref.TaxLotSelectionStrategy:
       type: string
-      description: Ref.Data.STATE_PROVINCE
-    InstrumentMarket:
+      description: Ref.Data.TAX_LOT_SELECTION_STRATEGY
+    MarketModelInstrumentPrice:
       properties:
-        market:
-          $ref: '#/components/schemas/Market'
-        marketModelInstrument:
-          $ref: '#/components/schemas/MarketModelInstrument'
-    ProjectCertification:
-      type: object
-      properties:
-        code:
-          $ref: '#/components/schemas/Ref.Certification'
-        projectCertificationDateRanges:
-          type: array
-          items:
-            type: object
-            properties:
-              certificationStart:
-                type: string
-                format: date-time
-                description: The project certification start date.
-              certificationEnd:
-                type: string
-                format: date-time
-                description: The project certification end date.
-    Ref.VoluntaryEligibilityType:
+        amount:
+          type: number
+          format: double
+          description: Amount.
+        currency:
+          $ref: '#/components/schemas/Ref.Currency'
+        lastUpdatedDate:
+          type: string
+          format: date-time
+          description: Last updated date-time.
+    Ref.RecProgram:
       type: string
-      description: The type of the voluntary eligibility. Ref.Data.REC_VOLUNTARY_ELIGIBILITY
-    Ref.CreditType:
-      type: string
-      description: The type of the credit. Ref.Data.CARBON_CREDIT_TYPE
-    Ref.RegistryTransferPurpose:
-      type: string
-      description: Ref.Data.PJM_TRANSFER_PURPOSE
-    Ref.ExecutionVenue:
-      type: string
-      description: Ref.Data.EXECUTION_VENUE
+      description: Ref.Data.REC_PROGRAM
     TransferDataTaxLots:
       type: object
       title: TransferDataTaxLots
@@ -1157,69 +1012,149 @@ components:
                 type: integer
                 format: int64
                 minimum: 1
-    Ref.GeneratorStatus:
-      type: string
-      description: The status of the generator in the registry. Ref.Data.GENERATOR_STATUS
-    Ref.RegistryTransferStatus:
-      type: string
-      description: Ref.Data.TRANSFER_REGISTRY_STATUS
-    VoluntaryEligibility:
+    NotAuthorizedError:
       type: object
-      description: Object to hold full voluntary eligibility information - type of eligibility, effective date, expiration, extendable with other information
+      properties:
+        message:
+          type: string
+    Ref.ProjectStatus:
+      type: string
+      description: Ref.Data.PROJECT_STATUS
+    Ref.StateProvince:
+      type: string
+      description: Ref.Data.STATE_PROVINCE
+    Ref.CarbonProgram:
+      type: string
+      description: Ref.Data.CARBON_PROGRAM
+    StateEligibility:
+      type: object
+      description: Object to hold full state eligibility information - type of eligibility, extendable with other information
       properties:
         name:
           type: string
-          description: The name of the registry voluntary eligibility.
+          description: Name of the state eligibility.
         type:
-          $ref: '#/components/schemas/Ref.VoluntaryEligibilityType'
-        effectiveDate:
+          $ref: '#/components/schemas/Ref.StateEligibilityType'
+        stateIdentifier:
           type: string
-          format: date-time
-          description: The effective date of the eligibility.
-        expirationDate:
+          description: This is the identifier of the eligibility from the registry
+    TransferDataStrategy:
+      type: object
+      required:
+      - transferDataType
+      - taxLotSelectionStrategy
+      - quantity
+      properties:
+        transferDataType:
           type: string
-          format: date-time
-          description: the expiration date of the eligibility.
+          default: STRATEGY
+        taxLotSelectionStrategy:
+          $ref: '#/components/schemas/Ref.TaxLotSelectionStrategy'
+        quantity:
+          type: integer
+          format: int64
+          minimum: 1
+    MarketModelInstrument:
+      properties:
+        ein:
+          type: string
+          description: 'Environment Instrument Number. Unique identifier associated with an issuance of credits from a given project,  vintage, technology/fuel type and associated certification(s)/eligibility(s).  An EIN is associated with a position and a position will never be associated with more than 1 EIN.
+
+            '
+        description:
+          type: string
+          description: Description.
+        price:
+          $ref: '#/components/schemas/MarketModelInstrumentPrice'
+    Ref.TransferType:
+      type: string
+      description: Ref.Data.TRANSFER_ACTION_TYPE
+    Ref.VoluntaryEligibilityType:
+      type: string
+      description: The type of the voluntary eligibility. Ref.Data.REC_VOLUNTARY_ELIGIBILITY
+    Ref.Country:
+      type: string
+      description: Ref.Data.COUNTRY
     Ref.InstrumentType:
       type: string
       description: REC or CARBON. Ref.Data.INSTRUMENT_TYPE
-    MarketModelInstrumentPrice:
+    Ref.ResourceOutType:
+      type: string
+      description: Ref.Data.RESOURCE_OUTPUT_TYPE
+    Price:
+      type: object
+      required:
+      - currency
+      - amount
       properties:
-        amount:
-          type: number
-          format: double
-          description: Amount.
         currency:
           $ref: '#/components/schemas/Ref.Currency'
-        lastUpdatedDate:
-          type: string
-          format: date-time
-          description: Last updated date-time.
-    Location:
-      title: Resource location
+        amount:
+          type: number
+          description: The numeric value of the price
+          minimum: 0
+    Ref.RegistryTransferPurpose:
+      type: string
+      description: Ref.Data.PJM_TRANSFER_PURPOSE
+    ResourceInstrument:
+      allOf:
+      - $ref: '#/components/schemas/BaseInstrument'
+      - type: object
+        required:
+        - resourceProject
+        properties:
+          serialNumber:
+            type: string
+          inType:
+            $ref: '#/components/schemas/Ref.ResourceInType'
+          outType:
+            $ref: '#/components/schemas/Ref.ResourceOutType'
+          resourceProject:
+            $ref: '#/components/schemas/ResourceProject'
+    InternalServerError:
       type: object
       properties:
-        latitude:
-          type: number
-          format: double
-          description: Latitude.
-        longitude:
-          type: number
-          format: double
-          description: Longitude.
+        message:
+          type: string
     Ref.Certification:
       type: string
       description: Certification code. Ref.Data.CARBON_CERTIFICATION
-    Ref.ResourceProjectStatus:
-      type: string
-      description: Ref.Data.RESOURCE_PROJECT_STATUS
-    ChildResourceProject:
+    ResourceProject:
       allOf:
       - $ref: '#/components/schemas/Resource'
       - type: object
+        required:
+        - programs
         properties:
+          programs:
+            type: array
+            items:
+              type: object
+              title: ResourceProjectProgram
+              required:
+              - program
+              - registryAssignedId
+              properties:
+                program:
+                  $ref: '#/components/schemas/Ref.ResourceProgram'
+                programName:
+                  type: string
+                registryAssignedId:
+                  type: string
+          status:
+            $ref: '#/components/schemas/Ref.ResourceProjectStatus'
+          country:
+            $ref: '#/components/schemas/Ref.Country'
           accountName:
             type: string
+          classification1:
+            type: string
+          classification2:
+            type: string
+          classification3:
+            type: string
+          childResourceProject:
+            $ref: '#/components/schemas/ChildResourceProject'
           inOutTypes:
             type: array
             items:
@@ -1232,21 +1167,123 @@ components:
                   $ref: '#/components/schemas/Ref.ResourceInType'
                 outType:
                   $ref: '#/components/schemas/Ref.ResourceOutType'
-          programs:
+          typeName:
+            type: string
+    BaseInstrument:
+      type: object
+      required:
+      - type
+      - ein
+      - program
+      - vintage
+      - creditType
+      properties:
+        type:
+          $ref: '#/components/schemas/Ref.InstrumentType'
+        id:
+          type: integer
+          format: int64
+          description: Unique Xpansiv Connect identifier.
+        ein:
+          type: string
+          description: 'Environment Instrument Number. Unique identifier associated with an issuance of credits from a given project,  vintage, technology/fuel type and associated certification(s)/eligibility(s). An EIN is associated with a  position and a position will never be associated with more than 1 EIN.
+
+            '
+        description:
+          type: string
+          description: 'The Xpansiv Connect description associated with the instrument providing information regarding location,  vintage, fuel type and certifications.
+
+            '
+        program:
+          $ref: '#/components/schemas/Ref.Program'
+        vintage:
+          $ref: '#/components/schemas/Vintage'
+        markets:
+          type: array
+          description: Optional property. Use `include` param.
+          items:
+            $ref: '#/components/schemas/InstrumentMarket'
+        creditType:
+          type: string
+          description: The type of the credit.
+      discriminator:
+        propertyName: type
+        mapping:
+          CARBON: '#/components/schemas/CarbonInstrument'
+          REC: '#/components/schemas/RecInstrument'
+          RESOURCE_PROJECT: '#/components/schemas/ResourceInstrument'
+    Ref.GeneratorStatus:
+      type: string
+      description: The status of the generator in the registry. Ref.Data.GENERATOR_STATUS
+    Ref.ResourceInType:
+      type: string
+      description: Ref.Data.RESOURCE_INPUT_TYPE
+    CarbonInstrument:
+      allOf:
+      - $ref: '#/components/schemas/BaseInstrument'
+      - type: object
+        required:
+        - project
+        properties:
+          serialNumber:
+            type: string
+          issuanceCertifications:
             type: array
+            description: Optional property. Use `include` param.
             items:
-              type: object
-              title: ChildResourceProjectProgram
-              required:
-              - program
-              - registryAssignedId
-              properties:
-                program:
-                  $ref: '#/components/schemas/Ref.ResourceProgram'
-                programName:
-                  type: string
-                registryAssignedId:
-                  type: string
+              $ref: '#/components/schemas/IssuanceCertification'
+          projectCertifications:
+            type: array
+            description: Optional property. Use `include` param.
+            items:
+              $ref: '#/components/schemas/ProjectCertification'
+          reportingPeriodStart:
+            type: string
+            format: date-time
+            description: Reporting period start date.
+          reportingPeriodEnd:
+            type: string
+            format: date-time
+            description: Reporting period end date.
+          project:
+            $ref: '#/components/schemas/Project'
+  parameters:
+    Include:
+      name: include
+      description: Comma-separated values from optional response fields
+      in: query
+      required: false
+      schema:
+        type: string
+    PageSize:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    PageNumber:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    AccountIdentifier:
+      description: Account identifier
+      name: AccountIdentifier
+      example: 098B0A25
+      in: path
+      required: true
+      schema:
+        type: string
+    ProgramCode:
+      name: ProgramCode
+      description: Any program code. Ref.Data.PROGRAM
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Ref.Program'
   responses:
     '401':
       description: Not authorized error
@@ -1260,43 +1297,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/InternalServerError'
-  parameters:
-    AccountIdentifier:
-      description: Account identifier
-      name: AccountIdentifier
-      example: 098B0A25
-      in: path
-      required: true
-      schema:
-        type: string
-    Include:
-      name: include
-      description: Comma-separated values from optional response fields
-      in: query
-      required: false
-      schema:
-        type: string
-    PageNumber:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        format: int32
-    ProgramCode:
-      name: ProgramCode
-      description: Any program code. Ref.Data.PROGRAM
-      in: path
-      required: true
-      schema:
-        $ref: '#/components/schemas/Ref.Program'
-    PageSize:
-      name: size
-      in: query
-      required: false
-      schema:
-        type: integer
-        format: int32
   securitySchemes:
     bearerToken:
       type: http
