@@ -79,6 +79,18 @@ paths:
                 $ref: '#/components/schemas/ServiceException'
 components:
   schemas:
+    ReportRequestParameters:
+      required:
+      - key
+      - value
+      type: object
+      properties:
+        key:
+          type: string
+          description: Name of the specific report parameter
+        value:
+          type: string
+          description: Value for the specific report parameter
     ServiceException:
       type: object
       properties:
@@ -273,18 +285,6 @@ components:
                 type: string
               localizedMessage:
                 type: string
-    ReportRequestParameters:
-      required:
-      - key
-      - value
-      type: object
-      properties:
-        key:
-          type: string
-          description: Name of the specific report parameter
-        value:
-          type: string
-          description: Value for the specific report parameter
   securitySchemes:
     basicScheme:
       type: http

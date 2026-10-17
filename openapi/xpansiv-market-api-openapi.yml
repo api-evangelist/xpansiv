@@ -123,6 +123,27 @@ paths:
                   type: object
 components:
   schemas:
+    MarketPricingListResponse:
+      description: Market pricing rows returned in the API envelope `data` field.
+      type: array
+      items:
+        $ref: '#/components/schemas/MarketPricingItem'
+    AuthError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 401 when API authentication is missing or invalid.
+            type: string
+            example: connection_failed
+          message:
+            type: string
+            example: Authentication error
+        type: object
     MarketPricingItem:
       description: One market pricing row in the API envelope `data` array for `searchMarket`.
       required:
@@ -148,27 +169,6 @@ components:
           format: float
           example: 6.5
       type: object
-    MarketPricingListResponse:
-      description: Market pricing rows returned in the API envelope `data` field.
-      type: array
-      items:
-        $ref: '#/components/schemas/MarketPricingItem'
-    AuthError:
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-      - properties:
-          error:
-            description: 401 when API authentication is missing or invalid.
-            type: string
-            example: connection_failed
-          message:
-            type: string
-            example: Authentication error
-        type: object
     ResponseEnvelope:
       description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
       required:

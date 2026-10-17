@@ -318,14 +318,6 @@ components:
           type: string
           description: Type of data in the file, such as DA or RT
       description: UploadFileDescription
-    MultiRequest:
-      type: object
-      properties:
-        uploadFileDescription:
-          $ref: '#/components/schemas/UploadFileDescription'
-        file:
-          type: string
-          format: binary
     FileItem:
       type: object
       properties:
@@ -560,34 +552,6 @@ components:
                 type: string
               localizedMessage:
                 type: string
-    DownloadFileDescriptor:
-      required:
-      - fileType
-      - latestVersionOnly
-      - participant
-      - region
-      - rendition
-      - source
-      type: object
-      properties:
-        region:
-          type: string
-          description: 'ISO code '
-        participant:
-          type: string
-          description: APX MarketSuite participant code
-        fileType:
-          type: string
-          description: APX MarketSuite File Type Name
-        source:
-          type: string
-          description: Data source system
-        rendition:
-          type: string
-          description: Type of data in the file, such as DA or RT
-        latestVersionOnly:
-          type: boolean
-          description: Flag indicating whether or not to list the most recent version of a file.  True means list the most recent version only.  False means list all versions.  The default is true.
     ScheduleFileParam:
       required:
       - applications
@@ -624,6 +588,42 @@ components:
           - csv
       xml:
         name: ParameterSet
+    MultiRequest:
+      type: object
+      properties:
+        uploadFileDescription:
+          $ref: '#/components/schemas/UploadFileDescription'
+        file:
+          type: string
+          format: binary
+    DownloadFileDescriptor:
+      required:
+      - fileType
+      - latestVersionOnly
+      - participant
+      - region
+      - rendition
+      - source
+      type: object
+      properties:
+        region:
+          type: string
+          description: 'ISO code '
+        participant:
+          type: string
+          description: APX MarketSuite participant code
+        fileType:
+          type: string
+          description: APX MarketSuite File Type Name
+        source:
+          type: string
+          description: Data source system
+        rendition:
+          type: string
+          description: Type of data in the file, such as DA or RT
+        latestVersionOnly:
+          type: boolean
+          description: Flag indicating whether or not to list the most recent version of a file.  True means list the most recent version only.  False means list all versions.  The default is true.
   securitySchemes:
     basicScheme:
       type: http

@@ -83,22 +83,45 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 components:
-  parameters:
-    PageNumber:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        format: int32
-    PageSize:
-      name: size
-      in: query
-      required: false
-      schema:
-        type: integer
-        format: int32
+  responses:
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerError'
+    '401':
+      description: Not authorized error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NotAuthorizedError'
   schemas:
+    Page:
+      type: object
+      required:
+      - page
+      - size
+      - totalPages
+      - totalElements
+      properties:
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
     AccountHolder:
       type: object
       required:
@@ -127,52 +150,29 @@ components:
         generatorAccount:
           type: boolean
           description: True/False.
+    Ref.Program:
+      type: string
+      description: Ref.Data.PROGRAM
     NotAuthorizedError:
       type: object
       properties:
         message:
           type: string
-    InternalServerError:
-      type: object
-      properties:
-        message:
-          type: string
-    Ref.Program:
-      type: string
-      description: Ref.Data.PROGRAM
-    Page:
-      type: object
-      required:
-      - page
-      - size
-      - totalPages
-      - totalElements
-      properties:
-        page:
-          type: integer
-          format: int32
-        size:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-        totalElements:
-          type: integer
-          format: int64
-  responses:
-    '401':
-      description: Not authorized error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/NotAuthorizedError'
-    '500':
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/InternalServerError'
+  parameters:
+    PageNumber:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    PageSize:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
   securitySchemes:
     bearerToken:
       type: http

@@ -87,6 +87,12 @@ paths:
       - Projects
 components:
   schemas:
+    Ref.CarbonProgram:
+      type: string
+      description: Ref.Data.CARBON_PROGRAM
+    Ref.ProjectType:
+      type: string
+      description: The project type. Ref.Data.CARBON_PROJECT_TYPE
     Location:
       title: Resource location
       type: object
@@ -99,6 +105,43 @@ components:
           type: number
           format: double
           description: Longitude.
+    Ref.Country:
+      type: string
+      description: Ref.Data.COUNTRY
+    Ref.ProjectRegistryStatus:
+      type: string
+      description: The registry status of the project. Ref.Data.PROJECT_REGISTRY_STATUS
+    Ref.ProjectStatus:
+      type: string
+      description: Ref.Data.PROJECT_STATUS
+    NotAuthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+    Ref.CreditType:
+      type: string
+      description: The type of the credit. Ref.Data.CARBON_CREDIT_TYPE
+    Page:
+      type: object
+      required:
+      - page
+      - size
+      - totalPages
+      - totalElements
+      properties:
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
     Project:
       allOf:
       - $ref: '#/components/schemas/Resource'
@@ -176,9 +219,9 @@ components:
             description: Optional property. Use `include` param.
             items:
               $ref: '#/components/schemas/IssuanceCertification'
-    Ref.ProjectType:
+    Ref.BaselineMethodology:
       type: string
-      description: The project type. Ref.Data.CARBON_PROJECT_TYPE
+      description: Ref.Data.BASELINE_METHODOLOGY
     ProjectCertification:
       type: object
       properties:
@@ -197,9 +240,6 @@ components:
                 type: string
                 format: date-time
                 description: The project certification end date.
-    Ref.CreditType:
-      type: string
-      description: The type of the credit. Ref.Data.CARBON_CREDIT_TYPE
     IssuanceCertification:
       type: object
       properties:
@@ -211,6 +251,14 @@ components:
           items:
             type: integer
             format: int32
+    InternalServerError:
+      type: object
+      properties:
+        message:
+          type: string
+    Ref.Certification:
+      type: string
+      description: Certification code. Ref.Data.CARBON_CERTIFICATION
     Resource:
       type: object
       required:
@@ -228,69 +276,7 @@ components:
         name:
           type: string
           description: The registry assigned name of the project or generator.
-    Ref.ProjectRegistryStatus:
-      type: string
-      description: The registry status of the project. Ref.Data.PROJECT_REGISTRY_STATUS
-    Page:
-      type: object
-      required:
-      - page
-      - size
-      - totalPages
-      - totalElements
-      properties:
-        page:
-          type: integer
-          format: int32
-        size:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-        totalElements:
-          type: integer
-          format: int64
-    Ref.BaselineMethodology:
-      type: string
-      description: Ref.Data.BASELINE_METHODOLOGY
-    NotAuthorizedError:
-      type: object
-      properties:
-        message:
-          type: string
-    Ref.ProjectStatus:
-      type: string
-      description: Ref.Data.PROJECT_STATUS
-    Ref.CarbonProgram:
-      type: string
-      description: Ref.Data.CARBON_PROGRAM
-    Ref.Country:
-      type: string
-      description: Ref.Data.COUNTRY
-    InternalServerError:
-      type: object
-      properties:
-        message:
-          type: string
-    Ref.Certification:
-      type: string
-      description: Certification code. Ref.Data.CARBON_CERTIFICATION
   parameters:
-    Include:
-      name: include
-      description: Comma-separated values from optional response fields
-      in: query
-      required: false
-      schema:
-        type: string
-    PageSize:
-      name: size
-      in: query
-      required: false
-      schema:
-        type: integer
-        format: int32
     PageNumber:
       name: page
       in: query
@@ -298,6 +284,20 @@ components:
       schema:
         type: integer
         format: int32
+    PageSize:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    Include:
+      name: include
+      description: Comma-separated values from optional response fields
+      in: query
+      required: false
+      schema:
+        type: string
   responses:
     '401':
       description: Not authorized error

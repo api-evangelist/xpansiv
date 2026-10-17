@@ -108,6 +108,11 @@ paths:
       - BearerAuth: []
 components:
   schemas:
+    BuildingTypesListResponse:
+      description: Building type rows returned in the API envelope `data` field.
+      type: array
+      items:
+        $ref: '#/components/schemas/BuildingTypeItem'
     ValidationError:
       description: 'Error payload for validation failures (400, 422) on request bodies and business rules.
 
@@ -126,59 +131,6 @@ components:
           type: object
           additionalProperties: true
       type: object
-    ServerError:
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-      - properties:
-          error:
-            description: 500 when an unexpected server or infrastructure failure occurs.
-            type: string
-            example: internal_error
-          message:
-            type: string
-            example: Error description
-        type: object
-    BuildingTypesListResponse:
-      description: Building type rows returned in the API envelope `data` field.
-      type: array
-      items:
-        $ref: '#/components/schemas/BuildingTypeItem'
-    BuildingTypeItem:
-      description: 'One building type row in the API envelope `data` array for `getBuildingTypes`.
-
-
-        Runtime: {@see \Building_type_lib::get_building_types()} — `id`, `name`.'
-      required:
-      - id
-      - name
-      properties:
-        id:
-          description: Primary key (`building_type_id`).
-          type: integer
-        name:
-          description: Display name (`building_type_name`).
-          type: string
-      type: object
-    AccessForbiddenError:
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-      - properties:
-          error:
-            description: 403 when the caller lacks permission for the requested account or resource.
-            type: string
-            example: access_forbidden
-          message:
-            type: string
-            example: You do not have permission to access this resource
-        type: object
     ResponseEnvelope:
       description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
       required:
@@ -230,6 +182,54 @@ components:
           type: string
           example: Error description
       type: object
+    BuildingTypeItem:
+      description: 'One building type row in the API envelope `data` array for `getBuildingTypes`.
+
+
+        Runtime: {@see \Building_type_lib::get_building_types()} — `id`, `name`.'
+      required:
+      - id
+      - name
+      properties:
+        id:
+          description: Primary key (`building_type_id`).
+          type: integer
+        name:
+          description: Display name (`building_type_name`).
+          type: string
+      type: object
+    ServerError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 500 when an unexpected server or infrastructure failure occurs.
+            type: string
+            example: internal_error
+          message:
+            type: string
+            example: Error description
+        type: object
+    AccessForbiddenError:
+      required:
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Error'
+      - properties:
+          error:
+            description: 403 when the caller lacks permission for the requested account or resource.
+            type: string
+            example: access_forbidden
+          message:
+            type: string
+            example: You do not have permission to access this resource
+        type: object
   securitySchemes:
     BearerAuth:
       type: http

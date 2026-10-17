@@ -328,15 +328,146 @@ components:
           example: 'naturalGeographyProgramCode": "GHG_MEASUREMENT_PROGRAM'
       description: A field within a 'cooked' form
       readOnly: true
-    ProgramAuditor:
+    ResourceInputOutputStream:
       type: object
       properties:
-        programAuditorIdentifier:
+        identifier:
           type: string
+          description: The Resource Input/Output Stream's unique system identifier
           format: uuid
-        legalEntity:
-          $ref: '#/components/schemas/LegalEntity'
-      description: A program auditor data object
+          example: f7923885-e840-11ee-936a-26ee6306d735
+        resourceInputOutputStreamType:
+          $ref: '#/components/schemas/ReferenceDatum'
+        streamIntervalType:
+          $ref: '#/components/schemas/ReferenceDatum'
+        intervalPeriodicity:
+          type: string
+        reportingEntityStreamIdentifier:
+          type: string
+          description: Reporting entity specific identifier for this Resource Input/Output stream
+        unitOfMeasure:
+          $ref: '#/components/schemas/ReferenceDatum'
+        readingProfileCode:
+          type: string
+          description: The code for the Meter Data Telemetry Service reading profile used to process readings for this stream
+        timeIntervals:
+          uniqueItems: true
+          type: array
+          description: A list of time intervals with Input/Output values
+          items:
+            $ref: '#/components/schemas/TimeInterval'
+        productIdentifier:
+          type: string
+          description: If applicable, the unique system identifier for a registered Product associated with the stream
+          format: uuid
+      description: A resource input/output stream data object
+    ResourceProcess:
+      type: object
+      properties:
+        selector:
+          type: string
+          description: Correlating identifier used when referencing this Resource Process from other parts of the resource model
+        identifier:
+          type: string
+          description: The Resource Process's unique system identifier
+          format: uuid
+        status:
+          $ref: '#/components/schemas/ReferenceDatum'
+        name:
+          type: string
+          description: Resource process's name
+        statusTransition:
+          type: string
+          description: Desired status transition for this ResourceProcess
+        viableStatusTransitions:
+          uniqueItems: true
+          type: array
+          description: A list of viable status transitions to specify when updating the Resource Process; based upon current status
+          items:
+            type: string
+            description: A list of viable status transitions to specify when updating the Resource Process; based upon current status
+        processType:
+          $ref: '#/components/schemas/ReferenceDatum'
+        protocols:
+          uniqueItems: true
+          type: array
+          description: A list of associated protocols
+          items:
+            $ref: '#/components/schemas/ResourceProcessProtocol'
+        inputOutputs:
+          uniqueItems: true
+          type: array
+          description: A list of resource inputs and outputs that are associated with this process
+          items:
+            $ref: '#/components/schemas/ResourceProcessInputOutput'
+      description: A resource process data object
+    ResourceParameterStream:
+      type: object
+      properties:
+        resourceParameterStreamType:
+          $ref: '#/components/schemas/ReferenceDatum'
+        timeIntervals:
+          uniqueItems: true
+          type: array
+          description: A list of time intervals with Parameter values
+          items:
+            $ref: '#/components/schemas/TimeInterval'
+        currentTimeInterval:
+          $ref: '#/components/schemas/TimeInterval'
+      description: A resource parameter stream data object
+    ReferenceDatum:
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: The code associated with this reference data entry
+        name:
+          type: string
+          description: The name associated with this reference data entry
+      description: A reference datum data object
+      example: '"code": "PROJECT_SITE"'
+    LegalEntityExtIdentifier:
+      type: object
+      properties:
+        identifierType:
+          $ref: '#/components/schemas/ReferenceDatum'
+        identifierValue:
+          type: string
+      description: Legal Entity External Identifier
+    ConditionalAuthorityStateCriteria:
+      type: object
+      properties:
+        or:
+          type: boolean
+        clauses:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConditionalAuthorityStateCriteriaClause'
+    ResourceProcessProtocol:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        status:
+          $ref: '#/components/schemas/ReferenceDatum'
+        statusTransition:
+          type: string
+        viableStatusTransitions:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        protocolVersion:
+          $ref: '#/components/schemas/CodeVersion'
+        programQualificationIdentifier:
+          type: string
+        effectiveAt:
+          type: string
+          format: date-time
+      description: A resource process protocol data object
     ExtEntityAndFormWithMetadataResource:
       type: object
       properties:
@@ -346,6 +477,164 @@ components:
           $ref: '#/components/schemas/CookedForm'
         uiCode:
           type: string
+    Address:
+      type: object
+      properties:
+        addressModelCode:
+          type: string
+          description: Code of the address model associated with this address
+          example: RESOURCE
+        countryIso2Code:
+          type: string
+          description: Country Code
+          example: US
+        countrySubdivisionCode:
+          type: string
+          description: State / Province code
+          example: US-NJ
+        countrySubdivisionName:
+          type: string
+          description: State / Province
+          example: New Jersey
+        identifier:
+          type: string
+          description: The Address record's system identifier.
+          example: f789fb82-e840-11ee-8492-5e76882005f5
+        municipality:
+          type: string
+          description: City / municipality
+          example: Basking Ridge
+        postalCode:
+          type: string
+          description: Postal Code
+          example: 07920
+        resourceIdentifier:
+          type: string
+          description: If applicable, the unique System identifier for the resource associated with this address.
+          example: 98b00f41-e840-11ee-936a-26ee6306d735
+        street:
+          type: string
+          description: The street address
+          example: 69 Patriot Hill Drive
+        suiteOfficeNumber:
+          type: string
+          description: The office or suite, if applicable.
+          example: Suite 1004
+      description: Address
+    ResourceProgramClassification:
+      type: object
+      properties:
+        classificationType:
+          $ref: '#/components/schemas/ReferenceDatum'
+        classification:
+          $ref: '#/components/schemas/ReferenceDatum'
+      description: A resource program classification data object
+    ResourceLinkage:
+      type: object
+      properties:
+        linkageModel:
+          $ref: '#/components/schemas/ReferenceDatum'
+        producingResourceInputOutput:
+          $ref: '#/components/schemas/Identifier'
+        consumingResourceInputOutput:
+          $ref: '#/components/schemas/Identifier'
+        status:
+          $ref: '#/components/schemas/ReferenceDatum'
+        statusTransition:
+          type: string
+          description: Desired status transition for this ResourceLinkage
+        viableStatusTransitions:
+          uniqueItems: true
+          type: array
+          description: A list of viable status transitions to specify when updating the Resource Linkage; based upon current status
+          items:
+            type: string
+            description: A list of viable status transitions to specify when updating the Resource Linkage; based upon current status
+      description: A resource linkage data object
+    ProgramAuditor:
+      type: object
+      properties:
+        programAuditorIdentifier:
+          type: string
+          format: uuid
+        legalEntity:
+          $ref: '#/components/schemas/LegalEntity'
+      description: A program auditor data object
+    FileUpload:
+      type: object
+      properties:
+        content:
+          type: string
+          format: byte
+        fileTypeCode:
+          type: string
+          description: Code of File Type associated with this file
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+            description: Metadata to accompany the file.
+          description: Metadata to accompany the file.
+        originalFileName:
+          type: string
+          description: Original filename associated with the file
+      description: If applicable, can be used to upload a new topology file, using the FileUpload schema
+    ConditionalAuthorityStateCriteriaClause:
+      type: object
+      properties:
+        field:
+          type: string
+        exclusive:
+          type: boolean
+        states:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+    Account:
+      type: object
+      properties:
+        srcAcctIdentifier:
+          type: string
+          description: The Account's ID as displayed in the registry
+        srcAcctId:
+          type: string
+          description: The Account's unique system-assigned identifier used for programmatic (API) interactions
+          example: 4edse581-b97a-11ef-ea69-b61606fd520c
+      description: Account record
+    ResourceSummary:
+      type: object
+      properties:
+        programAssignedIdentifier:
+          type: string
+          description: The Resource's program identifier; used on Registry's UI and Reporting
+          example: PLS1184
+        resourceIdentifier:
+          type: string
+          description: The Resource's unique system identifier; used for API calls
+          format: uuid
+          example: e0c7bdbf-3031-11ec-b9d4-de0f29bf6378
+        resourceName:
+          type: string
+          description: The Resource's supplied name; listed in Resource Reporting
+          example: Accum Resource Test
+        resourceTypeCode:
+          type: string
+          description: Code defining the type of Resource, as identified in the context of a specific program
+          example: ARC_GEN
+        resourceProgramStatusCode:
+          type: string
+          description: Code defining a specific resource's program status
+          example: INACTIVE
+        formCode:
+          type: string
+          description: Code defining the form used when viewing or updating the Resource via API. Form details available via /resource/:resourceId/form/:formCode
+          example: RMS_PLASTICS_M_PARENT_EDIT
+        uiFormCode:
+          type: string
+          description: Code defining the UI form used when viewing or updating the Resource via UI
+          example: RMS_PLASTICS_M_PARENT_EDIT_UI
+      description: Summary of a specific Resource
     ResourceProgram:
       type: object
       properties:
@@ -418,16 +707,6 @@ components:
           items:
             $ref: '#/components/schemas/ResourceProgramClassification'
       description: A resource program data object
-    KeyedCookedForm:
-      type: object
-      properties:
-        key:
-          type: string
-          description: Key field
-        form:
-          $ref: '#/components/schemas/CookedForm'
-      description: A keyed cooked form data object
-      readOnly: true
     ResourceProcessInputOutputProtocol:
       type: object
       properties:
@@ -453,79 +732,65 @@ components:
           type: string
           format: date-time
       description: A resource process input/output protocol data object
-    LegalEntityRoleProgram:
-      type: object
-      properties:
-        programVersion:
-          $ref: '#/components/schemas/CodeVersion'
-      description: Legal Entity Role Relationship to Program Version
-    ResourceProcessInputOutput:
+    ResourceParameter:
       type: object
       properties:
         id:
           type: integer
+          description: Unique id for the specific Resource Parameter
           format: int32
-        resourceInputOutput:
+        resourceParameterType:
+          $ref: '#/components/schemas/ReferenceDatum'
+        resourceProcess:
           $ref: '#/components/schemas/Selector'
-        allowAllProtocols:
-          type: boolean
-        protocols:
-          uniqueItems: true
+        streams:
           type: array
+          description: List of Resource Parameter streams and current values (within nested TimeInterval structure)
           items:
-            $ref: '#/components/schemas/ResourceProcessInputOutputProtocol'
-      description: A resource process input/output data object
-    ConditionalAuthorityStateCriteria:
+            $ref: '#/components/schemas/ResourceParameterStream'
+      description: A resource parameter data object
+    ExtEntityAndFormResource:
       type: object
       properties:
-        or:
-          type: boolean
-        clauses:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConditionalAuthorityStateCriteriaClause'
-    LegalEntity:
+        entity:
+          $ref: '#/components/schemas/Resource'
+        cookedFormMetadata:
+          $ref: '#/components/schemas/CookedForm'
+    LegalEntityRole:
       type: object
       properties:
-        adminNotes:
-          type: string
-        dbaName:
-          type: string
-        externalIdentifiers:
+        programs:
           type: array
           items:
-            $ref: '#/components/schemas/LegalEntityExtIdentifier'
-        globalParent:
-          type: boolean
-        identifier:
-          type: string
-        legalEntityNumber:
-          type: string
-        legalEntitySource:
+            $ref: '#/components/schemas/LegalEntityRoleProgram'
+        roleType:
           $ref: '#/components/schemas/ReferenceDatum'
-        legalEntityType:
-          $ref: '#/components/schemas/ReferenceDatum'
-        name:
-          type: string
-        naturalGeography:
-          $ref: '#/components/schemas/NaturalGeography'
-        parent:
-          $ref: '#/components/schemas/LegalEntity'
-        proposingSrcAcctId:
-          type: string
-        roles:
-          type: array
-          items:
-            $ref: '#/components/schemas/LegalEntityRole'
         status:
           $ref: '#/components/schemas/ReferenceDatum'
-        viableStatusTransitions:
-          type: array
-          items:
-            type: string
-        website:
+        statusEffectiveDate:
           type: string
-      description: Legal Entity
+          format: date-time
+      description: Legal Entity Role
+    KeyedCookedForm:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Key field
+        form:
+          $ref: '#/components/schemas/CookedForm'
+      description: A keyed cooked form data object
+      readOnly: true
+    ValidationError:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        parameter:
+          type: string
+        message:
+          type: string
     CookedForm:
       type: object
       properties:
@@ -563,50 +828,81 @@ components:
             $ref: '#/components/schemas/CookedFormHint'
       description: A form, including specific field details and hints/guidance, presented 'cooked' in the context of the caller/active user.
       readOnly: true
-    ConditionalAuthorityStateCriteriaClause:
+    ResourceProject:
       type: object
       properties:
-        field:
+        resourceProjectType:
+          $ref: '#/components/schemas/ReferenceDatum'
+        identifier:
           type: string
-        exclusive:
+          description: The resource's project unique system identifier
+          format: uuid
+          example: f79c4ab1-e840-11ee-936a-26ee6306d735
+        name:
+          type: string
+          description: The project's name
+          example: RMSAR_CYTest
+        projectBegin:
+          type: string
+          description: The date at which this project on the resource commenced
+          format: date-time
+        projectGoLive:
+          type: string
+          description: The project's Go-Live date
+          format: date-time
+          example: '2022-12-31T18:30:00Z'
+      description: A resource project data object
+    ResourceProponent:
+      type: object
+      properties:
+        legalEntityIdentifier:
+          type: string
+          description: The Legal Entity system identifier of the resource proponent. Proponents are not always associated with Accounts
+          format: uuid
+          example: 3a896df5-e840-11ee-90ea-2a6a898eb566
+        direct:
           type: boolean
-        states:
-          uniqueItems: true
-          type: array
-          items:
-            type: string
-    ResourceLinkage:
+          description: If "true", the Proponent is a "Direct" proponent
+          example: true
+      description: A resource proponent data object
+    ConditionalAuthorityCriteria:
       type: object
       properties:
-        linkageModel:
-          $ref: '#/components/schemas/ReferenceDatum'
-        producingResourceInputOutput:
-          $ref: '#/components/schemas/Identifier'
-        consumingResourceInputOutput:
-          $ref: '#/components/schemas/Identifier'
-        status:
-          $ref: '#/components/schemas/ReferenceDatum'
-        statusTransition:
+        state:
+          $ref: '#/components/schemas/ConditionalAuthorityStateCriteria'
+        predicateBean:
           type: string
-          description: Desired status transition for this ResourceLinkage
-        viableStatusTransitions:
-          uniqueItems: true
-          type: array
-          description: A list of viable status transitions to specify when updating the Resource Linkage; based upon current status
-          items:
-            type: string
-            description: A list of viable status transitions to specify when updating the Resource Linkage; based upon current status
-      description: A resource linkage data object
-    ValidationError:
+    CodeVersion:
+      required:
+      - code
+      - version
       type: object
       properties:
         code:
+          type: string
+          description: The code associated with this reference data entry
+        name:
+          type: string
+          description: The name associated with this reference data entry
+        version:
+          type: string
+          description: Version identifier associated with specific code
+      description: A code version data object
+    ResourceInputOutputClassification:
+      required:
+      - classification
+      - classificationType
+      type: object
+      properties:
+        id:
           type: integer
+          description: Internal identifier of the classification
           format: int32
-        parameter:
-          type: string
-        message:
-          type: string
+        classificationType:
+          $ref: '#/components/schemas/ReferenceDatum'
+        classification:
+          $ref: '#/components/schemas/ReferenceDatum'
+      description: A resource input/output classification data object
     CookedFormHint:
       type: object
       properties:
@@ -631,6 +927,176 @@ components:
           - IF_EMPTY
           - IF_ABSENT_OR_EMPTY
       description: A hint for a 'cooked' form
+      readOnly: true
+    TimeInterval:
+      required:
+      - intervalBegin
+      - intervalEnd
+      type: object
+      properties:
+        entityId:
+          type: integer
+          description: System identifier for Time Interval entry
+          format: int32
+        id:
+          type: integer
+          description: System identifier for Time Interval entry
+          format: int32
+        intervalBegin:
+          type: string
+          description: Timestamp denoting the start of the effective period of the Time Interval value
+          format: date-time
+          example: '2024-03-22T00:00:00-04:00'
+        intervalEnd:
+          type: string
+          description: Timestamp denoting the end of the effective period of the Time Interval value
+          format: date-time
+          example: '3000-01-01T00:00:00Z'
+        value:
+          type: number
+          description: Value associated with this specific Time Interval
+        status:
+          $ref: '#/components/schemas/ReferenceDatum'
+        statusTransition:
+          type: string
+          description: Desired status transition for this Time Interval
+        viableStatusTransitions:
+          uniqueItems: true
+          type: array
+          description: A list of viable status transitions to specify when updating the Time Interval; based upon current status
+          example: DELETE
+          items:
+            type: string
+            description: A list of viable status transitions to specify when updating the Time Interval; based upon current status
+            example: '"DELETE"'
+      description: An time interval data object
+    ResourceInputOutputProtocol:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/ReferenceDatum'
+        programVersion:
+          $ref: '#/components/schemas/CodeVersion'
+        protocolVersion:
+          $ref: '#/components/schemas/CodeVersion'
+        programAssignedIdentifier:
+          type: string
+          description: The program-assigned identifier for this Resource Input/Output to protocol relationship, as defined by the program
+          example: PLS1184
+        programQualificationIdentifier:
+          type: string
+          description: Program assigned qualification identifier for the specific protocol as related to a particular Resource Input / Output
+          example: AD56TY3
+        effectiveAt:
+          type: string
+          description: Effective timestamp for this Resource Input/Output to Protocol relationship
+          format: date-time
+        expiresAt:
+          type: string
+          description: Expiration timestamp for this Resource Input/Output to Protocol relationship
+          format: date-time
+      description: A resource input/output protocol data object
+    ResourceInputOutput:
+      type: object
+      properties:
+        selector:
+          type: string
+          description: Correlating identifier used when referencing this Resource Input/Output from other parts of the resource model
+          example: f791c353-e840-11ee-936a-26ee6306d735
+        identifier:
+          type: string
+          description: The Resource Input/Output's unique system identifier
+          format: uuid
+          example: f791c353-e840-11ee-936a-26ee6306d735
+        resourceInputOutputType:
+          $ref: '#/components/schemas/ReferenceDatum'
+        streams:
+          type: array
+          description: A list of Input/Output streams
+          items:
+            $ref: '#/components/schemas/ResourceInputOutputStream'
+        protocols:
+          type: array
+          description: Collection of protocols associated with this Resource Input/Output
+          items:
+            $ref: '#/components/schemas/ResourceInputOutputProtocol'
+        producingLinkages:
+          type: array
+          description: Linkages where this Resource Input/Output is a producer
+          items:
+            $ref: '#/components/schemas/ResourceLinkage'
+        consumingLinkages:
+          type: array
+          description: Linkages where this Resource Input/Output is a consumer
+          items:
+            $ref: '#/components/schemas/ResourceLinkage'
+        classifications:
+          uniqueItems: true
+          type: array
+          description: Collection of classifications associated with this Resource Input/Output
+          items:
+            $ref: '#/components/schemas/ResourceInputOutputClassification'
+      description: A resource input/output data object
+    Identifier:
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: A unique system-assigned identifier
+          format: uuid
+          example: f79a9cff-e840-11ee-936a-26ee6306d735
+      description: An identifier
+    LegalEntityRoleProgram:
+      type: object
+      properties:
+        programVersion:
+          $ref: '#/components/schemas/CodeVersion'
+      description: Legal Entity Role Relationship to Program Version
+    ConditionalAuthorityDefinition:
+      type: object
+      properties:
+        criteria:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConditionalAuthorityCriteria'
+        editAuthorities:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        viewAuthorities:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+      description: The conditional authorities for evaluating viewability and editability
+      readOnly: true
+    ResourceProcessInputOutput:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        resourceInputOutput:
+          $ref: '#/components/schemas/Selector'
+        allowAllProtocols:
+          type: boolean
+        protocols:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/ResourceProcessInputOutputProtocol'
+      description: A resource process input/output data object
+    CookedFormFieldAttribute:
+      type: object
+      properties:
+        conditionalAuthorities:
+          type: array
+          description: The conditional authorities for evaluating viewability and editability
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/ConditionalAuthorityDefinition'
+      description: A field within a 'cooked' form
       readOnly: true
     Resource:
       type: object
@@ -695,169 +1161,22 @@ components:
           items:
             $ref: '#/components/schemas/Resource'
       description: A resource data object; contains all resource information contained in the specified resource form
-    CookedFormFieldAttribute:
+    Selector:
       type: object
       properties:
-        conditionalAuthorities:
-          type: array
-          description: The conditional authorities for evaluating viewability and editability
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/ConditionalAuthorityDefinition'
-      description: A field within a 'cooked' form
-      readOnly: true
-    ExtEntityAndFormResource:
-      type: object
-      properties:
-        entity:
-          $ref: '#/components/schemas/Resource'
-        cookedFormMetadata:
-          $ref: '#/components/schemas/CookedForm'
-    ResourceProponent:
-      type: object
-      properties:
-        legalEntityIdentifier:
+        selectBy:
           type: string
-          description: The Legal Entity system identifier of the resource proponent. Proponents are not always associated with Accounts
-          format: uuid
-          example: 3a896df5-e840-11ee-90ea-2a6a898eb566
-        direct:
-          type: boolean
-          description: If "true", the Proponent is a "Direct" proponent
-          example: true
-      description: A resource proponent data object
-    ConditionalAuthorityDefinition:
-      type: object
-      properties:
-        criteria:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConditionalAuthorityCriteria'
-        editAuthorities:
-          uniqueItems: true
-          type: array
-          items:
-            type: string
-        viewAuthorities:
-          uniqueItems: true
-          type: array
-          items:
-            type: string
-      description: The conditional authorities for evaluating viewability and editability
-      readOnly: true
-    ResourceInputOutputClassification:
-      required:
-      - classification
-      - classificationType
-      type: object
-      properties:
-        id:
-          type: integer
-          description: Internal identifier of the classification
-          format: int32
-        classificationType:
-          $ref: '#/components/schemas/ReferenceDatum'
-        classification:
-          $ref: '#/components/schemas/ReferenceDatum'
-      description: A resource input/output classification data object
-    ReferenceDatum:
-      required:
-      - code
-      type: object
-      properties:
-        code:
-          type: string
-          description: The code associated with this reference data entry
-        name:
-          type: string
-          description: The name associated with this reference data entry
-      description: A reference datum data object
-      example: '"code": "PROJECT_SITE"'
-    Address:
-      type: object
-      properties:
-        addressModelCode:
-          type: string
-          description: Code of the address model associated with this address
-          example: RESOURCE
-        countryIso2Code:
-          type: string
-          description: Country Code
-          example: US
-        countrySubdivisionCode:
-          type: string
-          description: State / Province code
-          example: US-NJ
-        countrySubdivisionName:
-          type: string
-          description: State / Province
-          example: New Jersey
-        identifier:
-          type: string
-          description: The Address record's system identifier.
-          example: f789fb82-e840-11ee-8492-5e76882005f5
-        municipality:
-          type: string
-          description: City / municipality
-          example: Basking Ridge
-        postalCode:
-          type: string
-          description: Postal Code
-          example: 07920
-        resourceIdentifier:
-          type: string
-          description: If applicable, the unique System identifier for the resource associated with this address.
-          example: 98b00f41-e840-11ee-936a-26ee6306d735
-        street:
-          type: string
-          description: The street address
-          example: 69 Patriot Hill Drive
-        suiteOfficeNumber:
-          type: string
-          description: The office or suite, if applicable.
-          example: Suite 1004
-      description: Address
-    ResourceInputOutput:
-      type: object
-      properties:
+          description: Identifiies the type of selector
+          example: SELECTOR
+          enum:
+          - SELECTOR
+          - SINGLETON
+          - TYPE
         selector:
           type: string
-          description: Correlating identifier used when referencing this Resource Input/Output from other parts of the resource model
-          example: f791c353-e840-11ee-936a-26ee6306d735
-        identifier:
-          type: string
-          description: The Resource Input/Output's unique system identifier
-          format: uuid
-          example: f791c353-e840-11ee-936a-26ee6306d735
-        resourceInputOutputType:
-          $ref: '#/components/schemas/ReferenceDatum'
-        streams:
-          type: array
-          description: A list of Input/Output streams
-          items:
-            $ref: '#/components/schemas/ResourceInputOutputStream'
-        protocols:
-          type: array
-          description: Collection of protocols associated with this Resource Input/Output
-          items:
-            $ref: '#/components/schemas/ResourceInputOutputProtocol'
-        producingLinkages:
-          type: array
-          description: Linkages where this Resource Input/Output is a producer
-          items:
-            $ref: '#/components/schemas/ResourceLinkage'
-        consumingLinkages:
-          type: array
-          description: Linkages where this Resource Input/Output is a consumer
-          items:
-            $ref: '#/components/schemas/ResourceLinkage'
-        classifications:
-          uniqueItems: true
-          type: array
-          description: Collection of classifications associated with this Resource Input/Output
-          items:
-            $ref: '#/components/schemas/ResourceInputOutputClassification'
-      description: A resource input/output data object
+          description: The Selector's identifier
+          example: f792fbd6-e840-11ee-936a-26ee6306d735
+      description: A selector data object
     NaturalGeography:
       type: object
       properties:
@@ -904,202 +1223,6 @@ components:
           description: The Resource's unique system identifier; used for API calls.
           example: 98b00f41-e840-11ee-936a-26ee6306d735
       description: Natural Geography
-    ResourceProcess:
-      type: object
-      properties:
-        selector:
-          type: string
-          description: Correlating identifier used when referencing this Resource Process from other parts of the resource model
-        identifier:
-          type: string
-          description: The Resource Process's unique system identifier
-          format: uuid
-        status:
-          $ref: '#/components/schemas/ReferenceDatum'
-        name:
-          type: string
-          description: Resource process's name
-        statusTransition:
-          type: string
-          description: Desired status transition for this ResourceProcess
-        viableStatusTransitions:
-          uniqueItems: true
-          type: array
-          description: A list of viable status transitions to specify when updating the Resource Process; based upon current status
-          items:
-            type: string
-            description: A list of viable status transitions to specify when updating the Resource Process; based upon current status
-        processType:
-          $ref: '#/components/schemas/ReferenceDatum'
-        protocols:
-          uniqueItems: true
-          type: array
-          description: A list of associated protocols
-          items:
-            $ref: '#/components/schemas/ResourceProcessProtocol'
-        inputOutputs:
-          uniqueItems: true
-          type: array
-          description: A list of resource inputs and outputs that are associated with this process
-          items:
-            $ref: '#/components/schemas/ResourceProcessInputOutput'
-      description: A resource process data object
-    Selector:
-      type: object
-      properties:
-        selectBy:
-          type: string
-          description: Identifiies the type of selector
-          example: SELECTOR
-          enum:
-          - SELECTOR
-          - SINGLETON
-          - TYPE
-        selector:
-          type: string
-          description: The Selector's identifier
-          example: f792fbd6-e840-11ee-936a-26ee6306d735
-      description: A selector data object
-    ResourceParameterStream:
-      type: object
-      properties:
-        resourceParameterStreamType:
-          $ref: '#/components/schemas/ReferenceDatum'
-        timeIntervals:
-          uniqueItems: true
-          type: array
-          description: A list of time intervals with Parameter values
-          items:
-            $ref: '#/components/schemas/TimeInterval'
-        currentTimeInterval:
-          $ref: '#/components/schemas/TimeInterval'
-      description: A resource parameter stream data object
-    TimeInterval:
-      required:
-      - intervalBegin
-      - intervalEnd
-      type: object
-      properties:
-        entityId:
-          type: integer
-          description: System identifier for Time Interval entry
-          format: int32
-        id:
-          type: integer
-          description: System identifier for Time Interval entry
-          format: int32
-        intervalBegin:
-          type: string
-          description: Timestamp denoting the start of the effective period of the Time Interval value
-          format: date-time
-          example: '2024-03-22T00:00:00-04:00'
-        intervalEnd:
-          type: string
-          description: Timestamp denoting the end of the effective period of the Time Interval value
-          format: date-time
-          example: '3000-01-01T00:00:00Z'
-        value:
-          type: number
-          description: Value associated with this specific Time Interval
-        status:
-          $ref: '#/components/schemas/ReferenceDatum'
-        statusTransition:
-          type: string
-          description: Desired status transition for this Time Interval
-        viableStatusTransitions:
-          uniqueItems: true
-          type: array
-          description: A list of viable status transitions to specify when updating the Time Interval; based upon current status
-          example: DELETE
-          items:
-            type: string
-            description: A list of viable status transitions to specify when updating the Time Interval; based upon current status
-            example: '"DELETE"'
-      description: An time interval data object
-    FileUpload:
-      type: object
-      properties:
-        content:
-          type: string
-          format: byte
-        fileTypeCode:
-          type: string
-          description: Code of File Type associated with this file
-        metadata:
-          type: object
-          additionalProperties:
-            type: string
-            description: Metadata to accompany the file.
-          description: Metadata to accompany the file.
-        originalFileName:
-          type: string
-          description: Original filename associated with the file
-      description: If applicable, can be used to upload a new topology file, using the FileUpload schema
-    ResourceProcessProtocol:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        status:
-          $ref: '#/components/schemas/ReferenceDatum'
-        statusTransition:
-          type: string
-        viableStatusTransitions:
-          uniqueItems: true
-          type: array
-          items:
-            type: string
-        protocolVersion:
-          $ref: '#/components/schemas/CodeVersion'
-        programQualificationIdentifier:
-          type: string
-        effectiveAt:
-          type: string
-          format: date-time
-      description: A resource process protocol data object
-    Identifier:
-      type: object
-      properties:
-        identifier:
-          type: string
-          description: A unique system-assigned identifier
-          format: uuid
-          example: f79a9cff-e840-11ee-936a-26ee6306d735
-      description: An identifier
-    ResourceSummary:
-      type: object
-      properties:
-        programAssignedIdentifier:
-          type: string
-          description: The Resource's program identifier; used on Registry's UI and Reporting
-          example: PLS1184
-        resourceIdentifier:
-          type: string
-          description: The Resource's unique system identifier; used for API calls
-          format: uuid
-          example: e0c7bdbf-3031-11ec-b9d4-de0f29bf6378
-        resourceName:
-          type: string
-          description: The Resource's supplied name; listed in Resource Reporting
-          example: Accum Resource Test
-        resourceTypeCode:
-          type: string
-          description: Code defining the type of Resource, as identified in the context of a specific program
-          example: ARC_GEN
-        resourceProgramStatusCode:
-          type: string
-          description: Code defining a specific resource's program status
-          example: INACTIVE
-        formCode:
-          type: string
-          description: Code defining the form used when viewing or updating the Resource via API. Form details available via /resource/:resourceId/form/:formCode
-          example: RMS_PLASTICS_M_PARENT_EDIT
-        uiFormCode:
-          type: string
-          description: Code defining the UI form used when viewing or updating the Resource via UI
-          example: RMS_PLASTICS_M_PARENT_EDIT_UI
-      description: Summary of a specific Resource
     ODataEnvelopeOfResourceSummary:
       required:
       - value
@@ -1115,171 +1238,48 @@ components:
           items:
             $ref: '#/components/schemas/ResourceSummary'
       description: Container for OData-like rows of information
-    ResourceInputOutputStream:
+    LegalEntity:
       type: object
       properties:
+        adminNotes:
+          type: string
+        dbaName:
+          type: string
+        externalIdentifiers:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegalEntityExtIdentifier'
+        globalParent:
+          type: boolean
         identifier:
           type: string
-          description: The Resource Input/Output Stream's unique system identifier
-          format: uuid
-          example: f7923885-e840-11ee-936a-26ee6306d735
-        resourceInputOutputStreamType:
-          $ref: '#/components/schemas/ReferenceDatum'
-        streamIntervalType:
-          $ref: '#/components/schemas/ReferenceDatum'
-        intervalPeriodicity:
+        legalEntityNumber:
           type: string
-        reportingEntityStreamIdentifier:
-          type: string
-          description: Reporting entity specific identifier for this Resource Input/Output stream
-        unitOfMeasure:
+        legalEntitySource:
           $ref: '#/components/schemas/ReferenceDatum'
-        readingProfileCode:
-          type: string
-          description: The code for the Meter Data Telemetry Service reading profile used to process readings for this stream
-        timeIntervals:
-          uniqueItems: true
-          type: array
-          description: A list of time intervals with Input/Output values
-          items:
-            $ref: '#/components/schemas/TimeInterval'
-        productIdentifier:
-          type: string
-          description: If applicable, the unique system identifier for a registered Product associated with the stream
-          format: uuid
-      description: A resource input/output stream data object
-    ResourceProgramClassification:
-      type: object
-      properties:
-        classificationType:
+        legalEntityType:
           $ref: '#/components/schemas/ReferenceDatum'
-        classification:
-          $ref: '#/components/schemas/ReferenceDatum'
-      description: A resource program classification data object
-    CodeVersion:
-      required:
-      - code
-      - version
-      type: object
-      properties:
-        code:
-          type: string
-          description: The code associated with this reference data entry
         name:
           type: string
-          description: The name associated with this reference data entry
-        version:
+        naturalGeography:
+          $ref: '#/components/schemas/NaturalGeography'
+        parent:
+          $ref: '#/components/schemas/LegalEntity'
+        proposingSrcAcctId:
           type: string
-          description: Version identifier associated with specific code
-      description: A code version data object
-    ResourceProject:
-      type: object
-      properties:
-        resourceProjectType:
-          $ref: '#/components/schemas/ReferenceDatum'
-        identifier:
-          type: string
-          description: The resource's project unique system identifier
-          format: uuid
-          example: f79c4ab1-e840-11ee-936a-26ee6306d735
-        name:
-          type: string
-          description: The project's name
-          example: RMSAR_CYTest
-        projectBegin:
-          type: string
-          description: The date at which this project on the resource commenced
-          format: date-time
-        projectGoLive:
-          type: string
-          description: The project's Go-Live date
-          format: date-time
-          example: '2022-12-31T18:30:00Z'
-      description: A resource project data object
-    ConditionalAuthorityCriteria:
-      type: object
-      properties:
-        state:
-          $ref: '#/components/schemas/ConditionalAuthorityStateCriteria'
-        predicateBean:
-          type: string
-    Account:
-      type: object
-      properties:
-        srcAcctIdentifier:
-          type: string
-          description: The Account's ID as displayed in the registry
-        srcAcctId:
-          type: string
-          description: The Account's unique system-assigned identifier used for programmatic (API) interactions
-          example: 4edse581-b97a-11ef-ea69-b61606fd520c
-      description: Account record
-    LegalEntityExtIdentifier:
-      type: object
-      properties:
-        identifierType:
-          $ref: '#/components/schemas/ReferenceDatum'
-        identifierValue:
-          type: string
-      description: Legal Entity External Identifier
-    ResourceParameter:
-      type: object
-      properties:
-        id:
-          type: integer
-          description: Unique id for the specific Resource Parameter
-          format: int32
-        resourceParameterType:
-          $ref: '#/components/schemas/ReferenceDatum'
-        resourceProcess:
-          $ref: '#/components/schemas/Selector'
-        streams:
-          type: array
-          description: List of Resource Parameter streams and current values (within nested TimeInterval structure)
-          items:
-            $ref: '#/components/schemas/ResourceParameterStream'
-      description: A resource parameter data object
-    ResourceInputOutputProtocol:
-      type: object
-      properties:
-        status:
-          $ref: '#/components/schemas/ReferenceDatum'
-        programVersion:
-          $ref: '#/components/schemas/CodeVersion'
-        protocolVersion:
-          $ref: '#/components/schemas/CodeVersion'
-        programAssignedIdentifier:
-          type: string
-          description: The program-assigned identifier for this Resource Input/Output to protocol relationship, as defined by the program
-          example: PLS1184
-        programQualificationIdentifier:
-          type: string
-          description: Program assigned qualification identifier for the specific protocol as related to a particular Resource Input / Output
-          example: AD56TY3
-        effectiveAt:
-          type: string
-          description: Effective timestamp for this Resource Input/Output to Protocol relationship
-          format: date-time
-        expiresAt:
-          type: string
-          description: Expiration timestamp for this Resource Input/Output to Protocol relationship
-          format: date-time
-      description: A resource input/output protocol data object
-    LegalEntityRole:
-      type: object
-      properties:
-        programs:
+        roles:
           type: array
           items:
-            $ref: '#/components/schemas/LegalEntityRoleProgram'
-        roleType:
-          $ref: '#/components/schemas/ReferenceDatum'
+            $ref: '#/components/schemas/LegalEntityRole'
         status:
           $ref: '#/components/schemas/ReferenceDatum'
-        statusEffectiveDate:
+        viableStatusTransitions:
+          type: array
+          items:
+            type: string
+        website:
           type: string
-          format: date-time
-      description: Legal Entity Role
+      description: Legal Entity
   securitySchemes:
     JWT:
       type: http

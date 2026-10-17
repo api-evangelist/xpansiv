@@ -1006,154 +1006,14 @@ paths:
                   type: object
 components:
   schemas:
-    ProcessMeterReadingImageBadRequestError:
-      description: '`POST .../image-readings` client errors (missing/invalid image per manual spec).'
+    MeterReadingEligibilityBadRequestError:
+      description: '`GET .../readings/eligibility` when facility or meter path IDs are invalid (manual contract).'
       required:
-      - success
       - error
       - message
       type: object
       allOf:
-      - $ref: '#/components/schemas/MeterReadingOperationError'
-      - properties:
-          error:
-            description: Error code indicating the type of validation failure
-            type: string
-            example: no_image
-            enum:
-            - no_image
-            - invalid_image
-          message:
-            description: Human-readable error message
-            type: string
-            example: No image uploaded
-        type: object
-    SubmitReadingVerificationSuccess:
-      description: Verification submission accepted — reading moved to `pending_review`.
-      required:
-      - meter_readings_id
-      - meter_readings_status
-      - message
-      properties:
-        meter_readings_id:
-          description: ID of the meter reading that was verified.
-          type: integer
-          example: 98765
-        meter_readings_status:
-          description: New status of the reading after verification. Always `pending_review`.
-          type: string
-          example: pending_review
-          enum:
-          - pending_review
-        message:
-          description: Human-readable confirmation message.
-          type: string
-          example: Verification submitted successfully
-      type: object
-    MeterReadingErrorResponse:
-      description: 'Error response payload (inside the data envelope).
-
-
-        The `error` and `errors` fields are optional and may not be present in all error responses.'
-      required:
-      - success
-      - message
-      properties:
-        success:
-          description: Indicates if the submission was successful (always false for errors)
-          type: boolean
-          example: false
-        error:
-          description: Error code identifying the specific error type (optional)
-          type: string
-          example: VALIDATION_ERROR
-          enum:
-          - MULTIPLE_FACILITIES
-          - NO_FACILITY
-          - FIRST_TIME_SUBMISSION
-          - CUMULATIVE_ONLY
-          - AUTO_REPORTING
-          - METER_NOT_VERIFIED
-          - NEPOOL_REGISTRY
-          - WREGIS_REGISTRY
-          - NOT_ELIGIBLE
-          - NO_METER
-          - UNAUTHORIZED
-          - INACTIVE_FACILITY
-          - METER_ID_MISMATCH
-          - VALIDATION_ERROR
-          - OUTSIDE_EDIT_WINDOW
-          - READING_NOT_FOUND
-          - READING_METER_MISMATCH
-        message:
-          description: Human-readable error message (always present)
-          type: string
-          example: Reading falls outside of the accepted date range.
-        errors:
-          description: Field-specific validation errors (optional)
-          type: object
-          example:
-            meter_reading: Reading is required
-            meter_reading_date_taken: Reading date is required for cumulative meters
-          additionalProperties:
-            type: string
-      type: object
-    MeterReadingSuccessResponse:
-      description: Success response payload (inside the data envelope)
-      required:
-      - success
-      - meter_readings_id
-      - meter_reading_status
-      properties:
-        success:
-          description: Indicates if the submission was successful
-          type: boolean
-          example: true
-        meter_readings_id:
-          description: The unique identifier of the created/updated meter reading
-          type: integer
-          example: 54321
-        meter_reading_status:
-          description: The status of the submitted meter reading
-          type: string
-          example: approved
-          enum:
-          - approved
-          - held_high
-          - held_low
-          - held_less_than_previous
-          - pending_review
-          - disapproved
-          - setup_incomplete
-          - date_outside_expected
-          - wrong_held_gen_id
-          - missing_previous_verified
-          - extrapolation_off
-          - invalid_meter_style
-          - already_processed
-          - unknown
-        message:
-          description: Success message (optional)
-          type: string
-          example: Meter reading submitted successfully
-      type: object
-    MeterReadingEligibilityServerError:
-      description: '`GET .../readings/eligibility` when an unexpected error occurs (manual contract).'
-      required:
-      - can_submit
-      - code
-      - message
-      properties:
-        can_submit:
-          type: boolean
-          example: false
-        code:
-          type: string
-          example: UNKNOWN
-        message:
-          type: string
-          example: Error occurred while checking meter reading eligibility. Please try again later.
-      type: object
+      - $ref: '#/components/schemas/Error'
     MeterReadingImageExtractedData:
       description: OCR extracted data from the meter reading image
       required:
@@ -1189,6 +1049,141 @@ components:
           type: string
           example: ''
       type: object
+    ProcessMeterReadingImageSuccess:
+      description: Image accepted for OCR processing.
+      required:
+      - success
+      - message
+      - processing_id
+      - remaining_attempts
+      properties:
+        success:
+          description: Indicates if the request was successful
+          type: boolean
+          example: true
+        message:
+          description: Human-readable success message
+          type: string
+          example: Meter readings processing started
+        processing_id:
+          description: Unique identifier for tracking the image processing status
+          type: integer
+          example: 16
+        remaining_attempts:
+          description: Number of remaining photo submission attempts before manual entry is required
+          type: integer
+          example: 4
+          maximum: 5
+          minimum: 0
+      type: object
+    MeterReadingSubmissionWindow:
+      properties:
+        current_period:
+          $ref: '#/components/schemas/MeterReadingSubmissionPeriod'
+        next_period:
+          $ref: '#/components/schemas/MeterReadingSubmissionPeriod'
+      type: object
+    Error:
+      description: 'Generic error payload when no more specific error schema applies.
+
+
+        Implements JsonSerializable so it can be passed directly to API_Controller::response().
+
+        Implements Countable returning 0 so the response size guard in API_Controller treats it
+
+        as an empty collection (error responses never trigger the size limit).'
+      required:
+      - error
+      - message
+      properties:
+        error:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Error description
+      type: object
+    ProcessMeterReadingImageServerError:
+      description: '`POST .../image-readings` server failures after the image is accepted.'
+      required:
+      - success
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/MeterReadingOperationError'
+      - properties:
+          error:
+            description: Error code indicating the type of server failure
+            type: string
+            example: image_upload_failed
+            enum:
+            - image_upload_failed
+            - document_reference_missing
+            - unexpected_error
+          message:
+            description: Human-readable error message
+            type: string
+            example: Image upload failed
+        type: object
+    ApiFieldError:
+      description: API field error
+      properties:
+        field:
+          type: string
+          example: field_name
+        message:
+          type: string
+          example: error_message
+      type: object
+    ProcessMeterReadingImageMaxAttemptsError:
+      description: '`POST .../image-readings` when the photo OCR retry limit is reached (HTTP 429).'
+      required:
+      - success
+      - error
+      - message
+      - requires_manual_entry
+      - remaining_attempts
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          description: Error code indicating the retry limit has been reached
+          type: string
+          example: max_photo_attempts_reached
+          enum:
+          - max_photo_attempts_reached
+        message:
+          description: Human-readable error message
+          type: string
+          example: Maximum photo submission attempts reached. Please use manual entry.
+        requires_manual_entry:
+          description: Always true when retry limit is reached
+          type: boolean
+          example: true
+        remaining_attempts:
+          description: Always 0 when retry limit is reached
+          type: integer
+          example: 0
+          minimum: 0
+      type: object
+    MeterReadingImageProcessingStatusNotFoundError:
+      description: '`GET .../image-readings/{processing_id}` when the processing record is missing or not owned by the facility.'
+      required:
+      - success
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/MeterReadingOperationError'
+      - properties:
+          error:
+            type: string
+            example: invalid_processing_id
+            enum:
+            - invalid_processing_id
+        type: object
     ResponseEnvelope:
       description: Standard API response envelope. Every response wraps its payload in this structure; the `data` field contains the operation-specific payload.
       required:
@@ -1220,95 +1215,6 @@ components:
           - type: integer
             example: 2
       type: object
-    ProcessMeterReadingImageServerError:
-      description: '`POST .../image-readings` server failures after the image is accepted.'
-      required:
-      - success
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/MeterReadingOperationError'
-      - properties:
-          error:
-            description: Error code indicating the type of server failure
-            type: string
-            example: image_upload_failed
-            enum:
-            - image_upload_failed
-            - document_reference_missing
-            - unexpected_error
-          message:
-            description: Human-readable error message
-            type: string
-            example: Image upload failed
-        type: object
-    ApiResponseDTO:
-      description: API response data
-      properties:
-        success:
-          type: boolean
-          example: true
-        error:
-          type: string
-          example: error message
-        message:
-          type: string
-          example: message
-        data:
-          type: object
-          example:
-            key: value
-        errors:
-          type: array
-          items:
-            type: string
-          example:
-          - error message
-        field_errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiFieldError'
-          example:
-          - field: email
-            message: error message
-      type: object
-    MeterReadingImageProcessingStatusBadRequestError:
-      description: '`GET .../image-readings/{processing_id}` when facility access or path validation fails (manual documents as 400).'
-      required:
-      - success
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/MeterReadingOperationError'
-    ProcessMeterReadingImageSuccess:
-      description: Image accepted for OCR processing.
-      required:
-      - success
-      - message
-      - processing_id
-      - remaining_attempts
-      properties:
-        success:
-          description: Indicates if the request was successful
-          type: boolean
-          example: true
-        message:
-          description: Human-readable success message
-          type: string
-          example: Meter readings processing started
-        processing_id:
-          description: Unique identifier for tracking the image processing status
-          type: integer
-          example: 16
-        remaining_attempts:
-          description: Number of remaining photo submission attempts before manual entry is required
-          type: integer
-          example: 4
-          maximum: 5
-          minimum: 0
-      type: object
     ProcessMeterReadingImageRequest:
       description: Multipart body for `POST /facilities/{facility_id}/generation/meters/{meter_id}/image-readings`.
       required:
@@ -1328,71 +1234,8 @@ components:
           format: date
           example: '2025-12-02'
       type: object
-    Error:
-      description: 'Generic error payload when no more specific error schema applies.
-
-
-        Implements JsonSerializable so it can be passed directly to API_Controller::response().
-
-        Implements Countable returning 0 so the response size guard in API_Controller treats it
-
-        as an empty collection (error responses never trigger the size limit).'
-      required:
-      - error
-      - message
-      properties:
-        error:
-          type: string
-          example: error
-        message:
-          type: string
-          example: Error description
-      type: object
-    MeterReadingImageProcessingStatus:
-      description: OCR processing status and extracted data
-      required:
-      - success
-      - status
-      - requires_manual_entry
-      - remaining_attempts
-      - extracted_data
-      properties:
-        extracted_data:
-          $ref: '#/components/schemas/MeterReadingImageExtractedData'
-        success:
-          description: Whether the request was successful
-          type: boolean
-          example: true
-        status:
-          description: Current OCR processing status
-          type: string
-          example: processing
-          enum:
-          - pending
-          - processing
-          - successful
-          - failed
-        requires_manual_entry:
-          description: Whether manual entry is required (true when status is failed and no remaining attempts)
-          type: boolean
-          example: false
-        remaining_attempts:
-          description: Number of remaining photo submission attempts before manual entry is required
-          type: integer
-          example: 5
-          maximum: 5
-          minimum: 0
-      type: object
-    MeterReadingEligibilityBadRequestError:
-      description: '`GET .../readings/eligibility` when facility or meter path IDs are invalid (manual contract).'
-      required:
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/Error'
-    MeterReadingImageProcessingStatusNotFoundError:
-      description: '`GET .../image-readings/{processing_id}` when the processing record is missing or not owned by the facility.'
+    MeterReadingImageProcessingStatusBadRequestError:
+      description: '`GET .../image-readings/{processing_id}` when facility access or path validation fails (manual documents as 400).'
       required:
       - success
       - error
@@ -1400,13 +1243,32 @@ components:
       type: object
       allOf:
       - $ref: '#/components/schemas/MeterReadingOperationError'
-      - properties:
-          error:
-            type: string
-            example: invalid_processing_id
-            enum:
-            - invalid_processing_id
-        type: object
+    MeterReadingLastSubmission:
+      required:
+      - meter_readings_id
+      - generation_period
+      - value
+      properties:
+        meter_readings_id:
+          description: ID of the last meter reading submission
+          type: integer
+          example: 4728475
+        generation_period:
+          description: Period for which the last meter reading was submitted
+          type: string
+          example: 2025/09
+        user_reading_taken:
+          description: Date on which the user has taken the reading
+          type:
+          - string
+          - 'null'
+          format: date
+          example: '2025-10-12'
+        value:
+          description: Value of the last meter reading
+          type: number
+          example: 3701
+      type: object
     AuthError:
       required:
       - error
@@ -1478,38 +1340,228 @@ components:
           - string
           - 'null'
       type: object
-    ProcessMeterReadingImageMaxAttemptsError:
-      description: '`POST .../image-readings` when the photo OCR retry limit is reached (HTTP 429).'
+    SubmitReadingVerificationSuccess:
+      description: Verification submission accepted — reading moved to `pending_review`.
+      required:
+      - meter_readings_id
+      - meter_readings_status
+      - message
+      properties:
+        meter_readings_id:
+          description: ID of the meter reading that was verified.
+          type: integer
+          example: 98765
+        meter_readings_status:
+          description: New status of the reading after verification. Always `pending_review`.
+          type: string
+          example: pending_review
+          enum:
+          - pending_review
+        message:
+          description: Human-readable confirmation message.
+          type: string
+          example: Verification submitted successfully
+      type: object
+    ApiResponseDTO:
+      description: API response data
+      properties:
+        success:
+          type: boolean
+          example: true
+        error:
+          type: string
+          example: error message
+        message:
+          type: string
+          example: message
+        data:
+          type: object
+          example:
+            key: value
+        errors:
+          type: array
+          items:
+            type: string
+          example:
+          - error message
+        field_errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiFieldError'
+          example:
+          - field: email
+            message: error message
+      type: object
+    MeterReadingImageProcessingStatus:
+      description: OCR processing status and extracted data
+      required:
+      - success
+      - status
+      - requires_manual_entry
+      - remaining_attempts
+      - extracted_data
+      properties:
+        extracted_data:
+          $ref: '#/components/schemas/MeterReadingImageExtractedData'
+        success:
+          description: Whether the request was successful
+          type: boolean
+          example: true
+        status:
+          description: Current OCR processing status
+          type: string
+          example: processing
+          enum:
+          - pending
+          - processing
+          - successful
+          - failed
+        requires_manual_entry:
+          description: Whether manual entry is required (true when status is failed and no remaining attempts)
+          type: boolean
+          example: false
+        remaining_attempts:
+          description: Number of remaining photo submission attempts before manual entry is required
+          type: integer
+          example: 5
+          maximum: 5
+          minimum: 0
+      type: object
+    MeterReadingEligibilityServerError:
+      description: '`GET .../readings/eligibility` when an unexpected error occurs (manual contract).'
+      required:
+      - can_submit
+      - code
+      - message
+      properties:
+        can_submit:
+          type: boolean
+          example: false
+        code:
+          type: string
+          example: UNKNOWN
+        message:
+          type: string
+          example: Error occurred while checking meter reading eligibility. Please try again later.
+      type: object
+    MeterReadingSuccessResponse:
+      description: Success response payload (inside the data envelope)
+      required:
+      - success
+      - meter_readings_id
+      - meter_reading_status
+      properties:
+        success:
+          description: Indicates if the submission was successful
+          type: boolean
+          example: true
+        meter_readings_id:
+          description: The unique identifier of the created/updated meter reading
+          type: integer
+          example: 54321
+        meter_reading_status:
+          description: The status of the submitted meter reading
+          type: string
+          example: approved
+          enum:
+          - approved
+          - held_high
+          - held_low
+          - held_less_than_previous
+          - pending_review
+          - disapproved
+          - setup_incomplete
+          - date_outside_expected
+          - wrong_held_gen_id
+          - missing_previous_verified
+          - extrapolation_off
+          - invalid_meter_style
+          - already_processed
+          - unknown
+        message:
+          description: Success message (optional)
+          type: string
+          example: Meter reading submitted successfully
+      type: object
+    MeterReadingErrorResponse:
+      description: 'Error response payload (inside the data envelope).
+
+
+        The `error` and `errors` fields are optional and may not be present in all error responses.'
+      required:
+      - success
+      - message
+      properties:
+        success:
+          description: Indicates if the submission was successful (always false for errors)
+          type: boolean
+          example: false
+        error:
+          description: Error code identifying the specific error type (optional)
+          type: string
+          example: VALIDATION_ERROR
+          enum:
+          - MULTIPLE_FACILITIES
+          - NO_FACILITY
+          - FIRST_TIME_SUBMISSION
+          - CUMULATIVE_ONLY
+          - AUTO_REPORTING
+          - METER_NOT_VERIFIED
+          - NEPOOL_REGISTRY
+          - WREGIS_REGISTRY
+          - NOT_ELIGIBLE
+          - NO_METER
+          - UNAUTHORIZED
+          - INACTIVE_FACILITY
+          - METER_ID_MISMATCH
+          - VALIDATION_ERROR
+          - OUTSIDE_EDIT_WINDOW
+          - READING_NOT_FOUND
+          - READING_METER_MISMATCH
+        message:
+          description: Human-readable error message (always present)
+          type: string
+          example: Reading falls outside of the accepted date range.
+        errors:
+          description: Field-specific validation errors (optional)
+          type: object
+          example:
+            meter_reading: Reading is required
+            meter_reading_date_taken: Reading date is required for cumulative meters
+          additionalProperties:
+            type: string
+      type: object
+    MeterReadingImageProcessingStatusServerError:
+      description: '`GET .../image-readings/{processing_id}` internal server error (manual contract).'
       required:
       - success
       - error
       - message
-      - requires_manual_entry
-      - remaining_attempts
-      properties:
-        success:
-          type: boolean
-          example: false
-        error:
-          description: Error code indicating the retry limit has been reached
-          type: string
-          example: max_photo_attempts_reached
-          enum:
-          - max_photo_attempts_reached
-        message:
-          description: Human-readable error message
-          type: string
-          example: Maximum photo submission attempts reached. Please use manual entry.
-        requires_manual_entry:
-          description: Always true when retry limit is reached
-          type: boolean
-          example: true
-        remaining_attempts:
-          description: Always 0 when retry limit is reached
-          type: integer
-          example: 0
-          minimum: 0
       type: object
+      allOf:
+      - $ref: '#/components/schemas/MeterReadingOperationError'
+    ProcessMeterReadingImageBadRequestError:
+      description: '`POST .../image-readings` client errors (missing/invalid image per manual spec).'
+      required:
+      - success
+      - error
+      - message
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/MeterReadingOperationError'
+      - properties:
+          error:
+            description: Error code indicating the type of validation failure
+            type: string
+            example: no_image
+            enum:
+            - no_image
+            - invalid_image
+          message:
+            description: Human-readable error message
+            type: string
+            example: No image uploaded
+        type: object
     MeterReadingOperationError:
       description: 'Shared `{success, error, message}` shape for meter-reading image/status API errors.
 
@@ -1531,48 +1583,6 @@ components:
           type: string
           example: An error occurred
       type: object
-    MeterReadingLastSubmission:
-      required:
-      - meter_readings_id
-      - generation_period
-      - value
-      properties:
-        meter_readings_id:
-          description: ID of the last meter reading submission
-          type: integer
-          example: 4728475
-        generation_period:
-          description: Period for which the last meter reading was submitted
-          type: string
-          example: 2025/09
-        user_reading_taken:
-          description: Date on which the user has taken the reading
-          type:
-          - string
-          - 'null'
-          format: date
-          example: '2025-10-12'
-        value:
-          description: Value of the last meter reading
-          type: number
-          example: 3701
-      type: object
-    MeterReadingSubmissionWindow:
-      properties:
-        current_period:
-          $ref: '#/components/schemas/MeterReadingSubmissionPeriod'
-        next_period:
-          $ref: '#/components/schemas/MeterReadingSubmissionPeriod'
-      type: object
-    MeterReadingImageProcessingStatusServerError:
-      description: '`GET .../image-readings/{processing_id}` internal server error (manual contract).'
-      required:
-      - success
-      - error
-      - message
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/MeterReadingOperationError'
     AutomatedMeterReadingRequest:
       description: Automated meter reading submission body for `submitMeterReading` (OCR processing_id).
       required:
@@ -1583,16 +1593,6 @@ components:
           type: integer
           example: 42
           minimum: 1
-      type: object
-    ApiFieldError:
-      description: API field error
-      properties:
-        field:
-          type: string
-          example: field_name
-        message:
-          type: string
-          example: error_message
       type: object
     MeterReadingSubmissionPeriod:
       required:

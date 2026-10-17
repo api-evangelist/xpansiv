@@ -147,6 +147,19 @@ components:
             $ref: '#/components/schemas/CorporateEntities'
       title: ODataEnvelopeOfCorporateEntities
       description: Container for OData-like rows of information
+    ErrorContainer:
+      type: object
+      properties:
+        errors:
+          type: array
+          description: List of errors
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+        submissionId:
+          type: string
+          description: Submission identifier for issue investigation
+      title: ErrorContainer
+      description: Container for errors
     ErrorItem:
       type: object
       required:
@@ -173,19 +186,6 @@ components:
           description: The path to the field specifically in error, if applicable
       title: ErrorItem
       description: Describes a specific error
-    ErrorContainer:
-      type: object
-      properties:
-        errors:
-          type: array
-          description: List of errors
-          items:
-            $ref: '#/components/schemas/ErrorItem'
-        submissionId:
-          type: string
-          description: Submission identifier for issue investigation
-      title: ErrorContainer
-      description: Container for errors
   securitySchemes:
     JWT:
       type: apiKey

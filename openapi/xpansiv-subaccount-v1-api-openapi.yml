@@ -154,105 +154,6 @@ paths:
                 $ref: '#/components/schemas/GeneralError'
 components:
   schemas:
-    ReferenceDatum:
-      required:
-      - code
-      type: object
-      properties:
-        code:
-          type: string
-          description: The reference data's value.
-        name:
-          type: string
-          description: The reference data's name
-      description: A reference datum data object
-    ExternalPlatform:
-      type: object
-      properties:
-        externalPlatformIdentifier:
-          type: string
-          description: The managing external platform's system-assigned identifier.
-          format: uuid
-          example: a5f8c9fa-001b-4444-b966-17b1a7871bbf
-        code:
-          type: string
-          description: The External Platform's system code, if applicable.
-        name:
-          type: string
-          description: The External Platform's name.
-          example: Xpansiv Connect
-        account:
-          $ref: '#/components/schemas/Account'
-        metadataConfig:
-          type: string
-          description: Metadata configuration (JSON) for additional fields required by the External Platform.
-    GeneralError:
-      type: object
-      properties:
-        code:
-          type: string
-        ticket:
-          type: string
-        message:
-          type: string
-    AbstractRestError:
-      type: object
-      properties:
-        code:
-          type: string
-        ticket:
-          type: string
-        message:
-          type: string
-    ErrorContainer:
-      type: object
-      properties:
-        submissionId:
-          type: string
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ErrorItem'
-    Subaccounts:
-      type: object
-      properties:
-        subaccounts:
-          type: array
-          description: Subaccounts
-          items:
-            $ref: '#/components/schemas/Subaccount'
-      description: Subaccounts
-    Account:
-      type: object
-      properties:
-        srcAcctId:
-          type: string
-          description: The Account's unique system-assigned identifier used for programmatic (API) interactions.
-          example: 4edse581-b97a-11ef-ea69-b61606fd520c
-        identifier:
-          type: string
-          description: The Account's ID as displayed in the registry.
-          example: '15184192'
-        name:
-          type: string
-          description: The Account Operating Name on the registry.
-          example: APXOPCAR Project Manager
-      description: Account record
-    ErrorItem:
-      type: object
-      properties:
-        parameter:
-          type: string
-        correlationId:
-          type: string
-        path:
-          type: string
-        field:
-          type: string
-        code:
-          type: string
-        message:
-          type: string
     Subaccount:
       required:
       - name
@@ -310,3 +211,102 @@ components:
           readOnly: true
           example: true
       description: This class contains caller-visible set of sub-accounts for either the calling account or the account identified by onBehalfOfSrcAcctId
+    GeneralError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
+    ErrorContainer:
+      type: object
+      properties:
+        submissionId:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+    AbstractRestError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
+    Subaccounts:
+      type: object
+      properties:
+        subaccounts:
+          type: array
+          description: Subaccounts
+          items:
+            $ref: '#/components/schemas/Subaccount'
+      description: Subaccounts
+    Account:
+      type: object
+      properties:
+        srcAcctId:
+          type: string
+          description: The Account's unique system-assigned identifier used for programmatic (API) interactions.
+          example: 4edse581-b97a-11ef-ea69-b61606fd520c
+        identifier:
+          type: string
+          description: The Account's ID as displayed in the registry.
+          example: '15184192'
+        name:
+          type: string
+          description: The Account Operating Name on the registry.
+          example: APXOPCAR Project Manager
+      description: Account record
+    ReferenceDatum:
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: The reference data's value.
+        name:
+          type: string
+          description: The reference data's name
+      description: A reference datum data object
+    ExternalPlatform:
+      type: object
+      properties:
+        externalPlatformIdentifier:
+          type: string
+          description: The managing external platform's system-assigned identifier.
+          format: uuid
+          example: a5f8c9fa-001b-4444-b966-17b1a7871bbf
+        code:
+          type: string
+          description: The External Platform's system code, if applicable.
+        name:
+          type: string
+          description: The External Platform's name.
+          example: Xpansiv Connect
+        account:
+          $ref: '#/components/schemas/Account'
+        metadataConfig:
+          type: string
+          description: Metadata configuration (JSON) for additional fields required by the External Platform.
+    ErrorItem:
+      type: object
+      properties:
+        parameter:
+          type: string
+        correlationId:
+          type: string
+        path:
+          type: string
+        field:
+          type: string
+        code:
+          type: string
+        message:
+          type: string

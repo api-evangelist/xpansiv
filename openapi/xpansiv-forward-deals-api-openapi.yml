@@ -258,10 +258,132 @@ paths:
         '500':
           $ref: '#/components/responses/500'
 components:
+  parameters:
+    PageNumber:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    PageSize:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    Include:
+      name: include
+      description: Comma-separated values from optional response fields
+      in: query
+      required: false
+      schema:
+        type: string
+    AccountIdentifier:
+      description: Account identifier
+      name: AccountIdentifier
+      example: 098B0A25
+      in: path
+      required: true
+      schema:
+        type: string
   schemas:
+    ForwardMarket:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Instrument code.
+        name:
+          type: string
+          description: Instrument name.
+    ForwardInstrumentMarketModelInstrument:
+      type: object
+      properties:
+        type:
+          type: string
+          default: MMI
+        marketModelInstrument:
+          type: object
+          properties:
+            dateRange:
+              $ref: '#/components/schemas/ForwardDateRange'
+            market:
+              $ref: '#/components/schemas/ForwardMarket'
+    Ref.UnitOfMeasure:
+      type: string
+      description: Unit of measure. Ref.Data.UNIT_OF_MEASURE
+    ForwardFuelType:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/Ref.FuelType'
+        registryCode:
+          type: string
+          description: Registry fuel type code.
     Ref.VintageType:
       type: string
       description: Ref.Data.FORWARD_DEAL_VINTAGE_TYPE
+    ForwardContract:
+      type: object
+      properties:
+        volume:
+          type: integer
+          format: int64
+          description: Delivered volume.
+        unitPrice:
+          allOf:
+          - $ref: '#/components/schemas/Price'
+          description: Delivered price.
+        value:
+          allOf:
+          - $ref: '#/components/schemas/Price'
+          description: Delivered value.
+    Ref.ForwardDealType:
+      type: string
+      default: PHYSICAL
+      description: Type of deal as either Market or Project Specific. Ref.Data.FORWARD_DEAL_TYPE
+    Ref.ForwardDeliveryScheduleType:
+      type: string
+      description: Delivery schedule type. Ref.Data.FORWARD_DEAL_DELIVERY_SCHEDULE_TYPE
+    Ref.ForwardTransactionStatus:
+      type: string
+      description: Delivery status. Ref.Data.FORWARD_DEAL_TRANSACTION_STATUS
+    NotAuthorizedError:
+      type: object
+      properties:
+        message:
+          type: string
+    Ref.TransactionSideType:
+      type: string
+      description: Buy or Sell. Ref.Data.FORWARD_DEAL_TRANSACTION_TYPE
+    Ref.ForwardTransactionQuantityType:
+      type: string
+      description: Quantity type. Ref.Data.FORWARD_DEAL_QUANTITY_TYPE
+    Page:
+      type: object
+      required:
+      - page
+      - size
+      - totalPages
+      - totalElements
+      properties:
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+    Ref.FuelType:
+      type: string
+      description: Ref.Data.REC_FUEL_TYPE
     ForwardDateRange:
       type: object
       properties:
@@ -284,44 +406,22 @@ components:
     Ref.Program:
       type: string
       description: Ref.Data.PROGRAM
-    Ref.ForwardDealType:
-      type: string
-      default: PHYSICAL
-      description: Type of deal as either Market or Project Specific. Ref.Data.FORWARD_DEAL_TYPE
-    Ref.Currency:
-      description: Ref.Data.CURRENCY
-      type: string
-      minLength: 3
-      example: USD
-    Ref.FuelType:
-      type: string
-      description: Ref.Data.REC_FUEL_TYPE
-    Page:
+    ForwardStatusEvent:
       type: object
-      required:
-      - page
-      - size
-      - totalPages
-      - totalElements
       properties:
-        page:
-          type: integer
-          format: int32
-        size:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-        totalElements:
-          type: integer
-          format: int64
-    Ref.ForwardDealStatus:
-      type: string
-      description: Ref.Data.FORWARD_DEAL_STATUS
-    Ref.UnitOfMeasure:
-      type: string
-      description: Unit of measure. Ref.Data.UNIT_OF_MEASURE
+        action:
+          type: string
+          description: Action for the statusEvent.
+        notes:
+          type: string
+          description: Notes for the statusEvent.
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp for the statusEvent.
+        user:
+          type: string
+          description: User for the statusEvent.
     ForwardInstrumentAttributeBundle:
       type: object
       properties:
@@ -350,26 +450,6 @@ components:
                       '
                   fuelType:
                     $ref: '#/components/schemas/ForwardFuelType'
-    Ref.ForwardDeliveryScheduleType:
-      type: string
-      description: Delivery schedule type. Ref.Data.FORWARD_DEAL_DELIVERY_SCHEDULE_TYPE
-    NotAuthorizedError:
-      type: object
-      properties:
-        message:
-          type: string
-    Ref.ForwardTransactionQuantityType:
-      type: string
-      description: Quantity type. Ref.Data.FORWARD_DEAL_QUANTITY_TYPE
-    ForwardMarket:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Instrument code.
-        name:
-          type: string
-          description: Instrument name.
     Price:
       type: object
       required:
@@ -382,99 +462,19 @@ components:
           type: number
           description: The numeric value of the price
           minimum: 0
-    Ref.TransactionSideType:
+    Ref.ForwardDealStatus:
       type: string
-      description: Buy or Sell. Ref.Data.FORWARD_DEAL_TRANSACTION_TYPE
+      description: Ref.Data.FORWARD_DEAL_STATUS
+    Ref.Currency:
+      description: Ref.Data.CURRENCY
+      type: string
+      minLength: 3
+      example: USD
     InternalServerError:
       type: object
       properties:
         message:
           type: string
-    ForwardContract:
-      type: object
-      properties:
-        volume:
-          type: integer
-          format: int64
-          description: Delivered volume.
-        unitPrice:
-          allOf:
-          - $ref: '#/components/schemas/Price'
-          description: Delivered price.
-        value:
-          allOf:
-          - $ref: '#/components/schemas/Price'
-          description: Delivered value.
-    ForwardStatusEvent:
-      type: object
-      properties:
-        action:
-          type: string
-          description: Action for the statusEvent.
-        notes:
-          type: string
-          description: Notes for the statusEvent.
-        timestamp:
-          type: string
-          format: date-time
-          description: Timestamp for the statusEvent.
-        user:
-          type: string
-          description: User for the statusEvent.
-    ForwardInstrumentMarketModelInstrument:
-      type: object
-      properties:
-        type:
-          type: string
-          default: MMI
-        marketModelInstrument:
-          type: object
-          properties:
-            dateRange:
-              $ref: '#/components/schemas/ForwardDateRange'
-            market:
-              $ref: '#/components/schemas/ForwardMarket'
-    Ref.ForwardTransactionStatus:
-      type: string
-      description: Delivery status. Ref.Data.FORWARD_DEAL_TRANSACTION_STATUS
-    ForwardFuelType:
-      type: object
-      properties:
-        code:
-          $ref: '#/components/schemas/Ref.FuelType'
-        registryCode:
-          type: string
-          description: Registry fuel type code.
-  parameters:
-    Include:
-      name: include
-      description: Comma-separated values from optional response fields
-      in: query
-      required: false
-      schema:
-        type: string
-    PageSize:
-      name: size
-      in: query
-      required: false
-      schema:
-        type: integer
-        format: int32
-    PageNumber:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        format: int32
-    AccountIdentifier:
-      description: Account identifier
-      name: AccountIdentifier
-      example: 098B0A25
-      in: path
-      required: true
-      schema:
-        type: string
   responses:
     '401':
       description: Not authorized error

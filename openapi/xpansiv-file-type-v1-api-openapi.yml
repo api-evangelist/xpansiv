@@ -143,16 +143,6 @@ paths:
                 $ref: '#/components/schemas/ValidationError'
 components:
   schemas:
-    ValidationError:
-      type: object
-      properties:
-        code:
-          type: integer
-          format: int32
-        parameter:
-          type: string
-        message:
-          type: string
     FileEntry:
       required:
       - fileName
@@ -211,6 +201,54 @@ components:
           type: boolean
           description: File access flag
       description: A file entry
+    ODataEnvelopeOfFileReport:
+      required:
+      - value
+      type: object
+      properties:
+        '@count':
+          type: integer
+          description: The total number of results (only present if requested)
+          format: int32
+        value:
+          type: array
+          description: Rows of information
+          items:
+            $ref: '#/components/schemas/FileReport'
+      description: Container for OData-like rows of information
+    ValidationError:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        parameter:
+          type: string
+        message:
+          type: string
+    FileType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        code:
+          type: string
+        name:
+          type: string
+        shortName:
+          type: string
+        fileTypeSpecificityCode:
+          type: string
+          enum:
+          - ACCOUNT
+          - RESOURCE
+          - ACCOUNT_OR_RESOURCE
+        singleInstance:
+          type: boolean
+        allowPublicFile:
+          type: boolean
+      description: A file type
     FileReport:
       type: object
       properties:
@@ -258,44 +296,6 @@ components:
         allowPublicFile:
           type: boolean
       description: File Report
-    FileType:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        code:
-          type: string
-        name:
-          type: string
-        shortName:
-          type: string
-        fileTypeSpecificityCode:
-          type: string
-          enum:
-          - ACCOUNT
-          - RESOURCE
-          - ACCOUNT_OR_RESOURCE
-        singleInstance:
-          type: boolean
-        allowPublicFile:
-          type: boolean
-      description: A file type
-    ODataEnvelopeOfFileReport:
-      required:
-      - value
-      type: object
-      properties:
-        '@count':
-          type: integer
-          description: The total number of results (only present if requested)
-          format: int32
-        value:
-          type: array
-          description: Rows of information
-          items:
-            $ref: '#/components/schemas/FileReport'
-      description: Container for OData-like rows of information
   securitySchemes:
     JWT:
       type: http

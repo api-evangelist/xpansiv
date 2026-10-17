@@ -426,16 +426,7 @@ paths:
                 $ref: '#/components/schemas/GeneralError'
 components:
   schemas:
-    GeneralError:
-      type: object
-      properties:
-        code:
-          type: string
-        ticket:
-          type: string
-        message:
-          type: string
-    Marketplace:
+    ReferenceDatum:
       required:
       - code
       type: object
@@ -446,151 +437,7 @@ components:
         name:
           type: string
           description: The reference data's name
-        marketplaceIdentifier:
-          type: string
-          description: The Marketplace's system-assigned identifier.
-          format: uuid
-          example: 732f1eaf-66db-44fa-aba8-036d184ae8e9
-        transactionsRequireContract:
-          type: boolean
-          description: If true, transactions in this marketplace must be associated with a contract
-          example: false
-        timeZone:
-          type: string
-          description: The marketplace's Internet Assigned Numbers Authority (IANA) time zone
-          example: America/New_York
-        requireTransactionProductLotSelection:
-          type: boolean
-          description: If true, the entry of a transaction associated with this marketplace will require the explicit quantified selection of product lots
-          example: false
-      description: A marketplace data object
-    LedgerAccounts:
-      type: object
-      properties:
-        ledgerAccounts:
-          type: array
-          description: A list of accounts related to the specified ownership ledger.
-          items:
-            $ref: '#/components/schemas/LedgerAccount'
-    OwnershipLedgerType:
-      required:
-      - code
-      type: object
-      properties:
-        code:
-          type: string
-          description: The reference data's value.
-        name:
-          type: string
-          description: The reference data's name
-        ownershipLedgerTypeIdentifier:
-          type: string
-          description: The ownership ledger type's system-assigned identifier.
-          format: uuid
-          example: 7562eb1e-fe02-41f6-911a-aa3a805a1e29
-        centralized:
-          type: boolean
-          description: If true, the ownership ledger is centralized
-          example: true
-        serialized:
-          type: boolean
-          description: If true, goods tracked on this ownership ledger are serialized.
-          example: true
-      description: Ownership Ledger Type
-    ProgramVersion:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Program code
-          example: GHG_MEASUREMENT_PROGRAM
-        version:
-          type: string
-          description: Version of Program.
-          example: 5.0.0
-        shortName:
-          type: string
-          description: Program short name
-          example: Carbon Measurement
-        protocolVersions:
-          type: array
-          description: A list of Protocols associated with Program.
-          items:
-            $ref: '#/components/schemas/NamedProtocolVersion'
-    Holdings:
-      required:
-      - value
-      type: object
-      properties:
-        '@count':
-          type: integer
-          description: The total number of results (only present if requested)
-          format: int32
-        value:
-          type: array
-          description: Rows of information
-          items:
-            $ref: '#/components/schemas/Holding'
-    LedgerHistory:
-      type: object
-      properties:
-        ledgerEntryType:
-          type: string
-          description: 'The ledger entry type: TRANSFERBATCH = Transfer Batch (includes both inter-account and subaccount transfers); RETIREMENTBATCH = Retirement Batch; ISSUANCE = Issuance; ENCUMBRANCEBATCH = Encumbrance Batch; INTERLEDGERTRANSFER = Inter-Ledger Transfer'
-          example: ISSUANCE
-        identifier:
-          type: string
-          description: The  system-assigned identifier for the ledger entry.
-          example: 3F06C260-5760-4DFA-BE70-407067D60704
-        statusCode:
-          type: string
-          description: The ledger entry's current status code.
-          example: ISSUED
-        createdAt:
-          type: string
-          description: Timestamp for when ledger entry was created
-          format: date-time
-        lastModifiedAt:
-          type: string
-          description: Timestamp for when ledger entry was last modified
-          format: date-time
-    LedgerHistoryList:
-      type: object
-      properties:
-        ledgerHistoryRecords:
-          type: array
-          description: A collection of ledger history entries.
-          items:
-            $ref: '#/components/schemas/LedgerHistory'
-    LedgerAccount:
-      type: object
-      properties:
-        account:
-          $ref: '#/components/schemas/Account'
-        privileges:
-          uniqueItems: true
-          type: array
-          description: A list of the Account's participation privileges on the specified ownership ledger.
-          items:
-            type: string
-    AbstractRestError:
-      type: object
-      properties:
-        code:
-          type: string
-        ticket:
-          type: string
-        message:
-          type: string
-    ErrorContainer:
-      type: object
-      properties:
-        submissionId:
-          type: string
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ErrorItem'
+      description: A reference datum data object
     Issuance:
       type: object
       properties:
@@ -660,7 +507,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Holding'
-    ReferenceDatum:
+    OwnershipLedgerType:
       required:
       - code
       type: object
@@ -671,57 +518,43 @@ components:
         name:
           type: string
           description: The reference data's name
-      description: A reference datum data object
-    OwnershipLedger:
-      type: object
-      properties:
-        ownershipLedgerIdentifier:
+        ownershipLedgerTypeIdentifier:
           type: string
-          description: The Ownership Ledger's system-assigned identifier for programmatic (API) interactions.
+          description: The ownership ledger type's system-assigned identifier.
           format: uuid
-          example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
-        marketplace:
-          $ref: '#/components/schemas/Marketplace'
-        code:
-          type: string
-          description: The ownership ledger's system code.
-          example: PLASTIC_WASTE_REDUCTION_PROGRAM
-        name:
-          type: string
-          description: Ownership ledger's name
-          example: Plastic Waste Reduction Offset Credit
-        description:
-          type: string
-          description: The ownership ledger's description, if applicable.
-        supportsSubaccounts:
+          example: 7562eb1e-fe02-41f6-911a-aa3a805a1e29
+        centralized:
           type: boolean
-          description: If "true", the ownership ledger supports sub-accounts.
+          description: If true, the ownership ledger is centralized
           example: true
-        shadowing:
+        serialized:
           type: boolean
-          description: If "true", the ownership ledger contains replicas of instruments held in an external ledger.
-          example: false
-        ownershipLedgerTypeDTO:
-          $ref: '#/components/schemas/OwnershipLedgerType'
-        supportsTransferBatchNotes:
-          type: boolean
-          description: This parameter is true when ownership ledger supports transfer batch notes
-        supportsTransferBatchPricing:
-          type: boolean
-          description: This parameter is true when ownership ledger supports transfer batch pricing
-      description: Ownership Ledger
-    IssuanceRetrieveByIdentifierRequest:
+          description: If true, goods tracked on this ownership ledger are serialized.
+          example: true
+      description: Ownership Ledger Type
+    LedgerHistory:
       type: object
       properties:
-        onBehalfOfSrcAcctId:
+        ledgerEntryType:
           type: string
-          description: If permitted, allows the caller to retrieve issuances on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
-        issuanceIdentifiers:
-          uniqueItems: true
-          type: array
-          description: Collection of issuance identifiers for the issuances to retrieve.
-          items:
-            type: string
+          description: 'The ledger entry type: TRANSFERBATCH = Transfer Batch (includes both inter-account and subaccount transfers); RETIREMENTBATCH = Retirement Batch; ISSUANCE = Issuance; ENCUMBRANCEBATCH = Encumbrance Batch; INTERLEDGERTRANSFER = Inter-Ledger Transfer'
+          example: ISSUANCE
+        identifier:
+          type: string
+          description: The  system-assigned identifier for the ledger entry.
+          example: 3F06C260-5760-4DFA-BE70-407067D60704
+        statusCode:
+          type: string
+          description: The ledger entry's current status code.
+          example: ISSUED
+        createdAt:
+          type: string
+          description: Timestamp for when ledger entry was created
+          format: date-time
+        lastModifiedAt:
+          type: string
+          description: Timestamp for when ledger entry was last modified
+          format: date-time
     NamedProtocolVersion:
       type: object
       properties:
@@ -748,44 +581,20 @@ components:
           type: string
           description: Protocol's short name
           example: AMS-I.D.
-    IssuanceRetrieveByIdentifierResponse:
+    Holdings:
+      required:
+      - value
       type: object
       properties:
-        issuances:
+        '@count':
+          type: integer
+          description: The total number of results (only present if requested)
+          format: int32
+        value:
           type: array
+          description: Rows of information
           items:
-            $ref: '#/components/schemas/Issuance'
-    ProtocolVersion:
-      type: object
-      properties:
-        code:
-          type: string
-          description: Protocol code
-          example: AMS-I.D.
-        version:
-          type: string
-          description: Version of Protocol
-          example: 1.0.0
-        effectiveAt:
-          type: string
-          description: Start date of the Protocol Version
-          format: date-time
-        expiresAt:
-          type: string
-          description: End date of the Protocol Version
-          format: date-time
-        issuing:
-          type: boolean
-          description: Issuing/Adorning flag
-    OwnershipLedgers:
-      type: object
-      properties:
-        ownershipLedgers:
-          type: array
-          description: A list of available ownership ledgers.
-          items:
-            $ref: '#/components/schemas/OwnershipLedger'
-      description: Ownership Ledgers
+            $ref: '#/components/schemas/Holding'
     Account:
       type: object
       properties:
@@ -802,21 +611,18 @@ components:
           description: The Account Operating Name on the registry.
           example: APXOPCAR Project Manager
       description: Account record
-    ErrorItem:
+    IssuanceRetrieveByIdentifierRequest:
       type: object
       properties:
-        parameter:
+        onBehalfOfSrcAcctId:
           type: string
-        correlationId:
-          type: string
-        path:
-          type: string
-        field:
-          type: string
-        code:
-          type: string
-        message:
-          type: string
+          description: If permitted, allows the caller to retrieve issuances on behalf of another account holder, identifying that account holder by their system-assigned srcAcctId.
+        issuanceIdentifiers:
+          uniqueItems: true
+          type: array
+          description: Collection of issuance identifiers for the issuances to retrieve.
+          items:
+            type: string
     Holding:
       type: object
       properties:
@@ -919,3 +725,197 @@ components:
           description: Identifier for grouped holdings in transfer operations, if applicable.
         certificateType:
           $ref: '#/components/schemas/ReferenceDatum'
+    ProgramVersion:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Program code
+          example: GHG_MEASUREMENT_PROGRAM
+        version:
+          type: string
+          description: Version of Program.
+          example: 5.0.0
+        shortName:
+          type: string
+          description: Program short name
+          example: Carbon Measurement
+        protocolVersions:
+          type: array
+          description: A list of Protocols associated with Program.
+          items:
+            $ref: '#/components/schemas/NamedProtocolVersion'
+    ErrorItem:
+      type: object
+      properties:
+        parameter:
+          type: string
+        correlationId:
+          type: string
+        path:
+          type: string
+        field:
+          type: string
+        code:
+          type: string
+        message:
+          type: string
+    IssuanceRetrieveByIdentifierResponse:
+      type: object
+      properties:
+        issuances:
+          type: array
+          items:
+            $ref: '#/components/schemas/Issuance'
+    OwnershipLedgers:
+      type: object
+      properties:
+        ownershipLedgers:
+          type: array
+          description: A list of available ownership ledgers.
+          items:
+            $ref: '#/components/schemas/OwnershipLedger'
+      description: Ownership Ledgers
+    GeneralError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
+    LedgerHistoryList:
+      type: object
+      properties:
+        ledgerHistoryRecords:
+          type: array
+          description: A collection of ledger history entries.
+          items:
+            $ref: '#/components/schemas/LedgerHistory'
+    ProtocolVersion:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Protocol code
+          example: AMS-I.D.
+        version:
+          type: string
+          description: Version of Protocol
+          example: 1.0.0
+        effectiveAt:
+          type: string
+          description: Start date of the Protocol Version
+          format: date-time
+        expiresAt:
+          type: string
+          description: End date of the Protocol Version
+          format: date-time
+        issuing:
+          type: boolean
+          description: Issuing/Adorning flag
+    LedgerAccounts:
+      type: object
+      properties:
+        ledgerAccounts:
+          type: array
+          description: A list of accounts related to the specified ownership ledger.
+          items:
+            $ref: '#/components/schemas/LedgerAccount'
+    AbstractRestError:
+      type: object
+      properties:
+        code:
+          type: string
+        ticket:
+          type: string
+        message:
+          type: string
+    ErrorContainer:
+      type: object
+      properties:
+        submissionId:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorItem'
+    Marketplace:
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: The reference data's value.
+        name:
+          type: string
+          description: The reference data's name
+        marketplaceIdentifier:
+          type: string
+          description: The Marketplace's system-assigned identifier.
+          format: uuid
+          example: 732f1eaf-66db-44fa-aba8-036d184ae8e9
+        transactionsRequireContract:
+          type: boolean
+          description: If true, transactions in this marketplace must be associated with a contract
+          example: false
+        timeZone:
+          type: string
+          description: The marketplace's Internet Assigned Numbers Authority (IANA) time zone
+          example: America/New_York
+        requireTransactionProductLotSelection:
+          type: boolean
+          description: If true, the entry of a transaction associated with this marketplace will require the explicit quantified selection of product lots
+          example: false
+      description: A marketplace data object
+    OwnershipLedger:
+      type: object
+      properties:
+        ownershipLedgerIdentifier:
+          type: string
+          description: The Ownership Ledger's system-assigned identifier for programmatic (API) interactions.
+          format: uuid
+          example: 4b7375e9-79b0-4b8b-a89e-a21607f0239f
+        marketplace:
+          $ref: '#/components/schemas/Marketplace'
+        code:
+          type: string
+          description: The ownership ledger's system code.
+          example: PLASTIC_WASTE_REDUCTION_PROGRAM
+        name:
+          type: string
+          description: Ownership ledger's name
+          example: Plastic Waste Reduction Offset Credit
+        description:
+          type: string
+          description: The ownership ledger's description, if applicable.
+        supportsSubaccounts:
+          type: boolean
+          description: If "true", the ownership ledger supports sub-accounts.
+          example: true
+        shadowing:
+          type: boolean
+          description: If "true", the ownership ledger contains replicas of instruments held in an external ledger.
+          example: false
+        ownershipLedgerTypeDTO:
+          $ref: '#/components/schemas/OwnershipLedgerType'
+        supportsTransferBatchNotes:
+          type: boolean
+          description: This parameter is true when ownership ledger supports transfer batch notes
+        supportsTransferBatchPricing:
+          type: boolean
+          description: This parameter is true when ownership ledger supports transfer batch pricing
+      description: Ownership Ledger
+    LedgerAccount:
+      type: object
+      properties:
+        account:
+          $ref: '#/components/schemas/Account'
+        privileges:
+          uniqueItems: true
+          type: array
+          description: A list of the Account's participation privileges on the specified ownership ledger.
+          items:
+            type: string
