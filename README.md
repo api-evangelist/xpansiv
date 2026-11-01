@@ -64,46 +64,171 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Xpansiv is market infrastructure for global environmental and energy commodities — carbon
-credits, renewable energy certificates, water, low-carbon fuels and recycled materials. It
-operates CBL, the largest spot exchange for environmental commodities, the Evolution
-Markets and OTX execution desks, the H2OX water market, and the environmental registries it
-acquired with APX in 2022 (NAR, TIGR, I-REC, I-TRACK-G and the digital fuels registries).
+Xpansiv is market infrastructure for global environmental and energy commodities — carbon credits, renewable energy certificates, water, low-carbon fuels and recycled materials. It operates CBL, the largest spot exchange for environmental commodities, the Evolution Markets and OTX brokerage and execution desks, the H2OX water market and the ACE and JSEV carbon platforms, alongside the environmental registries it acquired with APX in 2022 — NAR (North American Renewables Registry), TIGR, I-REC, I-TRACK-G and the Xpansiv-powered digital fuels registries. Its public developer portal at developer.xpansiv.com publishes eleven OpenAPI descriptions across Xpansiv Connect (environmental commodity portfolio, retirement and transfer), Xpansiv Managed Solutions, the NAR and TIGR registry client APIs, the Optimal Outcomes suite and the APX Power Markets file registry, plus a FIX 4.4 marketplace protocol specification, Xpansiv Data market-data APIs and a first-party Python SDK.
 
-## What this profile found
+**Areas:** Company · Environmental Commodities · Carbon Markets · Renewable Energy Certificates · Registries · Market Data · Trading · Energy · Sustainability · Climate
 
-Xpansiv publishes a substantial, machine-readable API surface at
-[developer.xpansiv.com](https://developer.xpansiv.com/) — a Redocly portal that also serves
-an `llms.txt` and a live remote MCP server.
+## Xpansiv on APIs.io
 
-- **11 OpenAPI descriptions, 110 operations, 492 schemas** — harvested verbatim to
-  `openapi/_original/`. Xpansiv Connect (28 ops), Xpansiv Managed Solutions (29), the
-  Optimal Outcomes suite (32 across six services), the NAR (9) and TIGRS (5) registry client
-  APIs, and the APX Power Markets file registry (7).
-- **A FIX 4.4 marketplace protocol specification** — CBL order entry and real-time market
-  data are FIX, not REST, and Xpansiv publishes its full rules of engagement.
-- **A live remote MCP server** at `https://developer.xpansiv.com/mcp`, answering
-  `tools/list` anonymously with 7 tools. It is a *documentation* server: none of its tools
-  binds to any of the 110 business operations (see `mcp/xpansiv-tool-crosswalk.yml`).
-- **One first-party SDK** — `xpansiv-data` on PyPI, v1.0.2.post1, published 2026-03-12.
-- **Four separate credential systems** behind one `Authorization: Bearer` header, with no
-  token accepted across families — a direct consequence of growth by acquisition.
+Everything profiled for Xpansiv is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/xpansiv/](https://apis.io/providers/xpansiv/)** — or go straight to one of the APIs or properties below.
 
-Three gaps are worth naming because they carry real risk on a catalog that moves and cancels
-financial instruments: **no idempotency key exists on any of the 110 operations**,
-**retirements are irreversible** with no cancel or restore path anywhere, and **no rate
-limit is published** despite 429 being declared on 15 operations. The `conventions/`,
-`errors/` and `rate-limits/` artifacts record each with evidence.
+### APIs (43)
 
-Xpansiv publishes no status page, no changelog, no security.txt, no trust center and no
-public pricing.
+- [Xpansiv Data API](https://apis.io/apis/xpansiv/xpansiv-data/) — Real-time, end-of-day and historical transaction-based market data for environmental and energy commodities, sourced from CBL and global intermediaries…
+- [Xpansiv Marketplace FIX API](https://apis.io/apis/xpansiv/xpansiv-marketplace-fix/) — The Xpansiv Marketplace Server API for retrieving real-time market data and executing and managing orders on CBL, published as rules of engagement against…
+- [Xpansiv Account API](https://apis.io/apis/xpansiv/xpansiv-account-api/) — Account Information
+- [Xpansiv Building types API](https://apis.io/apis/xpansiv/xpansiv-building-types-api/) — Building types
+- [Xpansiv Clean Transportation API](https://apis.io/apis/xpansiv/xpansiv-clean-transportation-api/) — Clean Transportation
+- [Xpansiv Corporate Entity API](https://apis.io/apis/xpansiv/xpansiv-corporateentity-api/) — Corporate Entities Operations
+- [Xpansiv Exchange API](https://apis.io/apis/xpansiv/xpansiv-exchange-api/) — The Exchange APIs allow users to take various actions, both read and write, for their interactions with execution venues, such as the CBL platform. The…
+- [Xpansiv Facilities API](https://apis.io/apis/xpansiv/xpansiv-facilities-api/) — Facilities
+- [Xpansiv Facility import error handling API](https://apis.io/apis/xpansiv/xpansiv-facility-import-error-handling-api/) — Facility import error handling
+- [Xpansiv File Type V1 API](https://apis.io/apis/xpansiv/xpansiv-file-type-v1-api/) — View, update or upload a file
+- [Xpansiv /file Registry API](https://apis.io/apis/xpansiv/xpansiv-fileregistry-api/) — the File Registry REST API
+- [Xpansiv Forward Deals API](https://apis.io/apis/xpansiv/xpansiv-forward-deals-api/) — The Forward Deals API allows the user to search The Forward Deals associated with their Xpansiv Connect account and/or other Xpansiv Connect accounts that…
+- [Xpansiv Generators API](https://apis.io/apis/xpansiv/xpansiv-generators-api/) — The Generators API from Xpansiv — 1 operation(s) for generators.
+- [Xpansiv Instruments API](https://apis.io/apis/xpansiv/xpansiv-instruments-api/) — The Instruments API from Xpansiv — 1 operation(s) for instruments.
+- [Xpansiv Issuances API](https://apis.io/apis/xpansiv/xpansiv-issuances-api/) — The Issuance API allows the user to pull information on any Issuances associated with their account, or permissioned account, for the various registries…
+- [Xpansiv Ledger API](https://apis.io/apis/xpansiv/xpansiv-ledger-api/) — Ledger Operations
+- [Xpansiv Ledger V1 API](https://apis.io/apis/xpansiv/xpansiv-ledger-v1-api/) — View an Account's current and historical instrument details
+- [Xpansiv Market API](https://apis.io/apis/xpansiv/xpansiv-market-api/) — Market
+- [Xpansiv Meter Reading V1 API](https://apis.io/apis/xpansiv/xpansiv-meter-reading-v1-api/) — View or submit measurement data. Measurement data includes, but it is not limited to, telemetry data, emission records, verification records, etc.
+- [Xpansiv Meter Readings API](https://apis.io/apis/xpansiv/xpansiv-meter-readings-api/) — Meter Readings
+- [Xpansiv Portfolio API](https://apis.io/apis/xpansiv/xpansiv-portfolio-api/) — The Portfolio API allows the user to search their credit inventory (tax lot) data on active positions across all registry accounts linked to their Xpansiv…
+- [Xpansiv Projects API](https://apis.io/apis/xpansiv/xpansiv-projects-api/) — The Project API allows the user to pull publicly available information about carbon projects registered in the registries that are integrated with Xpansiv…
+- [Xpansiv Qualified reporting entities API](https://apis.io/apis/xpansiv/xpansiv-qualified-reporting-entities-api/) — Qualified reporting entities
+- [Xpansiv Remote data collectors API](https://apis.io/apis/xpansiv/xpansiv-remote-data-collectors-api/) — Remote data collectors
+- [Xpansiv Report Issuance V1 API](https://apis.io/apis/xpansiv/xpansiv-report-issuance-v1-api/) — Issuance Reports
+- [Xpansiv Report Resource V1 API](https://apis.io/apis/xpansiv/xpansiv-report-resource-v1-api/) — Resource Reports
+- [Xpansiv /reporting API](https://apis.io/apis/xpansiv/xpansiv-reporting-api/) — the Reporting REST API
+- [Xpansiv Reports API](https://apis.io/apis/xpansiv/xpansiv-reports-api/) — The Reports API allows the user to retrieve a comprehensive credit inventory (aka Tax Lot by Program Report) on all active positions with a single call…
+- [Xpansiv Resource V1 API](https://apis.io/apis/xpansiv/xpansiv-resource-v1-api/) — View, update or create a Resource.
+- [Xpansiv Retirementbatch V1 API](https://apis.io/apis/xpansiv/xpansiv-retirementbatch-v1-api/) — View or submit a retirement request, or redemption claim, on instrument(s).
+- [Xpansiv Retirements API](https://apis.io/apis/xpansiv/xpansiv-retirements-api/) — The Retirements APIs allow users to take various actions, both read and write, for their retirement activity. The Create Retirements API allows users of…
+- [Xpansiv Split Lots API](https://apis.io/apis/xpansiv/xpansiv-split-lots-api/) — The Split Lots API allows the user to search split lot data on their Xpansiv Connect account and/or other Xpansiv Connect accounts that have granted your…
+- [Xpansiv Subaccount V1 API](https://apis.io/apis/xpansiv/xpansiv-subaccount-v1-api/) — View or create subaccounts. Use subaccounts to organize your account’s instruments. All accounts have a "Default" subaccount, where all new issuances and…
+- [Xpansiv System API](https://apis.io/apis/xpansiv/xpansiv-system-api/) — System Information
+- [Xpansiv System V1 API](https://apis.io/apis/xpansiv/xpansiv-system-v1-api/) — Check the API system health.
+- [Xpansiv Transactions API](https://apis.io/apis/xpansiv/xpansiv-transactions-api/) — Transactions
+- [Xpansiv Transferbatch V1 API](https://apis.io/apis/xpansiv/xpansiv-transferbatch-v1-api/) — Initiate a transfer request (between subaccounts or another account holder), view or act upon pending transfers, as well as view historical transfer details.
+- [Xpansiv Transfers API](https://apis.io/apis/xpansiv/xpansiv-transfers-api/) — The Transfers APIs allow users to take various actions, both read and write, for their bilateral transaction activity. The Search Transfers API allows the…
+- [Xpansiv Usage Point Identifier V1 API](https://apis.io/apis/xpansiv/xpansiv-usage-point-identifier-v1-api/) — Retrieve usage point identifiers for resources (projects, facilities, etc.) for which measurement readings may be submitted
+- [Xpansiv Utilities API](https://apis.io/apis/xpansiv/xpansiv-utilities-api/) — Utilities
+- [Xpansiv Account Holders API](https://apis.io/apis/xpansiv/xpansiv-account-holders-api/) — The Account Holders API from Xpansiv — 1 operation(s) for account holders.
+- [Xpansiv Reference Data API](https://apis.io/apis/xpansiv/xpansiv-reference-data-api/) — The Reference Data API enables discovering Xpansiv Connect reference data types and values.
+- [Xpansiv Sub Account API](https://apis.io/apis/xpansiv/xpansiv-sub-account-api/) — Subaccount Operations
 
-## Artifacts
+### Published properties
 
-`openapi/` · `overlays/` · `mcp/` · `llms/` · `well-known/` · `packages/` ·
-`authentication/` · `scopes/` · `conventions/` · `errors/` · `conformance/` · `lifecycle/` ·
-`data-model/` · `rate-limits/` · `plans/` · `sandbox/` · `security/` · `skills/`
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-- Website: https://www.xpansiv.com/
-- Developer portal: https://developer.xpansiv.com/
-- Support: https://support.xpansiv.com/
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [Xpansiv Developer Portal MCP Server](https://apis.io/servers/xpansiv/xpansiv-developer-portal-mcp-server/)
+
+#### Overlays (6)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Xpansiv Apx Power Markets File Registry Overlay](https://apis.io/overlays/xpansiv/xpansiv-apx-power-markets-file-registry-overlay/)
+- [Xpansiv Connect Overlay](https://apis.io/overlays/xpansiv/xpansiv-connect-overlay/)
+- [Xpansiv Managed Solutions Overlay](https://apis.io/overlays/xpansiv/xpansiv-managed-solutions-overlay/)
+- [Xpansiv Nar Registry Client Overlay](https://apis.io/overlays/xpansiv/xpansiv-nar-registry-client-overlay/)
+- [Xpansiv Optimal Transfer Position Overlay](https://apis.io/overlays/xpansiv/xpansiv-optimal-transfer-position-overlay/)
+- [Xpansiv Tigr Registry Client Overlay](https://apis.io/overlays/xpansiv/xpansiv-tigr-registry-client-overlay/)
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Xpansiv Authentication](https://apis.io/security/xpansiv/xpansiv-authentication/)
+- [Xpansiv Domain Security](https://apis.io/security/xpansiv/xpansiv-domain-security/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Xpansiv Scopes](https://apis.io/scopes/xpansiv/xpansiv-scopes/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Xpansiv Plans Pricing](https://apis.io/plans/xpansiv/xpansiv-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Xpansiv Rate Limits](https://apis.io/rate-limits/xpansiv/xpansiv-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.xpansiv.com/)
+- [Documentation](https://developer.xpansiv.com/developer-portal)
+- [Getting started](https://developer.xpansiv.com/developer-portal/xpansiv-connect/getting-started)
+- [API reference](https://developer.xpansiv.com/developer-portal)
+- [Sign up](https://connect.xpansiv.com/app/login/)
+- [Support](https://support.xpansiv.com/)
+- [Blog](https://www.xpansiv.com/blog)
+- [Terms of service](https://www.xpansiv.com/general-terms-of-use)
+- [Privacy policy](https://www.xpansiv.com/privacy-policy)
+
+## API Evangelist rating
+
+**Kin Score 48.1** — developing · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 80.0 |
+| Contract quality | 51.3 |
+| Contract governance | 18.2 |
+| Operational transparency | 0.0 |
+| Developer ergonomics | 78.0 |
+| Access clarity | 21.1 |
+
+**Agent readiness 54.5** — agent-ready (gated down from agent-native)
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | documented (partial credit) |
+| MCP Server | verified |
+| Auth Clarity | served (partial credit) |
+| Idempotency | — |
+| Error Semantics | verified |
+| OpenAPI Examples | partial |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | yes |
+| Delegated Identity | served (partial credit) |
+| Protected Resource Metadata | verified |
+| Dynamic Client Registration | yes |
+| Agentic Commerce | — |
+| Pagination Ratio | — |
+| Operation Distinctiveness | mostly (partial credit) |
+
+**Regulatory alignment 34.4** — Energy & Utilities
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/xpansiv/](https://apis.io/providers/xpansiv/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Xpansiv: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/xpansiv/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
